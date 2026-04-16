@@ -2,6 +2,10 @@ import Head from "next/head";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
+import { useWeb3 } from "@/context/Web3Context";
+import { ethers } from "ethers";
+
+const CLAIM_ABI = ["function claimEarnings() external", "function pendingEarnings(address) external view returns (uint256)"];
 
 const DonutChart = ({ pct }: { pct: number }) => {
   const r = 70, cx = 100, cy = 100, circ = 2 * Math.PI * r;
@@ -45,10 +49,21 @@ const DonutChart = ({ pct }: { pct: number }) => {
 
 export default function Revenue() {
   const { user } = useAuth();
+  const { signer, isConnected, address } = useWeb3();
   const [shares, setShares] = useState<any[]>([]);
   const [unclaimed, setUnclaimed] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [claiming, setClaiming] = useState(false);
+  const [onChainEarnings, setOnChainEarnings] = useState("0");
+
+  // Fetch on-chain pending earnings
+  useEffect(() => {
+    if (!signer || !address) return;
+    const contractAddr = process.env.NEXT_PUBLIC_PAYMENTS_CONTRACT;
+    if (!contractAddr) return;
+    const c = new ethers.Contract(contractAddr, CLAIM_ABI, signer);
+    c.pendingEarnings(address).then((v: bigint) => setOnChainEarnings(ethers.formatEther(v))).catch(() => {});
+  }, [signer, address]);
 
   const fetchRevenue = async () => {
     if (!user) return;
@@ -67,15 +82,26 @@ export default function Revenue() {
   const sharePct = totalPool > 0 ? (yourShare / totalPool) * 100 : 22.8;
 
   const handleClaim = async () => {
-    if (!user || unclaimedAmt <= 0) return;
+    if (!user) return;
     setClaiming(true);
-    const { error } = await supabase.from('revenue_shares').update({ claimed: true }).eq('user_id', user.id).eq('claimed', false);
-    if (!error) {
-      const { data: profile } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
-      await supabase.from('profiles').update({ balance: (profile?.balance || 0) + unclaimedAmt }).eq('id', user.id);
-      fetchRevenue();
-    }
-    setClaiming(false);
+    try {
+      // On-chain claim if wallet connected
+      if (isConnected && signer && process.env.NEXT_PUBLIC_PAYMENTS_CONTRACT) {
+        const c = new ethers.Contract(process.env.NEXT_PUBLIC_PAYMENTS_CONTRACT, CLAIM_ABI, signer);
+        const tx = await c.claimEarnings();
+        await tx.wait();
+        setOnChainEarnings("0");
+      }
+      // Mark Supabase records claimed
+      if (unclaimedAmt > 0) {
+        await supabase.from('revenue_shares').update({ claimed: true }).eq('user_id', user.id).eq('claimed', false);
+        const { data: profile } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
+        await supabase.from('profiles').update({ balance: (profile?.balance || 0) + unclaimedAmt }).eq('id', user.id);
+        fetchRevenue();
+      }
+    } catch (e: any) {
+      alert(`Claim failed: ${e.message}`);
+    } finally { setClaiming(false); }
   };
 
   const nextPayout = new Date(); nextPayout.setDate(nextPayout.getDate() + 7);
@@ -114,9 +140,9 @@ export default function Revenue() {
               <div className="text-center">
                 <p className="text-sm text-gray-500 mb-2">Available to claim</p>
                 <p className="text-3xl font-bold text-gray-800 mb-4">${unclaimedAmt.toFixed(2)}</p>
-                <button onClick={handleClaim} disabled={claiming}
+                <button onClick={handleClaim} disabled={claiming || (unclaimedAmt <= 0 && onChainEarnings === "0")}
                   className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-50">
-                  {claiming ? 'Claiming...' : 'Claim Now'}
+                  {claiming ? 'Claiming...' : `Claim Now${onChainEarnings !== "0" ? ` (${onChainEarnings} A0GI on-chain)` : ''}`}
                 </button>
               </div>
             )}

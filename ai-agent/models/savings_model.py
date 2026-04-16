@@ -4,7 +4,9 @@ import tensorflow as tf
 from tensorflow.keras import layers
 
 class SavingsModel:
-    def __init__(self, model_path='ai-agent/models/tf_savings_model.keras'):
+    def __init__(self, model_path=None):
+        if model_path is None:
+            model_path = os.path.join(os.path.dirname(__file__), 'tf_savings_model.keras')
         self.model_path = model_path
         if os.path.exists(self.model_path):
             self.model = tf.keras.models.load_model(self.model_path)

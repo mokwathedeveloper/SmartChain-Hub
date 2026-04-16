@@ -8,7 +8,7 @@ interface LayoutProps {
   children: ReactNode;
 }
 
-const APP_ROUTES = ['/dashboard', '/transactions', '/console', '/history', '/revenue', '/profile'];
+const APP_ROUTES = ['/dashboard', '/transactions', '/payments', '/onramp', '/console', '/history', '/revenue', '/profile'];
 const AUTH_ROUTES = ['/login', '/signup'];
 
 const Layout = ({ children }: LayoutProps) => {

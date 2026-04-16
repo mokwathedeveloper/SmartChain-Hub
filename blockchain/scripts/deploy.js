@@ -31,7 +31,14 @@ async function main() {
   console.log(`SmartChainRevenue:     ${revAddr}`);
   if (explorer) console.log(`  → ${explorer}/${revAddr}`);
 
-  console.log(`\nUpdate .env.local:\n  NEXT_PUBLIC_CONTRACT_ADDRESS=${txAddr}\n  NEXT_PUBLIC_CHAIN=${network}`);
+  const Pay = await hre.ethers.getContractFactory("SmartChainPayments");
+  const pay = await Pay.deploy();
+  await pay.waitForDeployment();
+  const payAddr = await pay.getAddress();
+  console.log(`SmartChainPayments:    ${payAddr}`);
+  if (explorer) console.log(`  → ${explorer}/${payAddr}`);
+
+  console.log(`\nUpdate .env.local:\n  NEXT_PUBLIC_CONTRACT_ADDRESS=${txAddr}\n  NEXT_PUBLIC_PAYMENTS_CONTRACT=${payAddr}\n  NEXT_PUBLIC_CHAIN=${network}`);
 }
 
 main().catch((e) => { console.error(e); process.exitCode = 1; });

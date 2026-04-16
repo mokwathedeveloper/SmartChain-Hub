@@ -21,9 +21,9 @@ contract SmartChainRevenue is Ownable, ReentrancyGuard {
 
     /**
      * @dev Distributes revenue to a stakeholder. 
-     * In production, this would be triggered by the transaction validation contract.
+     * Added nonReentrant for security.
      */
-    function distributeRevenue(address _stakeholder, uint256 _totalFee) external onlyOwner {
+    function distributeRevenue(address _stakeholder, uint256 _totalFee) external onlyOwner nonReentrant {
         uint256 share = (_totalFee * SHARE_PERCENTAGE) / 100;
         pendingEarnings[_stakeholder] += share;
         totalDistributed += share;
@@ -33,6 +33,7 @@ contract SmartChainRevenue is Ownable, ReentrancyGuard {
 
     /**
      * @dev Allows stakeholders to claim their accumulated earnings.
+     * nonReentrant ensures protection against reentrancy attacks during transfer.
      */
     function claimEarnings() external nonReentrant {
         uint256 amount = pendingEarnings[msg.sender];
@@ -40,7 +41,6 @@ contract SmartChainRevenue is Ownable, ReentrancyGuard {
 
         pendingEarnings[msg.sender] = 0;
         
-        // In a real implementation on 0G, this would transfer actual tokens
         (bool success, ) = msg.sender.call{value: amount}("");
         require(success, "Transfer failed");
 

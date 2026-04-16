@@ -27,8 +27,13 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
         setProvider(browserProvider);
         setSigner(signerInstance);
         setAddress(accounts[0]);
-      } catch (error) {
-        console.error("User denied wallet connection:", error);
+      } catch (error: any) {
+        if (error.code === 4001) {
+          alert("Connection request was rejected. Please approve the connection in MetaMask to use on-chain features.");
+        } else {
+          console.error("Wallet connection error:", error);
+          alert("An error occurred while connecting your wallet. Please try again.");
+        }
       }
     } else {
       alert("Please install MetaMask or a compatible 0G wallet!");

@@ -60,12 +60,11 @@ export default function Contact() {
               )}
             </div>
 
-            {/* Right: Contact info + map */}
-            <div className="space-y-6">
-              {/* Contact details */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            {/* Right: Contact info + map in one card */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="p-6">
                 <h2 className="text-base font-bold text-gray-800 mb-5">Contact Information</h2>
-                <div className="space-y-4">
+                <div className="space-y-4 mb-6">
                   {[
                     { icon: "✉️", label: "Email", value: "support@smartchainhub.io" },
                     { icon: "💬", label: "Discord", value: "discord.gg/smartchain" },
@@ -82,25 +81,19 @@ export default function Contact() {
                   ))}
                 </div>
               </div>
-
-              {/* Map placeholder */}
-              <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-                <div className="bg-gradient-to-br from-blue-100 to-indigo-200 h-52 flex items-center justify-center relative">
-                  <svg viewBox="0 0 400 200" className="w-full h-full opacity-60">
-                    {/* Map-like grid */}
-                    {[0,1,2,3,4].map(i => <line key={`h${i}`} x1="0" y1={i*50} x2="400" y2={i*50} stroke="#818CF8" strokeWidth="0.5" opacity="0.4"/>)}
-                    {[0,1,2,3,4,5,6,7,8].map(i => <line key={`v${i}`} x1={i*50} y1="0" x2={i*50} y2="200" stroke="#818CF8" strokeWidth="0.5" opacity="0.4"/>)}
-                    {/* Roads */}
-                    <path d="M0,100 Q100,80 200,100 Q300,120 400,100" stroke="#818CF8" strokeWidth="3" fill="none" opacity="0.6"/>
-                    <path d="M200,0 Q180,100 200,200" stroke="#818CF8" strokeWidth="3" fill="none" opacity="0.6"/>
-                    {/* Location pin */}
-                    <circle cx="200" cy="100" r="12" fill="#3B82F6" opacity="0.9"/>
-                    <circle cx="200" cy="100" r="5" fill="white"/>
-                    <circle cx="200" cy="100" r="25" fill="#3B82F6" opacity="0.2"/>
-                  </svg>
-                  <div className="absolute bottom-3 left-3 bg-white rounded-lg px-3 py-1.5 shadow text-xs font-semibold text-gray-700">
-                    📍 SmartChain Hub HQ
-                  </div>
+              {/* Map */}
+              <div className="bg-gradient-to-br from-blue-100 to-indigo-200 h-52 relative">
+                <svg viewBox="0 0 400 200" className="w-full h-full opacity-60">
+                  {[0,1,2,3,4].map(i => <line key={`h${i}`} x1="0" y1={i*50} x2="400" y2={i*50} stroke="#818CF8" strokeWidth="0.5" opacity="0.4"/>)}
+                  {[0,1,2,3,4,5,6,7,8].map(i => <line key={`v${i}`} x1={i*50} y1="0" x2={i*50} y2="200" stroke="#818CF8" strokeWidth="0.5" opacity="0.4"/>)}
+                  <path d="M0,100 Q100,80 200,100 Q300,120 400,100" stroke="#818CF8" strokeWidth="3" fill="none" opacity="0.6"/>
+                  <path d="M200,0 Q180,100 200,200" stroke="#818CF8" strokeWidth="3" fill="none" opacity="0.6"/>
+                  <circle cx="200" cy="100" r="12" fill="#3B82F6" opacity="0.9"/>
+                  <circle cx="200" cy="100" r="5" fill="white"/>
+                  <circle cx="200" cy="100" r="25" fill="#3B82F6" opacity="0.2"/>
+                </svg>
+                <div className="absolute bottom-3 left-3 bg-white rounded-lg px-3 py-1.5 shadow text-xs font-semibold text-gray-700">
+                  📍 SmartChain Hub HQ
                 </div>
               </div>
             </div>

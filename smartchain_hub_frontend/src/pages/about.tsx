@@ -49,6 +49,30 @@ export default function About() {
               ))}
             </div>
           </div>
+        <section className="py-24 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4 tracking-tight">Meet the Architects</h2>
+              <p className="text-lg text-gray-600">The team behind the intelligent commerce revolution.</p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[
+                { name: "Alex Rivet", role: "AI Research Lead", icon: "👨‍🔬" },
+                { name: "Sarah Chen", role: "Blockchain Architect", icon: "👩‍💻" },
+                { name: "Marcus Thorne", role: "Full Stack Engineer", icon: "👨‍💻" },
+                { name: "Elena Voss", role: "UX Designer", icon: "👩‍🎨" }
+              ].map((member) => (
+                <div key={member.name} className="p-8 bg-white rounded-[2rem] border border-gray-100 shadow-sm text-center hover:shadow-xl transition-all">
+                  <div className="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6">
+                    {member.icon}
+                  </div>
+                  <h3 className="font-bold text-gray-900 text-xl mb-1">{member.name}</h3>
+                  <p className="text-blue-600 font-semibold text-sm">{member.role}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
       </div>
     </>

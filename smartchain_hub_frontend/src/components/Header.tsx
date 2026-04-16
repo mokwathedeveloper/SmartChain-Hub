@@ -4,11 +4,15 @@ import { supabase } from '@/utils/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { useWeb3 } from '@/context/Web3Context';
 
-const Header = () => {
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
+
+const Header = ({ onMenuClick }: HeaderProps) => {
   const router = useRouter();
   const { user } = useAuth(false);
   const { address, isConnected, connectWallet, disconnectWallet } = useWeb3();
-  const isApp = router.pathname.startsWith('/dashboard') || router.pathname.startsWith('/features') || router.pathname.startsWith('/profile');
+  const isApp = ['/dashboard', '/features', '/history', '/revenue', '/profile'].includes(router.pathname);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -16,80 +20,71 @@ const Header = () => {
   };
 
   return (
-    <header className="flex items-center justify-between bg-blue-900 text-white p-4 shadow-lg sticky top-0 z-50 backdrop-blur-md bg-blue-900/90">
-      <div className="text-2xl font-bold">
-        <Link href="/" className="hover:text-blue-300 transition-colors flex items-center">
-          <span className="bg-green-500 w-8 h-8 rounded-lg mr-2 flex items-center justify-center text-white text-xl">S</span>
-          SmartChain Hub
-        </Link>
-      </div>
-      <nav className="hidden md:flex items-center space-x-8">
-        {!user ? (
-          <>
-            <Link href="/features" className="hover:text-blue-300 transition-colors">Features</Link>
-            <Link href="/about" className="hover:text-blue-300 transition-colors">About</Link>
-            <Link href="/contact" className="hover:text-blue-300 transition-colors">Contact</Link>
-            <Link href="/login" className="hover:text-blue-300 transition-colors font-semibold">Login</Link>
-            <Link href="/signup" className="px-5 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg transition-all shadow-md">
+    <header className={`flex items-center justify-between p-4 ${isApp ? 'bg-transparent' : 'bg-white/80 sticky top-0 z-50 backdrop-blur-md border-b border-gray-100'}`}>
+      {!isApp ? (
+        <>
+          <div className="text-2xl font-bold">
+            <Link href="/" className="hover:text-electric-purple transition-colors flex items-center">
+              <span className="bg-electric-purple w-8 h-8 rounded-lg mr-2 flex items-center justify-center text-white text-xl shadow-lg shadow-electric-purple/20">S</span>
+              <span className="text-deep-blue tracking-tighter">SmartChain Hub</span>
+            </Link>
+          </div>
+          <nav className="hidden md:flex items-center space-x-8">
+            <Link href="/features" className="text-gray-500 hover:text-electric-purple font-bold text-sm transition-colors">Features</Link>
+            <Link href="/about" className="text-gray-500 hover:text-electric-purple font-bold text-sm transition-colors">About</Link>
+            <Link href="/contact" className="text-gray-500 hover:text-electric-purple font-bold text-sm transition-colors">Contact</Link>
+            <Link href="/login" className="text-gray-500 hover:text-electric-purple font-bold text-sm transition-colors">Login</Link>
+            <Link href="/signup" className="px-6 py-2.5 bg-deep-blue hover:bg-black text-white font-bold rounded-xl transition-all shadow-xl shadow-deep-blue/10">
               Get Started
             </Link>
-          </>
-        ) : (
-          <>
-            <Link href="/dashboard" className={`hover:text-blue-300 transition-colors ${router.pathname === '/dashboard' ? 'text-green-400' : ''}`}>Dashboard</Link>
-            <Link href="/features" className={`hover:text-blue-300 transition-colors ${router.pathname === '/features' ? 'text-green-400' : ''}`}>Optimization</Link>
+          </nav>
+        </>
+      ) : (
+        <>
+          <div className="flex items-center space-x-4">
+             <button 
+               onClick={onMenuClick}
+               className="lg:hidden p-2 bg-white border border-gray-100 rounded-xl shadow-sm text-deep-blue"
+             >
+               ☰
+             </button>
+             <h1 className="text-xl font-black text-deep-blue capitalize hidden sm:block">
+               {router.pathname.replace('/', '') || 'Dashboard'}
+             </h1>
+          </div>
+          <div className="flex items-center space-x-4">
+            <button className="w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center text-lg shadow-sm hover:bg-gray-50 transition-all relative">
+              🔔
+              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+            </button>
             
-            {/* Wallet Connection */}
             {!isConnected ? (
               <button 
                 onClick={connectWallet}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-md border border-blue-500 flex items-center"
+                className="px-4 py-2 bg-white border border-gray-100 text-deep-blue text-xs font-bold rounded-xl transition-all shadow-sm hover:bg-gray-50 flex items-center"
               >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                </svg>
                 Connect Wallet
               </button>
             ) : (
-              <div className="group relative">
-                <button className="px-4 py-2 bg-green-500/20 text-green-400 text-xs font-mono font-bold rounded-xl border border-green-500/30">
-                  {address?.slice(0, 6)}...{address?.slice(-4)}
-                </button>
-                <button 
-                  onClick={disconnectWallet}
-                  className="absolute top-full right-0 mt-2 hidden group-hover:block bg-red-600 text-white text-[10px] px-2 py-1 rounded shadow-lg"
-                >
-                  Disconnect
-                </button>
-              </div>
+              <button className="px-4 py-2 bg-green-500/10 text-green-600 text-xs font-mono font-bold rounded-xl border border-green-500/20">
+                {address?.slice(0, 6)}...{address?.slice(-4)}
+              </button>
             )}
 
-            <Link href="/profile" className="flex items-center space-x-4 border-l pl-6 border-blue-700">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold">
-                  {user.email?.[0].toUpperCase()}
-                </div>
-                <span className="hover:text-blue-300 transition-colors text-sm truncate max-w-[100px]">{user.email}</span>
+            <div className="flex items-center space-x-3 pl-4 border-l border-gray-100">
+              <div className="text-right hidden sm:block">
+                <p className="text-xs font-black text-deep-blue leading-none mb-1">{user?.email?.split('@')[0]}</p>
+                <button onClick={handleLogout} className="text-[10px] font-bold text-red-400 hover:text-red-600">Logout</button>
               </div>
-              <button 
-                onClick={handleLogout}
-                className="text-xs bg-red-500/20 hover:bg-red-500 text-red-200 hover:text-white px-2 py-1 rounded transition-all"
-              >
-                Logout
-              </button>
-            </Link>
-          </>
-        )}
-      </nav>
-      
-      {/* Mobile Menu Toggle (Simplified) */}
-      <div className="md:hidden">
-        <button className="p-2">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
-          </svg>
-        </button>
-      </div>
+              <Link href="/profile">
+                <div className="w-10 h-10 bg-electric-purple rounded-xl flex items-center justify-center text-white font-black shadow-lg shadow-electric-purple/20 cursor-pointer">
+                  {user?.email?.[0].toUpperCase()}
+                </div>
+              </Link>
+            </div>
+          </div>
+        </>
+      )}
     </header>
   );
 };

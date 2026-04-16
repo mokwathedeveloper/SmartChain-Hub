@@ -8,34 +8,28 @@ interface LayoutProps {
   children: ReactNode;
 }
 
+const APP_ROUTES = ['/dashboard', '/transactions', '/console', '/history', '/revenue', '/profile'];
+const AUTH_ROUTES = ['/login', '/signup'];
+
 const Layout = ({ children }: LayoutProps) => {
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
-  const isAppRoute = ['/dashboard', '/features', '/history', '/revenue', '/profile', '/console'].includes(router.pathname);
-  const isAuthRoute = ['/login', '/signup'].includes(router.pathname);
 
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const isAppRoute = APP_ROUTES.includes(router.pathname);
+  const isAuthRoute = AUTH_ROUTES.includes(router.pathname);
 
   if (isAppRoute) {
     return (
-      <div className="flex min-h-screen bg-soft-white font-sans overflow-hidden">
-        {/* Mobile Overlay */}
+      <div className="flex min-h-screen bg-gray-50">
         {isSidebarOpen && (
-          <div 
-            className="fixed inset-0 bg-deep-blue/50 backdrop-blur-sm z-[60] lg:hidden"
-            onClick={toggleSidebar}
-          ></div>
+          <div className="fixed inset-0 bg-black/30 z-[60] lg:hidden" onClick={() => setIsSidebarOpen(false)}/>
         )}
-
-        {/* Sidebar */}
-        <div className={`fixed lg:relative z-[70] transition-transform duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        <div className={`fixed lg:relative z-[70] transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
           <Sidebar onClose={() => setIsSidebarOpen(false)} />
         </div>
-
-        <div className="flex-1 flex flex-col h-screen overflow-y-auto">
-          <Header onMenuClick={toggleSidebar} />
-          <main className="flex-grow p-4 lg:p-8">
+        <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+          <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
+          <main className="flex-grow p-6 overflow-y-auto">
             {children}
           </main>
         </div>
@@ -44,11 +38,9 @@ const Layout = ({ children }: LayoutProps) => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen font-sans">
+    <div className="flex flex-col min-h-screen">
       {!isAuthRoute && <Header />}
-      <main className="flex-grow">
-        {children}
-      </main>
+      <main className="flex-grow">{children}</main>
       {!isAuthRoute && <Footer />}
     </div>
   );

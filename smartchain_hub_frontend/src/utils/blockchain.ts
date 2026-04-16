@@ -1,7 +1,5 @@
 import { ethers } from 'ethers';
-
-const OG_MAINNET_RPC = 'https://evmrpc.0g.ai';
-const OG_CHAIN_ID = 16661;
+import { ACTIVE_CHAIN } from './chains';
 
 const TX_ABI = [
   'function recordTransaction(bytes32 txHash, uint256 amount, uint256 fee, string route) external',
@@ -10,7 +8,7 @@ const TX_ABI = [
 ];
 
 export function getProvider() {
-  return new ethers.JsonRpcProvider(OG_MAINNET_RPC, OG_CHAIN_ID);
+  return new ethers.JsonRpcProvider(ACTIVE_CHAIN.rpc, ACTIVE_CHAIN.chainId);
 }
 
 export function getContract(signerOrProvider: ethers.Signer | ethers.Provider) {
@@ -21,28 +19,18 @@ export function getContract(signerOrProvider: ethers.Signer | ethers.Provider) {
   return new ethers.Contract(address, TX_ABI, signerOrProvider);
 }
 
-export async function recordTransactionOnChain(
-  signer: ethers.Signer,
-  amount: number,
-  fee: number,
-  route: string
-): Promise<string> {
+export async function recordTransactionOnChain(signer: ethers.Signer, amount: number, fee: number, route: string): Promise<string> {
   const contract = getContract(signer);
   const txHash = ethers.id(`${Date.now()}-${amount}-${route}`);
-  const tx = await contract.recordTransaction(
-    txHash,
-    ethers.parseUnits(amount.toString(), 18),
-    ethers.parseUnits(fee.toString(), 18),
-    route
-  );
+  const tx = await contract.recordTransaction(txHash, ethers.parseUnits(amount.toString(), 18), ethers.parseUnits(fee.toString(), 18), route);
   await tx.wait();
   return tx.hash;
 }
 
-export function shortenAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+export function getExplorerUrl(txHash: string): string {
+  return ACTIVE_CHAIN.explorerTx(txHash);
 }
 
-export function getChainScanUrl(txHash: string): string {
-  return `https://chainscan.0g.ai/tx/${txHash}`;
+export function shortenAddress(address: string): string {
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }

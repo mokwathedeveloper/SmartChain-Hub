@@ -5,129 +5,124 @@ export default function LandingPage() {
   return (
     <>
       <Head>
-        <title>SmartChain Hub | AI-Driven Decentralized Commerce</title>
+        <title>SmartChain Hub | AI-Powered Autonomous Commerce</title>
         <meta name="description" content="Revolutionizing digital commerce with AI agents and 0G Chain technology." />
       </Head>
 
-      <div className="bg-white">
+      <div className="bg-mesh min-h-screen">
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-blue-900 pt-16 pb-32 lg:pt-32 lg:pb-48">
-          <div className="absolute inset-0 z-0 opacity-20">
-            <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-          </div>
+        <section className="relative overflow-hidden pt-20 pb-32 lg:pt-40 lg:pb-56">
+          {/* Animated Background Blobs */}
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-electric-purple/20 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-deep-blue/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
           
           <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-4xl mx-auto text-center">
-              <span className="inline-block py-1 px-3 mb-6 text-xs font-semibold tracking-widest text-blue-300 uppercase bg-blue-800 rounded-full animate-fade-in">
-                Powered by 0G Chain & AI
+            <div className="max-w-5xl mx-auto text-center">
+              <span className="inline-flex items-center py-1.5 px-4 mb-8 text-xs font-bold tracking-widest text-electric-purple uppercase bg-electric-purple/10 rounded-full border border-electric-purple/20 animate-fade-in shadow-sm">
+                <span className="w-2 h-2 bg-electric-purple rounded-full mr-2 animate-pulse"></span>
+                Next-Gen 0G Chain Intelligence
               </span>
-              <h1 className="text-5xl lg:text-7xl font-extrabold text-white mb-8 tracking-tight animate-fade-in-up">
-                The Future of <span className="text-green-400">Digital Commerce</span> is Autonomous
+              <h1 className="text-6xl lg:text-8xl font-black text-deep-blue mb-8 tracking-tighter animate-fade-in-up leading-[0.9]">
+                The Future of Commerce is <span className="text-electric-purple">Autonomous</span>
               </h1>
-              <p className="text-xl text-blue-100 mb-10 leading-relaxed max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                SmartChain Hub uses AI-driven agents to optimize every transaction, ensuring maximum efficiency, security, and automated revenue sharing.
+              <p className="text-xl lg:text-2xl text-gray-600 mb-12 leading-relaxed max-w-3xl mx-auto animate-fade-in-up font-medium" style={{ animationDelay: '0.1s' }}>
+                SmartChain Hub deploys proprietary AI agents to automate high-frequency optimizations, 
+                slashing transaction fees by up to 40% on the 0G ecosystem.
               </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                <Link href="/signup" className="px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-all transform hover:scale-105 shadow-2xl">
-                  Launch App Now
+              <div className="flex flex-col sm:flex-row justify-center gap-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                <Link href="/signup" className="px-10 py-5 bg-deep-blue hover:bg-black text-white font-bold rounded-2xl transition-all transform hover:scale-105 shadow-2xl hover:shadow-deep-blue/20">
+                  Get Started for Free
                 </Link>
-                <Link href="/about" className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-all backdrop-blur-sm border border-white/20">
+                <Link href="/about" className="px-10 py-5 glass border-gray-200 text-deep-blue font-bold rounded-2xl transition-all hover:bg-white/50">
                   Read Whitepaper
                 </Link>
               </div>
             </div>
           </div>
-          
-          {/* Animated Background Element */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[150%] h-[300px] bg-gradient-to-t from-white to-transparent opacity-10 blur-3xl rounded-[100%]"></div>
         </section>
 
-        {/* Feature Highlights */}
-        <section className="py-24 bg-white">
+        {/* High-Impact Feature Grid */}
+        <section className="py-32 relative">
           <div className="container mx-auto px-4">
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">Why SmartChain Hub?</h2>
-              <p className="text-lg text-gray-600">We bridge the gap between complex blockchain technology and seamless digital commerce through intelligent automation.</p>
+            <div className="text-center max-w-3xl mx-auto mb-20">
+              <h2 className="text-4xl lg:text-5xl font-black text-deep-blue mb-6 tracking-tight">Intelligence at Scale</h2>
+              <p className="text-lg text-gray-500 font-medium leading-relaxed">We combine the raw power of 0G Chain with the decision-making speed of TensorFlow agents.</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-              <div className="p-8 rounded-3xl bg-gray-50 border border-gray-100 transition-all hover:shadow-xl group">
-                <div className="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center mb-6 transform group-hover:rotate-6 transition-transform">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                { 
+                  title: "AI Neural Routing", 
+                  desc: "Our agents use deep learning to predict the most efficient transaction pathways before network spikes occur.",
+                  icon: "🧠",
+                  color: "bg-purple-100"
+                },
+                { 
+                  title: "0G Newton Edge", 
+                  desc: "Execute transactions with sub-second finality using 0G's high-throughput decentralized storage and compute.",
+                  icon: "⚡",
+                  color: "bg-blue-100"
+                },
+                { 
+                  title: "Wasm Optimization", 
+                  desc: "Performance-critical verification logic written in Rust, ensuring maximum gas efficiency and protocol safety.",
+                  icon: "🦀",
+                  color: "bg-orange-100"
+                }
+              ].map((feature, i) => (
+                <div key={i} className="p-10 rounded-[2.5rem] bg-white border border-gray-100 shadow-xl shadow-gray-200/50 hover:-translate-y-2 transition-all group">
+                  <div className={`w-16 h-16 ${feature.color} rounded-2xl flex items-center justify-center mb-8 text-3xl group-hover:scale-110 transition-transform`}>
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-2xl font-bold text-deep-blue mb-4 tracking-tight">{feature.title}</h3>
+                  <p className="text-gray-500 leading-relaxed font-medium">
+                    {feature.desc}
+                  </p>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">AI Optimization</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Our proprietary AI agents analyze network conditions and transaction routes in real-time to save you up to 40% on fees.
-                </p>
-              </div>
-              
-              <div className="p-8 rounded-3xl bg-gray-50 border border-gray-100 transition-all hover:shadow-xl group">
-                <div className="w-14 h-14 bg-green-500 text-white rounded-2xl flex items-center justify-center mb-6 transform group-hover:rotate-6 transition-transform">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">0G Security</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Leveraging 0G Chain's modular architecture for high-performance decentralized storage and verifiable compute.
-                </p>
-              </div>
-              
-              <div className="p-8 rounded-3xl bg-gray-50 border border-gray-100 transition-all hover:shadow-xl group">
-                <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mb-6 transform group-hover:rotate-6 transition-transform">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Revenue Sharing</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Earn passive income through our decentralized revenue sharing model. Fees are distributed back to the community automatically.
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Stats Section */}
-        <section className="py-20 bg-blue-50">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-              <div>
-                <p className="text-4xl lg:text-5xl font-extrabold text-blue-900 mb-2">$240M+</p>
-                <p className="text-blue-600 font-medium uppercase tracking-wider text-sm">Volume Optimized</p>
-              </div>
-              <div>
-                <p className="text-4xl lg:text-5xl font-extrabold text-blue-900 mb-2">12k+</p>
-                <p className="text-blue-600 font-medium uppercase tracking-wider text-sm">Active Agents</p>
-              </div>
-              <div>
-                <p className="text-4xl lg:text-5xl font-extrabold text-blue-900 mb-2">0.2s</p>
-                <p className="text-blue-600 font-medium uppercase tracking-wider text-sm">Avg. Finality</p>
-              </div>
-              <div>
-                <p className="text-4xl lg:text-5xl font-extrabold text-blue-900 mb-2">99.9%</p>
-                <p className="text-blue-600 font-medium uppercase tracking-wider text-sm">Network Uptime</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Call to Action */}
-        <section className="py-24 bg-white overflow-hidden relative">
+        {/* Numbers Section */}
+        <section className="py-24 bg-deep-blue text-white overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
           <div className="container mx-auto px-4 relative z-10">
-            <div className="bg-blue-600 rounded-[3rem] p-12 lg:p-20 text-center text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-400/20 rounded-full -ml-32 -mb-32"></div>
-              
-              <h2 className="text-4xl lg:text-5xl font-bold mb-8">Ready to automate your commerce?</h2>
-              <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-                Join thousands of businesses and individuals who are already using SmartChain Hub to optimize their digital economy.
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 text-center">
+              {[
+                { label: "AI Volume", val: "$420M+" },
+                { label: "Avg. Savings", val: "32.4%" },
+                { label: "Active Nodes", val: "1,240" },
+                { label: "Uptime", val: "99.99%" }
+              ].map((stat, i) => (
+                <div key={i} className="animate-fade-in-up" style={{ animationDelay: `${i * 0.1}s` }}>
+                  <p className="text-4xl lg:text-6xl font-black mb-2 tracking-tighter">{stat.val}</p>
+                  <p className="text-electric-purple font-bold uppercase tracking-widest text-xs">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-32 container mx-auto px-4">
+          <div className="bg-gradient-to-br from-electric-purple to-deep-blue rounded-[3.5rem] p-16 lg:p-24 text-center text-white relative overflow-hidden shadow-3xl">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -mr-48 -mt-48"></div>
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl -ml-48 -mb-48"></div>
+            
+            <div className="relative z-10">
+              <h2 className="text-5xl lg:text-7xl font-black mb-10 tracking-tighter leading-tight">Ready to enter the <br/> Autonomous Economy?</h2>
+              <p className="text-xl text-purple-100 mb-12 max-w-2xl mx-auto font-medium opacity-90">
+                Join 10,000+ pioneers using SmartChain Hub to optimize their digital commerce flow.
               </p>
-              <Link href="/signup" className="px-10 py-5 bg-white text-blue-600 font-bold rounded-2xl hover:bg-blue-50 transition-colors shadow-xl">
-                Get Started for Free
-              </Link>
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Link href="/signup" className="px-12 py-6 bg-white text-deep-blue font-black rounded-2xl hover:scale-105 transition-all shadow-2xl">
+                  Launch Application
+                </Link>
+                <Link href="/contact" className="px-12 py-6 bg-transparent border-2 border-white/30 text-white font-black rounded-2xl hover:bg-white/10 transition-all">
+                  Contact Support
+                </Link>
+              </div>
             </div>
           </div>
         </section>

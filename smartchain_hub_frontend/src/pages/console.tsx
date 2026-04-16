@@ -8,7 +8,7 @@ const ConsolePage = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const systemLogs = [
+      const systemLogs: { msg: string; type: 'wasm' | 'storage' | 'network' }[] = [
         { msg: "WASM: Executing verification proof...", type: 'wasm' },
         { msg: "STORAGE: Sharding metadata for user session", type: 'storage' },
         { msg: "NETWORK: Syncing with 0G Newton Node...", type: 'network' },

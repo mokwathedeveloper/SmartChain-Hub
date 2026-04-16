@@ -1,132 +1,146 @@
 import Head from "next/head";
 import Link from "next/link";
 
-export default function LandingPage() {
+const HexagonSVG = () => (
+  <svg viewBox="0 0 400 400" className="w-full max-w-md" fill="none">
+    <defs>
+      <linearGradient id="hexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#818CF8"/>
+        <stop offset="100%" stopColor="#3B82F6"/>
+      </linearGradient>
+      <linearGradient id="innerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#C4B5FD"/>
+        <stop offset="100%" stopColor="#60A5FA"/>
+      </linearGradient>
+    </defs>
+    {/* Outer hexagon */}
+    <polygon points="200,30 350,115 350,285 200,370 50,285 50,115" stroke="url(#hexGrad)" strokeWidth="3" fill="none" opacity="0.4"/>
+    {/* Middle hexagon */}
+    <polygon points="200,70 320,135 320,265 200,330 80,265 80,135" stroke="url(#hexGrad)" strokeWidth="2.5" fill="none" opacity="0.6"/>
+    {/* Inner hexagon filled */}
+    <polygon points="200,110 295,162 295,238 200,290 105,238 105,162" fill="url(#hexGrad)" opacity="0.85"/>
+    {/* Center circle */}
+    <circle cx="200" cy="200" r="45" fill="white" opacity="0.95"/>
+    <circle cx="200" cy="200" r="30" fill="url(#innerGrad)" opacity="0.7"/>
+    {/* Corner dots */}
+    <circle cx="200" cy="30" r="8" fill="#818CF8"/>
+    <circle cx="350" cy="115" r="8" fill="#818CF8"/>
+    <circle cx="350" cy="285" r="8" fill="#818CF8"/>
+    <circle cx="200" cy="370" r="8" fill="#818CF8"/>
+    <circle cx="50" cy="285" r="8" fill="#818CF8"/>
+    <circle cx="50" cy="115" r="8" fill="#818CF8"/>
+    {/* Floating particles */}
+    <circle cx="360" cy="80" r="4" fill="#C4B5FD" opacity="0.6"/>
+    <circle cx="40" cy="200" r="3" fill="#93C5FD" opacity="0.5"/>
+    <circle cx="370" cy="320" r="5" fill="#818CF8" opacity="0.4"/>
+    <circle cx="100" cy="50" r="3" fill="#C4B5FD" opacity="0.5"/>
+  </svg>
+);
+
+const IllustrationCard = ({ color }: { color: string }) => (
+  <div className={`w-full h-32 rounded-xl ${color} flex items-end justify-center overflow-hidden`}>
+    <svg viewBox="0 0 200 100" className="w-full">
+      <defs>
+        <linearGradient id={`illGrad${color}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#818CF8" stopOpacity="0.6"/>
+          <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.4"/>
+        </linearGradient>
+      </defs>
+      <rect x="60" y="20" width="40" height="40" rx="4" fill={`url(#illGrad${color})`} transform="rotate(15 80 40)"/>
+      <rect x="100" y="30" width="35" height="35" rx="4" fill="#818CF8" opacity="0.5" transform="rotate(-10 117 47)"/>
+      <rect x="75" y="50" width="50" height="30" rx="4" fill="#60A5FA" opacity="0.6"/>
+      <circle cx="100" cy="45" r="12" fill="white" opacity="0.8"/>
+    </svg>
+  </div>
+);
+
+export default function Home() {
   return (
     <>
       <Head>
-        <title>SmartChain Hub | AI-Powered Autonomous Commerce</title>
-        <meta name="description" content="Revolutionizing digital commerce with AI agents and 0G Chain technology." />
+        <title>SmartChain Hub | AI-Powered Smart Contracts</title>
+        <meta name="description" content="Decentralize Commerce with AI-Powered Smart Contracts" />
       </Head>
 
-      <div className="bg-mesh min-h-screen">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden pt-20 pb-32 lg:pt-40 lg:pb-56">
-          {/* Animated Background Blobs */}
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-electric-purple/20 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-deep-blue/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-          
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-5xl mx-auto text-center">
-              <span className="inline-flex items-center py-1.5 px-4 mb-8 text-xs font-bold tracking-widest text-electric-purple uppercase bg-electric-purple/10 rounded-full border border-electric-purple/20 animate-fade-in shadow-sm">
-                <span className="w-2 h-2 bg-electric-purple rounded-full mr-2 animate-pulse"></span>
-                Next-Gen 0G Chain Intelligence
-              </span>
-              <h1 className="text-6xl lg:text-8xl font-black text-deep-blue mb-8 tracking-tighter animate-fade-in-up leading-[0.9]">
-                The Future of Commerce is <span className="text-electric-purple">Autonomous</span>
+      {/* Hero */}
+      <section className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 pt-16 pb-20">
+        <div className="container mx-auto px-6 max-w-6xl">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="flex-1 max-w-xl">
+              <h1 className="text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
+                SmartChain Hub
               </h1>
-              <p className="text-xl lg:text-2xl text-gray-600 mb-12 leading-relaxed max-w-3xl mx-auto animate-fade-in-up font-medium" style={{ animationDelay: '0.1s' }}>
-                SmartChain Hub deploys proprietary AI agents to automate high-frequency optimizations, 
-                slashing transaction fees by up to 40% on the 0G ecosystem.
-              </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                <Link href="/signup" className="px-10 py-5 bg-deep-blue hover:bg-black text-white font-bold rounded-2xl transition-all transform hover:scale-105 shadow-2xl hover:shadow-deep-blue/20">
-                  Get Started for Free
-                </Link>
-                <Link href="/about" className="px-10 py-5 glass border-gray-200 text-deep-blue font-bold rounded-2xl transition-all hover:bg-white/50">
-                  Read Whitepaper
-                </Link>
+              <p className="text-lg text-gray-500 mb-3">with AI-Powered Smart Contracts</p>
+              <p className="text-gray-400 mb-8">with AI-powered Decentralized Marketplace</p>
+              <Link href="/signup" className="inline-block px-7 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-blue-200">
+                Get Started
+              </Link>
+            </div>
+            <div className="flex-1 flex justify-center">
+              <HexagonSVG />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Decentralized Marketplace */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-6 max-w-6xl">
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-14">Decentralized Marketplace</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { icon: "🏛️", title: "Blockchain-Powered", desc: "Leverage secure blockchain technology to seamlessly process transactions" },
+              { icon: "🤖", title: "Intelligent Agents", desc: "Utilize AI agents to automate and optimize business processes" },
+              { icon: "🔒", title: "Secure & Decentralized", desc: "Ensure trust and security with decentralized protocols" },
+            ].map((item) => (
+              <div key={item.title} className="p-8 border border-gray-100 rounded-2xl hover:shadow-lg transition-all text-center">
+                <div className="text-4xl mb-4">{item.icon}</div>
+                <h3 className="text-lg font-bold text-gray-800 mb-3">{item.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
               </div>
-            </div>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* High-Impact Feature Grid */}
-        <section className="py-32 relative">
-          <div className="container mx-auto px-4">
-            <div className="text-center max-w-3xl mx-auto mb-20">
-              <h2 className="text-4xl lg:text-5xl font-black text-deep-blue mb-6 tracking-tight">Intelligence at Scale</h2>
-              <p className="text-lg text-gray-500 font-medium leading-relaxed">We combine the raw power of 0G Chain with the decision-making speed of TensorFlow agents.</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                { 
-                  title: "AI Neural Routing", 
-                  desc: "Our agents use deep learning to predict the most efficient transaction pathways before network spikes occur.",
-                  icon: "🧠",
-                  color: "bg-purple-100"
-                },
-                { 
-                  title: "0G Newton Edge", 
-                  desc: "Execute transactions with sub-second finality using 0G's high-throughput decentralized storage and compute.",
-                  icon: "⚡",
-                  color: "bg-blue-100"
-                },
-                { 
-                  title: "Wasm Optimization", 
-                  desc: "Performance-critical verification logic written in Rust, ensuring maximum gas efficiency and protocol safety.",
-                  icon: "🦀",
-                  color: "bg-orange-100"
-                }
-              ].map((feature, i) => (
-                <div key={i} className="p-10 rounded-[2.5rem] bg-white border border-gray-100 shadow-xl shadow-gray-200/50 hover:-translate-y-2 transition-all group">
-                  <div className={`w-16 h-16 ${feature.color} rounded-2xl flex items-center justify-center mb-8 text-3xl group-hover:scale-110 transition-transform`}>
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-2xl font-bold text-deep-blue mb-4 tracking-tight">{feature.title}</h3>
-                  <p className="text-gray-500 leading-relaxed font-medium">
-                    {feature.desc}
-                  </p>
+      {/* Core Features */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-6 max-w-6xl">
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-14">Core Features</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { title: "Decentralized Marketplace", desc: "Buy and sell securely at scale on a decentralized platform", color: "bg-blue-50" },
+              { title: "AI-Driven Automation", desc: "Automate workflows using integrations with intelligent AI agents", color: "bg-purple-50" },
+              { title: "Secure Transactions", desc: "Conduct safe, transparent transactions on decentralized platforms", color: "bg-indigo-50" },
+            ].map((item) => (
+              <div key={item.title} className="bg-white border border-gray-100 rounded-2xl p-6 hover:shadow-lg transition-all">
+                <div className="mb-2">
+                  <h3 className="text-lg font-bold text-gray-800 mb-2">{item.title}</h3>
+                  <p className="text-sm text-gray-500 mb-4">{item.desc}</p>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Numbers Section */}
-        <section className="py-24 bg-deep-blue text-white overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 text-center">
-              {[
-                { label: "AI Volume", val: "$420M+" },
-                { label: "Avg. Savings", val: "32.4%" },
-                { label: "Active Nodes", val: "1,240" },
-                { label: "Uptime", val: "99.99%" }
-              ].map((stat, i) => (
-                <div key={i} className="animate-fade-in-up" style={{ animationDelay: `${i * 0.1}s` }}>
-                  <p className="text-4xl lg:text-6xl font-black mb-2 tracking-tighter">{stat.val}</p>
-                  <p className="text-electric-purple font-bold uppercase tracking-widest text-xs">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-32 container mx-auto px-4">
-          <div className="bg-gradient-to-br from-electric-purple to-deep-blue rounded-[3.5rem] p-16 lg:p-24 text-center text-white relative overflow-hidden shadow-3xl">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -mr-48 -mt-48"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl -ml-48 -mb-48"></div>
-            
-            <div className="relative z-10">
-              <h2 className="text-5xl lg:text-7xl font-black mb-10 tracking-tighter leading-tight">Ready to enter the <br/> Autonomous Economy?</h2>
-              <p className="text-xl text-purple-100 mb-12 max-w-2xl mx-auto font-medium opacity-90">
-                Join 10,000+ pioneers using SmartChain Hub to optimize their digital commerce flow.
-              </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Link href="/signup" className="px-12 py-6 bg-white text-deep-blue font-black rounded-2xl hover:scale-105 transition-all shadow-2xl">
-                  Launch Application
-                </Link>
-                <Link href="/contact" className="px-12 py-6 bg-transparent border-2 border-white/30 text-white font-black rounded-2xl hover:bg-white/10 transition-all">
-                  Contact Support
-                </Link>
+                <IllustrationCard color={item.color} />
               </div>
-            </div>
+            ))}
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
+
+      {/* Bottom illustration banner */}
+      <section className="py-16 bg-gradient-to-br from-blue-50 to-indigo-100 flex justify-center">
+        <svg viewBox="0 0 600 160" className="w-full max-w-2xl opacity-70">
+          <defs>
+            <linearGradient id="bannerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#818CF8"/>
+              <stop offset="100%" stopColor="#3B82F6"/>
+            </linearGradient>
+          </defs>
+          <rect x="220" y="20" width="80" height="80" rx="8" fill="url(#bannerGrad)" opacity="0.8" transform="rotate(10 260 60)"/>
+          <rect x="310" y="40" width="70" height="70" rx="8" fill="#818CF8" opacity="0.6" transform="rotate(-8 345 75)"/>
+          <rect x="150" y="50" width="65" height="65" rx="8" fill="#60A5FA" opacity="0.5" transform="rotate(5 182 82)"/>
+          <circle cx="260" cy="60" r="20" fill="white" opacity="0.9"/>
+          <circle cx="345" cy="75" r="16" fill="white" opacity="0.8"/>
+        </svg>
+      </section>
     </>
   );
 }

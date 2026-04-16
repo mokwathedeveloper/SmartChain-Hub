@@ -2,12 +2,13 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title SmartChainTransaction
  * @dev Handles validation and recording of AI-optimized transactions on 0G Chain.
  */
-contract SmartChainTransaction is Ownable {
+contract SmartChainTransaction is Ownable, ReentrancyGuard {
     
     struct Transaction {
         address sender;
@@ -27,13 +28,14 @@ contract SmartChainTransaction is Ownable {
 
     /**
      * @dev Records a new transaction hash and its details.
+     * Added nonReentrant for security.
      */
     function recordTransaction(
         bytes32 _txHash, 
         uint256 _amount, 
         uint256 _fee, 
         string memory _route
-    ) external {
+    ) external nonReentrant {
         require(transactions[_txHash].sender == address(0), "Transaction already exists");
         
         transactions[_txHash] = Transaction({
@@ -49,9 +51,10 @@ contract SmartChainTransaction is Ownable {
     }
 
     /**
-     * @dev Validates a transaction. In a real scenario, this might be called by an AI Agent oracle.
+     * @dev Validates a transaction.
+     * Added nonReentrant for security.
      */
-    function validateTransaction(bytes32 _txHash) external onlyOwner {
+    function validateTransaction(bytes32 _txHash) external onlyOwner nonReentrant {
         require(transactions[_txHash].sender != address(0), "Transaction does not exist");
         require(!transactions[_txHash].validated, "Already validated");
 

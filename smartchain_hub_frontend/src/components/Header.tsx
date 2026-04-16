@@ -2,10 +2,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { supabase } from '@/utils/supabase';
 import { useAuth } from '@/hooks/useAuth';
+import { useWeb3 } from '@/context/Web3Context';
 
 const Header = () => {
   const router = useRouter();
-  const { user } = useAuth(false); // We don't want to force redirect here
+  const { user } = useAuth(false);
+  const { address, isConnected, connectWallet, disconnectWallet } = useWeb3();
   const isApp = router.pathname.startsWith('/dashboard') || router.pathname.startsWith('/features') || router.pathname.startsWith('/profile');
 
   const handleLogout = async () => {
@@ -36,6 +38,32 @@ const Header = () => {
           <>
             <Link href="/dashboard" className={`hover:text-blue-300 transition-colors ${router.pathname === '/dashboard' ? 'text-green-400' : ''}`}>Dashboard</Link>
             <Link href="/features" className={`hover:text-blue-300 transition-colors ${router.pathname === '/features' ? 'text-green-400' : ''}`}>Optimization</Link>
+            
+            {/* Wallet Connection */}
+            {!isConnected ? (
+              <button 
+                onClick={connectWallet}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-md border border-blue-500 flex items-center"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+                Connect Wallet
+              </button>
+            ) : (
+              <div className="group relative">
+                <button className="px-4 py-2 bg-green-500/20 text-green-400 text-xs font-mono font-bold rounded-xl border border-green-500/30">
+                  {address?.slice(0, 6)}...{address?.slice(-4)}
+                </button>
+                <button 
+                  onClick={disconnectWallet}
+                  className="absolute top-full right-0 mt-2 hidden group-hover:block bg-red-600 text-white text-[10px] px-2 py-1 rounded shadow-lg"
+                >
+                  Disconnect
+                </button>
+              </div>
+            )}
+
             <Link href="/profile" className="flex items-center space-x-4 border-l pl-6 border-blue-700">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold">

@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { ethers } from 'ethers';
 
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
+
 const OG_NEWTON_CHAIN_ID = '0x40d8'; // 16600 in hex
 const OG_NEWTON_PARAMS = {
   chainId: OG_NEWTON_CHAIN_ID,

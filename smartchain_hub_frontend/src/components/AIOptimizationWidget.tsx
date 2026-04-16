@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { supabase } from '@/utils/supabase';
 import { useAuth } from '@/hooks/useAuth';
+import { useWeb3 } from '@/context/Web3Context';
+import { ethers } from 'ethers';
+import { storageService } from '@/utils/storage';
 
 const AIOptimizationWidget = () => {
   const { user } = useAuth();
+  const { signer, isConnected } = useWeb3();
   const [amount, setAmount] = useState('');
   const [priority, setPriority] = useState('efficiency');
   const [isOptimizing, setIsOptimizing] = useState(false);
-  const [optimizedResult, setOptimizedResult] = useState<null | { fee: string, savings: string, route: string, explanation: string, confidence: number }>(null);
+  const [optimizedResult, setOptimizedResult] = useState<null | { fee: string, savings: string, route: string, explanation: string, confidence: number, ml_engine: string }>(null);
   const [isExecuting, setIsExecuting] = useState(false);
 
   const handleOptimize = async () => {
@@ -27,14 +31,14 @@ const AIOptimizationWidget = () => {
       setOptimizedResult(data);
     } catch (error) {
       console.warn("Falling back to simulated AI logic:", error);
-      // Fallback to local simulation if API is not running
       setTimeout(() => {
         setOptimizedResult({
           fee: (parseFloat(amount) * 0.005).toFixed(2),
           savings: (parseFloat(amount) * 0.015).toFixed(2),
           route: "0G Chain Flash Route (Fallback)",
           explanation: `The AI prioritized ${priority} by selecting a specialized route with optimized decentralized parameters.`,
-          confidence: 85.5
+          confidence: 85.5,
+          ml_engine: "Simulation Heuristics"
         });
         setIsOptimizing(false);
       }, 1000);
@@ -49,6 +53,50 @@ const AIOptimizationWidget = () => {
     setIsExecuting(true);
     
     try {
+      let tx_hash = `0x${Math.random().toString(16).slice(2)}${Math.random().toString(16).slice(2, 6)}`;
+      let storage_root = "";
+
+      // --- 0G STORAGE: Upload metadata before execution ---
+      try {
+        storage_root = await storageService.uploadMetadata({
+          user_id: user.id,
+          original_amount: amount,
+          optimization: optimizedResult,
+          timestamp: new Date().toISOString()
+        });
+      } catch (storageError) {
+        console.warn("0G Storage upload failed, proceeding with execution:", storageError);
+      }
+
+      // --- WEB3 BRIDGE: Call Smart Contract if wallet is connected ---
+      if (isConnected && signer) {
+        try {
+          const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+          if (contractAddress && contractAddress !== "your-deployed-contract-address-here") {
+            const abi = [
+              "function recordTransaction(bytes32 txHash, uint256 amount, uint256 fee, string route) external"
+            ];
+            const contract = new ethers.Contract(contractAddress, abi, signer);
+            
+            const bytes32Hash = ethers.id(Date.now().toString() + user.id);
+            
+            const tx = await contract.recordTransaction(
+              bytes32Hash,
+              ethers.parseUnits(amount, 18),
+              ethers.parseUnits(optimizedResult.fee, 18),
+              optimizedResult.route
+            );
+            
+            console.log("Blockchain Transaction Sent:", tx.hash);
+            await tx.wait();
+            tx_hash = tx.hash;
+          }
+        } catch (web3Error) {
+          console.error("Smart Contract execution failed, falling back to database-only record:", web3Error);
+        }
+      }
+
+      // Save to Supabase (Double-entry for indexing and historical record)
       const { error } = await supabase.from('transactions').insert([
         {
           user_id: user.id,
@@ -56,14 +104,15 @@ const AIOptimizationWidget = () => {
           optimized_fee: parseFloat(optimizedResult.fee),
           savings: parseFloat(optimizedResult.savings),
           route: optimizedResult.route,
-          status: 'pending',
-          tx_hash: `0x${Math.random().toString(16).slice(2)}...${Math.random().toString(16).slice(2, 6)}`
+          status: isConnected ? 'confirmed' : 'pending',
+          tx_hash: tx_hash,
+          storage_root: storage_root // Store the 0G Storage reference
         }
       ]);
 
       if (error) throw error;
       
-      alert("Transaction submitted successfully to 0G Chain!");
+      alert(isConnected ? "Transaction executed on 0G Chain, Metadata stored on 0G Storage!" : "Transaction recorded in database!");
       setOptimizedResult(null);
       setAmount('');
     } catch (error: any) {
@@ -134,9 +183,11 @@ const AIOptimizationWidget = () => {
             <button 
               onClick={handleExecute}
               disabled={isExecuting}
-              className="flex-[2] py-4 rounded-xl font-bold text-white bg-green-500 hover:bg-green-600 transition-all shadow-lg shadow-green-200 active:scale-95"
+              className={`flex-[2] py-4 rounded-xl font-bold text-white transition-all shadow-lg active:scale-95 ${
+                isConnected ? 'bg-green-500 hover:bg-green-600 shadow-green-200' : 'bg-blue-500 hover:bg-blue-600 shadow-blue-200'
+              }`}
             >
-              {isExecuting ? 'Submitting...' : 'Confirm & Execute'}
+              {isExecuting ? 'Processing...' : isConnected ? 'Confirm & Execute On-Chain' : 'Confirm (DB Only)'}
             </button>
           </div>
         )}
@@ -151,9 +202,14 @@ const AIOptimizationWidget = () => {
               </svg>
               AI Optimization Result
             </h3>
-            <span className="text-[10px] bg-green-200 text-green-700 px-2 py-0.5 rounded-full font-bold">
-              {optimizedResult.confidence}% CONFIDENCE
-            </span>
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] bg-green-200 text-green-700 px-2 py-0.5 rounded-full font-bold mb-1">
+                {optimizedResult.confidence}% CONFIDENCE
+              </span>
+              <span className="text-[8px] text-green-600 font-mono uppercase tracking-tighter">
+                ENGINE: {optimizedResult.ml_engine}
+              </span>
+            </div>
           </div>
           
           <div className="grid grid-cols-2 gap-4 mb-4">

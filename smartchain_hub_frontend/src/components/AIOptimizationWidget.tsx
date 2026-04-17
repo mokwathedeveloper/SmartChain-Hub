@@ -208,7 +208,7 @@ const AIOptimizationWidget = ({ onStateChange }: WidgetProps) => {
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
             <div>
               <p className="text-[10px] text-green-600 font-black uppercase mb-1 opacity-60">Estimated Fee</p>
               <p className="text-xl font-black text-deep-blue">${optimizedResult.fee}</p>

@@ -74,11 +74,11 @@ export default function Home() {
       </Head>
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 pt-16 pb-20">
+      <section className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 pt-10 pb-14 sm:pt-16 sm:pb-20">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 max-w-xl">
-              <h1 className="text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
+              <h1 className="text-3xl sm:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
                 SmartChain Hub
               </h1>
               <p className="text-lg text-gray-500 mb-3">with AI-Powered Smart Contracts</p>

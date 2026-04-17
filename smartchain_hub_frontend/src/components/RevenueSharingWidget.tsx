@@ -99,7 +99,7 @@ const RevenueSharingWidget = () => {
         <p className="text-indigo-400 text-sm mt-2">from ${revenue?.total_platform_revenue?.toLocaleString() || '0'} total platform revenue</p>
       </div>
       
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <div className="p-4 bg-gray-50 rounded-xl">
           <p className="text-xs text-gray-400 font-medium uppercase mb-1">Next Drop</p>
           <p className="font-bold text-gray-800">Every 24h</p>

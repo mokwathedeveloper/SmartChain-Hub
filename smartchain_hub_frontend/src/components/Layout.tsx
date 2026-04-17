@@ -21,15 +21,18 @@ const Layout = ({ children }: LayoutProps) => {
   if (isAppRoute) {
     return (
       <div className="flex min-h-screen bg-gray-50">
+        {/* Mobile overlay */}
         {isSidebarOpen && (
           <div className="fixed inset-0 bg-black/30 z-[60] lg:hidden" onClick={() => setIsSidebarOpen(false)}/>
         )}
-        <div className={`fixed lg:relative z-[70] transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        {/* Sidebar */}
+        <div className={`fixed lg:sticky lg:top-0 lg:h-screen z-[70] transition-transform duration-300 shrink-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
           <Sidebar onClose={() => setIsSidebarOpen(false)} />
         </div>
-        <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+        {/* Main content */}
+        <div className="flex-1 flex flex-col min-h-screen min-w-0 overflow-hidden">
           <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
-          <main className="flex-grow p-6 overflow-y-auto">
+          <main className="flex-grow p-4 sm:p-6 overflow-y-auto">
             {children}
           </main>
         </div>

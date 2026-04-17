@@ -48,8 +48,7 @@ export default function HistoryPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"><div className="overflow-x-auto"><table className="w-full min-w-[600px]">
             <thead>
               <tr className="text-xs text-gray-400 border-b border-gray-100 bg-gray-50/50">
                 <th className="px-6 py-3 text-left font-medium">Transaction Hash</th>

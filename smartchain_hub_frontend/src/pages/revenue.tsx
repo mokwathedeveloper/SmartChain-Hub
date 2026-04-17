@@ -153,7 +153,7 @@ export default function Revenue() {
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <h2 className="text-base font-bold text-gray-800">Recent Payouts</h2>
           </div>
-          <table className="w-full">
+          <table className="w-full min-w-[600px]">
             <thead>
               <tr className="text-xs text-gray-400 border-b border-gray-50">
                 <th className="px-6 py-3 text-left font-medium">Date</th>
@@ -176,7 +176,7 @@ export default function Revenue() {
                 <tr><td colSpan={3} className="px-6 py-12 text-center text-sm text-gray-400">{loading ? 'Loading...' : 'No revenue records yet.'}</td></tr>
               )}
             </tbody>
-          </table>
+          </table></div>
         </div>
       </div>
     </>

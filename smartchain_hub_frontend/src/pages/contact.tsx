@@ -14,13 +14,13 @@ export default function Contact() {
   return (
     <>
       <Head><title>Contact | SmartChain Hub</title></Head>
-      <section className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-20 min-h-screen">
+      <section className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-10 sm:py-20 min-h-screen">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
             {/* Left: Form */}
             <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-              <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Get in Touch</h1>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2">Get in Touch</h1>
               <p className="text-gray-500 text-sm mb-8 leading-relaxed">
                 Have questions about SmartChain Hub? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
               </p>

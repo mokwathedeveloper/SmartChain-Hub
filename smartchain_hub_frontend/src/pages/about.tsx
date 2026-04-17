@@ -37,11 +37,11 @@ export default function About() {
       <Head><title>About Us | SmartChain Hub</title></Head>
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 pt-16 pb-20">
+      <section className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 pt-10 pb-14 sm:pt-16 sm:pb-20">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="flex flex-col lg:flex-row gap-12 items-start">
             <div className="flex-1 max-w-lg">
-              <h1 className="text-4xl font-extrabold text-gray-900 mb-4">Our Mission</h1>
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-900 mb-4">Our Mission</h1>
               <p className="text-gray-500 mb-6 leading-relaxed">
                 Empowering decentralized commerce through AI-driven automation and blockchain technology to create a trustless environment.
               </p>
@@ -51,7 +51,7 @@ export default function About() {
             </div>
             {/* Team photo grid */}
             <div className="flex-1">
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {team.slice(0, 3).map((m, i) => (
                   <div key={i} className="bg-white rounded-2xl p-4 flex flex-col items-center shadow-sm border border-gray-100">
                     <AvatarPlaceholder seed={i} />

@@ -120,7 +120,7 @@ export default function Dashboard() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
           </div>
-          <table className="w-full">
+          <table className="w-full min-w-[600px]">
             <thead>
               <tr className="text-xs text-gray-400 border-b border-gray-50">
                 <th className="px-6 py-3 text-left font-medium">Description</th>
@@ -139,7 +139,7 @@ export default function Dashboard() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
 
         {/* Datasource */}
@@ -150,7 +150,7 @@ export default function Dashboard() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
           </div>
-          <table className="w-full">
+          <table className="w-full min-w-[600px]">
             <tbody>
               {staticDatasource.map((row, i) => (
                 <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/50">
@@ -162,7 +162,7 @@ export default function Dashboard() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
 
       </div>

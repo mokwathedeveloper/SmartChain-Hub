@@ -63,11 +63,11 @@ export default function Features() {
       <Head><title>Features | SmartChain Hub</title></Head>
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 pt-16 pb-20">
+      <section className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 pt-10 pb-14 sm:pt-16 sm:pb-20">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 max-w-lg">
-              <h1 className="text-4xl font-extrabold text-gray-900 mb-4">Devgen Agents</h1>
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-900 mb-4">Devgen Agents</h1>
               <p className="text-gray-500 mb-8 leading-relaxed">
                 Empowering decentralized commerce through autonomous AI agents that optimize every transaction, reduce fees, and ensure security at scale.
               </p>

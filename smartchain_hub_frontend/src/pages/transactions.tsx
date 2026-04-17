@@ -165,7 +165,7 @@ export default function Transactions() {
               ) : (
                 <div className="space-y-3">
                   <div className="p-4 bg-green-50 rounded-xl border border-green-100">
-                    <div className="grid grid-cols-3 gap-4 mb-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-3">
                       <div><p className="text-xs text-gray-500">Optimized Fee</p><p className="text-lg font-bold text-gray-800">${result.fee}</p></div>
                       <div><p className="text-xs text-gray-500">Savings</p><p className="text-lg font-bold text-green-600">${result.savings}</p></div>
                       <div><p className="text-xs text-gray-500">Est. Time</p><p className="text-lg font-bold text-blue-600">{result.estimated_time_s || 12}s</p></div>
@@ -339,7 +339,7 @@ export default function Transactions() {
                 {simResult ? (
                   <div className="space-y-3">
                     <h3 className="text-sm font-bold text-gray-700">Simulation Result</h3>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {[
                         { label: 'Estimated Fee',  value: `$${simResult.estimatedFee}`,    color: 'text-gray-800' },
                         { label: 'Est. Savings',   value: `$${simResult.savings}`,          color: 'text-green-600' },
@@ -381,7 +381,7 @@ export default function Transactions() {
           <div className="px-6 py-4 border-b border-gray-100">
             <h2 className="text-base font-bold text-gray-800">Recommendations</h2>
           </div>
-          <table className="w-full">
+          <table className="w-full min-w-[600px]">
             <thead>
               <tr className="text-xs text-gray-400 border-b border-gray-50">
                 <th className="px-6 py-3 text-left font-medium"><span className="flex items-center gap-1">Tx Hash <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/></svg></span></th>
@@ -411,7 +411,7 @@ export default function Transactions() {
                 <tr><td colSpan={6} className="px-6 py-12 text-center text-sm text-gray-400">No transactions yet. Use the Optimize tab to get started.</td></tr>
               )}
             </tbody>
-          </table>
+          </table></div>
         </div>
       </div>
     </>

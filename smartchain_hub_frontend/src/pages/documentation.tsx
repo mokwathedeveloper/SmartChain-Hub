@@ -26,7 +26,7 @@ export default function Documentation() {
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 max-w-lg">
-              <h1 className="text-4xl font-extrabold text-gray-900 mb-4">Developer Resources</h1>
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-900 mb-4">Developer Resources</h1>
               <p className="text-gray-500 mb-8 leading-relaxed">
                 Everything you need to integrate SmartChain Hub into your application. Explore our guides, API references, and GitHub repositories.
               </p>

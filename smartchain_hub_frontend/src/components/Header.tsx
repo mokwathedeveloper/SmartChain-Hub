@@ -49,7 +49,28 @@ const Header = ({ onMenuClick }: HeaderProps) => {
           <Link href="/features" className="text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors">Features</Link>
           <Link href="/documentation" className="text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors">Documentations</Link>
           <Link href="/contact" className="text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors">Contact</Link>
-          <Link href="/signup" className="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors">Get Started</Link>
+
+          {user ? (
+            /* Logged in — show avatar + dashboard link */
+            <div className="flex items-center gap-3">
+              <Link href="/dashboard" className="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors">
+                Dashboard
+              </Link>
+              <Link href="/profile" className="flex items-center gap-2 group">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold">
+                  {user.email?.[0]?.toUpperCase()}
+                </div>
+                <span className="text-sm text-gray-600 group-hover:text-blue-600 font-medium hidden lg:block">
+                  {user.email?.split('@')[0]}
+                </span>
+              </Link>
+            </div>
+          ) : (
+            /* Not logged in — show Get Started */
+            <Link href="/signup" className="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors">
+              Get Started
+            </Link>
+          )}
         </nav>
       </header>
     );

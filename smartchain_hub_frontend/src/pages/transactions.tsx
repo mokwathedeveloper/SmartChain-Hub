@@ -381,7 +381,7 @@ export default function Transactions() {
           <div className="px-6 py-4 border-b border-gray-100">
             <h2 className="text-base font-bold text-gray-800">Recommendations</h2>
           </div>
-          <table className="w-full min-w-[600px]">
+          <div className="overflow-x-auto"><table className="w-full min-w-[600px]">
             <thead>
               <tr className="text-xs text-gray-400 border-b border-gray-50">
                 <th className="px-6 py-3 text-left font-medium"><span className="flex items-center gap-1">Tx Hash <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/></svg></span></th>
@@ -411,7 +411,8 @@ export default function Transactions() {
                 <tr><td colSpan={6} className="px-6 py-12 text-center text-sm text-gray-400">No transactions yet. Use the Optimize tab to get started.</td></tr>
               )}
             </tbody>
-          </table></div>
+          </table>
+          </div>
         </div>
       </div>
     </>

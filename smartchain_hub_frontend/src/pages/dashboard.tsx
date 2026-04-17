@@ -120,6 +120,7 @@ export default function Dashboard() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
           </div>
+          <div className="overflow-x-auto">
           <table className="w-full min-w-[600px]">
             <thead>
               <tr className="text-xs text-gray-400 border-b border-gray-50">
@@ -139,7 +140,8 @@ export default function Dashboard() {
                 </tr>
               ))}
             </tbody>
-          </table></div>
+          </table>
+          </div>
         </div>
 
         {/* Datasource */}
@@ -150,6 +152,7 @@ export default function Dashboard() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
           </div>
+          <div className="overflow-x-auto">
           <table className="w-full min-w-[600px]">
             <tbody>
               {staticDatasource.map((row, i) => (
@@ -162,7 +165,8 @@ export default function Dashboard() {
                 </tr>
               ))}
             </tbody>
-          </table></div>
+          </table>
+          </div>
         </div>
 
       </div>

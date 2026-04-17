@@ -52,7 +52,7 @@ class TransactionOptimizer:
 
         return {
             "route": route["name"],
-            "fee": round(optimized_fee, 2),
+            "fee": round(max(optimized_fee, 0.01), 2),
             "savings": final_savings,
             "confidence": round(prediction["confidence"] * 100, 1),  # 0-100 for UI
             "risk": risk_label,

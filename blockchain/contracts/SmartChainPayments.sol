@@ -99,7 +99,10 @@ contract SmartChainPayments is Ownable, ReentrancyGuard {
         uint256 principal = s.amount;
         totalStaked -= principal;
         s.amount = 0; s.rewardDebt = 0; s.stakedAt = 0;
+        // Cap total to contract balance (reward may not be funded yet)
         uint256 total = principal + reward;
+        uint256 balance = address(this).balance;
+        if (total > balance) total = balance;
         (bool ok,) = payable(msg.sender).call{value: total}("");
         require(ok, "Transfer failed");
         emit Unstaked(msg.sender, principal, reward);

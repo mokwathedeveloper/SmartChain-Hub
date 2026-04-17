@@ -3,6 +3,8 @@ require("@nomicfoundation/hardhat-toolbox");
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.20",
+  paths: { tests: "./tests" },
+  mocha: { spec: "tests/**/*.{js,ts}" },
   networks: {
     hardhat: {},
     // ── 0G Networks (Hackathon primary) ──────────────────────────

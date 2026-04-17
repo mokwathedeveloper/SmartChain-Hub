@@ -170,8 +170,12 @@ export default function Transactions() {
                       <div><p className="text-xs text-gray-500">Savings</p><p className="text-lg font-bold text-green-600">${result.savings}</p></div>
                       <div><p className="text-xs text-gray-500">Est. Time</p><p className="text-lg font-bold text-blue-600">{result.estimated_time_s || 12}s</p></div>
                     </div>
-                    <p className="text-xs text-gray-500">Route: <span className="font-medium text-gray-700">{result.route}</span></p>
-                    <p className="text-xs text-gray-400 mt-1 italic">{result.explanation}</p>
+                    <p className="text-xs text-gray-500 mb-1">Route: <span className="font-medium text-gray-700">{result.route}</span></p>
+                    <div className="flex items-center gap-3 mb-2">
+                      {result.risk && <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${result.risk === 'Very Low' || result.risk === 'Low' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>Risk: {result.risk}</span>}
+                      {result.congestion !== undefined && <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">Network: {result.congestion}% congestion</span>}
+                    </div>
+                    <p className="text-xs text-gray-400 italic">{result.explanation}</p>
                     <div className="mt-2 flex items-center gap-2">
                       <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                         <div className="h-full bg-green-500 rounded-full" style={{ width: `${result.confidence}%` }}/>

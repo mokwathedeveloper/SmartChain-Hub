@@ -20,7 +20,7 @@ const staticDatasource = [
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const [stats, setStats] = useState({ totalTx: 12450, revenue: 24560, nodescore: 28 });
+  const [stats, setStats] = useState({ totalTx: 0, revenue: 0, nodescore: 0 });
   const [activity, setActivity] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -34,10 +34,9 @@ export default function Dashboard() {
       const txs = txRes.data || [];
       const revs = revRes.data || [];
       const totalRevenue = revs.reduce((s, r) => s + Number(r.user_share), 0);
-      if (txs.length > 0) {
-        setStats({ totalTx: txs.length, revenue: totalRevenue, nodescore: 28 });
-        setActivity(txs);
-      }
+      const nodescore = txs.filter((t: any) => t.status === 'confirmed').length;
+      setStats({ totalTx: txs.length, revenue: totalRevenue, nodescore });
+      setActivity(txs);
       setLoading(false);
     };
     fetch();

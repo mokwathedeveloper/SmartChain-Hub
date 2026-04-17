@@ -165,9 +165,10 @@ export default function Transactions() {
               ) : (
                 <div className="space-y-3">
                   <div className="p-4 bg-green-50 rounded-xl border border-green-100">
-                    <div className="grid grid-cols-2 gap-4 mb-3">
+                    <div className="grid grid-cols-3 gap-4 mb-3">
                       <div><p className="text-xs text-gray-500">Optimized Fee</p><p className="text-lg font-bold text-gray-800">${result.fee}</p></div>
                       <div><p className="text-xs text-gray-500">Savings</p><p className="text-lg font-bold text-green-600">${result.savings}</p></div>
+                      <div><p className="text-xs text-gray-500">Est. Time</p><p className="text-lg font-bold text-blue-600">{result.estimated_time_s || 12}s</p></div>
                     </div>
                     <p className="text-xs text-gray-500">Route: <span className="font-medium text-gray-700">{result.route}</span></p>
                     <p className="text-xs text-gray-400 mt-1 italic">{result.explanation}</p>

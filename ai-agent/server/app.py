@@ -139,6 +139,7 @@ def _local_optimize(amount: float, priority: str) -> dict:
     r["tee_proof"] = ""
     r["tee_signer"] = ""
     r["provider_id"] = "local-tf"
+    r.setdefault("estimated_time_s", 12)
     return r
 
 

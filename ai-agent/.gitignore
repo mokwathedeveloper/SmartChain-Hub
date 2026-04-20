@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+models/tf_savings_model.keras
+models/*.h5
+models/*.pkl
+data/

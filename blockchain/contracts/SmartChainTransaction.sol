@@ -6,7 +6,10 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title SmartChainTransaction
- * @dev Handles validation and recording of AI-optimized transactions on 0G Chain.
+ * @author SmartChain Hub
+ * @notice Records and validates AI-optimized transactions on 0G Chain.
+ * @dev Deployed on 0G Galileo Testnet (chainId 16602). Part of the SmartChain Hub
+ *      agentic economy platform built for the 0G APAC Hackathon 2026.
  */
 contract SmartChainTransaction is Ownable, ReentrancyGuard {
     

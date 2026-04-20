@@ -43,6 +43,7 @@ blockchain/.env
 
 # ── Backend ───────────────────────────────────────────────────────
 smartchain_hub_backend/.env
+smartchain_hub_backend/config/environment.env
 smartchain_hub_backend/node_modules/
 
 # ── AI Agent ──────────────────────────────────────────────────────

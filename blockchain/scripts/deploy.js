@@ -1,9 +1,7 @@
 const hre = require("hardhat");
 
-// Deploy to 0G Mainnet (hackathon):  npx hardhat run scripts/deploy.js --network og_mainnet
-// Deploy to 0G Testnet:              npx hardhat run scripts/deploy.js --network og_newton
-// Deploy to Ethereum Mainnet:        npx hardhat run scripts/deploy.js --network ethereum
-// Deploy to Sepolia Testnet:         npx hardhat run scripts/deploy.js --network sepolia
+// Deploy to 0G Testnet:   npx hardhat run scripts/deploy.js --network og_newton
+// Deploy to 0G Mainnet:   npx hardhat run scripts/deploy.js --network og_mainnet
 
 const EXPLORERS = {
   og_mainnet: "https://chainscan.0g.ai/address",
@@ -38,7 +36,18 @@ async function main() {
   console.log(`SmartChainPayments:    ${payAddr}`);
   if (explorer) console.log(`  → ${explorer}/${payAddr}`);
 
-  console.log(`\nUpdate .env.local:\n  NEXT_PUBLIC_CONTRACT_ADDRESS=${txAddr}\n  NEXT_PUBLIC_PAYMENTS_CONTRACT=${payAddr}\n  NEXT_PUBLIC_CHAIN=${network}`);
+  const AID = await hre.ethers.getContractFactory("SmartChainAgentID");
+  const aid = await AID.deploy();
+  await aid.waitForDeployment();
+  const aidAddr = await aid.getAddress();
+  console.log(`SmartChainAgentID:     ${aidAddr}`);
+  if (explorer) console.log(`  → ${explorer}/${aidAddr}`);
+
+  console.log(`\nUpdate .env.local:
+  NEXT_PUBLIC_CONTRACT_ADDRESS=${txAddr}
+  NEXT_PUBLIC_PAYMENTS_CONTRACT=${payAddr}
+  NEXT_PUBLIC_AGENT_ID_CONTRACT=${aidAddr}
+  NEXT_PUBLIC_CHAIN=${network}`);
 }
 
 main().catch((e) => { console.error(e); process.exitCode = 1; });

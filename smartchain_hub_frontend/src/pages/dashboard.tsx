@@ -2,6 +2,7 @@ import Head from "next/head";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
+import AgentIDCard from "@/components/AgentIDCard";
 
 const barHeights = [20,35,25,45,30,40,55,35,45,50,60,42,50,38,58,48,55,65,52,62,44,55,58,48,52,62,55,58,48,65];
 
@@ -57,8 +58,11 @@ export default function Dashboard() {
 
   return (
     <>
-      <Head><title>Dashboard | PayOptimize</title></Head>
+      <Head><title>Dashboard | SmartChain Hub</title></Head>
       <div className="space-y-5">
+
+        {/* Agent ID Card */}
+        <AgentIDCard />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

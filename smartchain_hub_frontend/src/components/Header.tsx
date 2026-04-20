@@ -47,7 +47,7 @@ const Header = ({ onMenuClick }: HeaderProps) => {
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
-            {[['/', 'Home'], ['/features', 'Features'], ['/about', 'About'], ['/documentation', 'Docs']].map(([href, label]) => (
+            {[['/', 'Home'], ['/features', 'Features'], ['/about', 'About'], ['/documentation', 'Docs'], ['/blog', 'Blog'], ['/contact', 'Contact']].map(([href, label]) => (
               <Link key={href} href={href} className="text-sm text-gray-400 hover:text-white font-medium transition-colors">{label}</Link>
             ))}
           </nav>

@@ -95,7 +95,7 @@ const Sidebar = ({ onClose }: SidebarProps) => {
             <path d="M20 8L30 14V22L20 28L10 22V14L20 8Z" fill="#3B82F6" opacity="0.8"/>
             <path d="M20 14L26 17.5V24.5L20 28L14 24.5V17.5L20 14Z" fill="#22C55E" opacity="0.9"/>
           </svg>
-          <span className="font-bold text-gray-800 text-base">PayOptimize</span>
+          <span className="font-bold text-gray-800 text-base">SmartChain Hub</span>
         </Link>
         <button onClick={onClose} className="lg:hidden text-gray-400 hover:text-gray-600">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

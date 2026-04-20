@@ -44,7 +44,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
   };
 
   const connectWallet = async () => {
-    if (!window.ethereum) { alert('Please install MetaMask or a Web3 wallet.'); return; }
+    if (!window.ethereum) { console.warn('No Web3 wallet detected'); return; }
     try {
       const bp = new ethers.BrowserProvider(window.ethereum);
       const network = await bp.getNetwork();

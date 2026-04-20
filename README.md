@@ -2,66 +2,112 @@
 
 > **0G APAC Hackathon 2026 — Track 3: Agentic Economy & Autonomous Applications**
 
-SmartChain Hub is a B2C decentralized commerce platform that uses **0G Compute** for TEE-verified AI inference, **0G Storage** for immutable transaction metadata, and **0G Chain** smart contracts for on-chain settlement and revenue sharing.
+SmartChain Hub is a decentralized AI commerce platform where every user has a **sovereign AI agent** with on-chain identity, persistent memory, and verifiable intelligence — powered by the full 0G modular stack.
+
+The agent optimizes blockchain transactions using **0G Compute** (TEE-verified LLaMA inference), stores immutable receipts on **0G Storage** (Log + KV layers), commits memory roots to a **soulbound Agent ID** on **0G Chain**, and distributes revenue automatically via smart contracts.
 
 ---
 
-## 🔗 0G Mainnet Deployment
+## 🔗 Live Deployment — 0G Galileo Testnet
 
 | Contract | Address | Explorer |
 |----------|---------|---------|
-| SmartChainTransaction | `<DEPLOY_ADDRESS_HERE>` | [ChainScan ↗](https://chainscan.0g.ai/address/<DEPLOY_ADDRESS_HERE>) |
-| SmartChainRevenue | `<DEPLOY_ADDRESS_HERE>` | [ChainScan ↗](https://chainscan.0g.ai/address/<DEPLOY_ADDRESS_HERE>) |
+| SmartChainTransaction | `0xf95A1610be22046c334E3bD1b11D2B88519E6C52` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0xf95A1610be22046c334E3bD1b11D2B88519E6C52) |
+| SmartChainRevenue | `0x8858886AEE6342DFA4DE5Cf66dB25dCF75b31A08` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0x8858886AEE6342DFA4DE5Cf66dB25dCF75b31A08) |
+| SmartChainPayments | `0x540aFf6B167F8B5889d852d124C545F5f876A7eB` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0x540aFf6B167F8B5889d852d124C545F5f876A7eB) |
+| **SmartChainAgentID** | `0x69C619374c6B901b99941Df7238fceb80d7DCd08` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0x69C619374c6B901b99941Df7238fceb80d7DCd08) |
 
-**Network:** 0G Mainnet · Chain ID `16661` · RPC `https://evmrpc.0g.ai`
+**Network:** 0G Galileo Testnet · Chain ID `16602` · RPC `https://evmrpc-testnet.0g.ai`
+
+---
+
+## 🤖 What Makes This Different — Agent Sovereignty
+
+Most "AI + Web3" projects are just ChatGPT with a tip jar. SmartChain Hub is different:
+
+| Feature | Most Projects | SmartChain Hub |
+|---------|--------------|----------------|
+| Agent identity | EOA wallet (copyable) | Soulbound NFT on 0G Chain (non-transferable) |
+| Agent memory | localStorage / DB | 0G Storage KV layer — survives browser resets |
+| Inference proof | None | TEE-verified via 0G Compute TeeML mode |
+| Transaction receipts | Centralized DB | Immutable 0G Storage Log layer + Merkle root |
+| Revenue sharing | Manual | Automated on-chain via SmartChainRevenue |
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     USER BROWSER (Next.js)                  │
-│  Login (Supabase Auth) → Dashboard → Transaction Optimizer  │
-└────────────────────┬────────────────────────────────────────┘
-                     │ REST API
-┌────────────────────▼────────────────────────────────────────┐
-│              AI AGENT SERVER (Python / Flask)               │
-│                                                             │
-│  1. Receives optimize request (amount, priority)            │
-│  2. Calls 0G Compute Broker → TeeML inference               │
-│     └─ Returns: fee, savings, route + TEE proof metadata    │
-│  3. Falls back to local TensorFlow if no API key            │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-        ┌────────────┴────────────┐
-        │                         │
-┌───────▼──────────┐   ┌──────────▼──────────────────────────┐
-│  0G COMPUTE      │   │  0G STORAGE (TypeScript SDK)         │
-│  ─────────────── │   │  ─────────────────────────────────── │
-│  Model: LLaMA 3  │   │  Log Layer: immutable tx receipts    │
-│  Mode: TeeML     │   │  KV Layer:  user state / memory      │
-│  Proof: TEE sig  │   │  Returns:   Merkle root hash         │
-└──────────────────┘   └──────────────────────────────────────┘
-                                   │
-                     ┌─────────────▼──────────────────────────┐
-                     │  0G CHAIN (Solidity / Hardhat)          │
-                     │  ──────────────────────────────────── │
-                     │  SmartChainTransaction.recordTransaction│
-                     │  SmartChainRevenue.distributeRevenue    │
-                     │  Events visible on ChainScan            │
-                     └────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                    USER BROWSER (Next.js 16)                    │
+│  Login → Dashboard → Agent ID Card → Transaction Optimizer      │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │ REST API
+┌──────────────────────────▼──────────────────────────────────────┐
+│               AI AGENT SERVER (Python / Flask)                  │
+│  1. POST /optimize → 0G Compute Broker (TeeML inference)        │
+│  2. Returns: fee, savings, route, TEE proof, confidence         │
+│  3. Falls back to local TensorFlow if no broker key             │
+└──────────┬───────────────────────────────────────────────────────┘
+           │
+     ┌─────┴──────────────────────────────────────┐
+     │                                            │
+┌────▼─────────────┐   ┌────────────────────────────────────────┐
+│  0G COMPUTE      │   │  0G STORAGE (TypeScript SDK)           │
+│  ─────────────── │   │  ──────────────────────────────────── │
+│  Model: LLaMA 3  │   │  Log Layer → immutable tx receipts     │
+│  Mode:  TeeML    │   │  KV Layer  → agent memory (fast read)  │
+│  Proof: TEE sig  │   │  Returns   → Merkle root hash          │
+└──────────────────┘   └────────────────┬───────────────────────┘
+                                        │ rootHash committed
+                       ┌────────────────▼───────────────────────┐
+                       │  0G CHAIN — 4 Contracts                 │
+                       │  ──────────────────────────────────── │
+                       │  SmartChainAgentID   → soulbound NFT   │
+                       │    .mintAgentID()    → one per wallet  │
+                       │    .updateMemory()   → KV root on-chain│
+                       │    .reputation       → increments/tx   │
+                       │                                        │
+                       │  SmartChainTransaction → record tx     │
+                       │  SmartChainRevenue     → auto payout   │
+                       │  SmartChainPayments    → stake/earn    │
+                       └────────────────────────────────────────┘
 ```
 
 ---
 
 ## 🧩 0G Components Used
 
-| Component | How Used | Why 0G |
-|-----------|----------|--------|
-| **0G Compute** | AI inference for transaction optimization via TeeML mode | TEE-verified responses — users can verify inference happened inside a trusted enclave |
-| **0G Storage** | Stores transaction metadata (Merkle root committed on-chain) | Immutable, decentralized receipts — no centralized server can alter history |
-| **0G Chain** | `SmartChainTransaction` + `SmartChainRevenue` contracts on mainnet | On-chain settlement and verifiable revenue sharing |
+| Component | Integration | Proof |
+|-----------|-------------|-------|
+| **0G Compute** | TeeML inference via broker SDK — LLaMA 3.1 8B optimizes transactions | TEE proof in response headers, displayed in UI badge |
+| **0G Storage Log** | Immutable transaction receipts uploaded via `@0glabs/0g-ts-sdk` MemData | Merkle root stored in Supabase + on-chain |
+| **0G Storage KV** | Agent memory persisted cross-session via `/api/agent-memory` server route | Memory root committed to Agent ID contract |
+| **0G Chain** | 4 contracts deployed on Galileo Testnet — settlement, revenue, Agent ID | All addresses verified on ChainScan |
+| **Agent ID** | `SmartChainAgentID.sol` — soulbound NFT storing modelHash + memoryRoot + reputation | Non-transferable, updated on every optimization |
+
+---
+
+## 🔄 Economic Flywheel
+
+```
+User optimizes transaction
+        ↓
+AI Agent (0G Compute TeeML) returns optimized route
+        ↓
+Receipt uploaded to 0G Storage Log → Merkle root returned
+        ↓
+Agent ID memory updated on-chain (reputation++)
+        ↓
+0.5% fee collected → distributed to stakers via SmartChainPayments
+        ↓
+Revenue share recorded → claimable via SmartChainRevenue
+        ↓
+User claims earnings → stakes back → earns 5% APY
+        ↓ (loop)
+```
+
+Every optimization generates: 1 Storage upload + 1 Agent ID update + 1 revenue event = **3 on-chain interactions per user action**.
 
 ---
 
@@ -69,47 +115,49 @@ SmartChain Hub is a B2C decentralized commerce platform that uses **0G Compute**
 
 ### Prerequisites
 - Node.js 20+, Python 3.12+
-- A funded 0G mainnet wallet (for contract deployment)
+- Funded 0G Galileo wallet (get tokens: https://hub.0g.ai/faucet)
 
-### 1. Frontend
+### 1. Clone & Install
 
 ```bash
+git clone <repo>
+cd SmartChain-Hub
+
+# Frontend
 cd smartchain_hub_frontend
 cp .env.local.example .env.local
-# Fill in NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_CONTRACT_ADDRESS
+# Fill in Supabase keys + contract addresses (see .env.local.example)
 npm install
-npm run dev
-# → http://localhost:3000
-```
+npm run dev   # → http://localhost:3000
 
-### 2. AI Agent (with 0G Compute)
-
-```bash
-cd ai-agent
+# AI Agent
+cd ../ai-agent
+cp .env.example .env
+# Fill in OG_COMPUTE_PRIVATE_KEY
 pip install -r requirements.txt
-export OG_COMPUTE_API_KEY=your_key_here          # from https://dashboard.0g.ai
-export OG_COMPUTE_BROKER_URL=https://broker.0g.ai
-python3 server/app.py
-# → http://localhost:5000
+python3 server/app.py   # → http://localhost:5000
 ```
 
-Without `OG_COMPUTE_API_KEY`, the server falls back to local TensorFlow inference automatically.
+### 2. Supabase Setup
 
-### 3. Deploy Contracts to 0G Mainnet
+Run `docs/backend/supabase_schema.sql` then `docs/backend/supabase_migration_002.sql` in your Supabase SQL editor.
+
+### 3. Deploy Contracts
 
 ```bash
 cd blockchain
+cp .env.example .env
+# Set PRIVATE_KEY to funded wallet
 npm install
-export PRIVATE_KEY=your_wallet_private_key
-npx hardhat run scripts/deploy.js --network og_mainnet
-# Copy deployed addresses → update .env.local NEXT_PUBLIC_CONTRACT_ADDRESS
+npx hardhat run scripts/deploy.js --network og_newton
+# Copy addresses → update .env.local
 ```
 
 ### 4. Verify on ChainScan
 
-After deployment, visit:
 ```
-https://chainscan.0g.ai/address/<YOUR_CONTRACT_ADDRESS>
+https://scan-testnet.0g.ai/address/0xf95A1610be22046c334E3bD1b11D2B88519E6C52
+https://scan-testnet.0g.ai/address/0x69C619374c6B901b99941Df7238fceb80d7DCd08
 ```
 
 ---
@@ -120,16 +168,22 @@ https://chainscan.0g.ai/address/<YOUR_CONTRACT_ADDRESS>
 # Frontend (.env.local)
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
-NEXT_PUBLIC_CONTRACT_ADDRESS=        # deployed SmartChainTransaction address
-NEXT_PUBLIC_STORAGE_PRIVATE_KEY=     # wallet key for 0G Storage uploads (optional)
+NEXT_PUBLIC_CONTRACT_ADDRESS=        # SmartChainTransaction
+NEXT_PUBLIC_PAYMENTS_CONTRACT=       # SmartChainPayments
+NEXT_PUBLIC_AGENT_ID_CONTRACT=       # SmartChainAgentID
+NEXT_PUBLIC_STORAGE_PRIVATE_KEY=     # 0G Storage wallet key
+STORAGE_PRIVATE_KEY=                 # Server-side storage key
+NEXT_PUBLIC_AI_AGENT_URL=http://localhost:5000
+NEXT_PUBLIC_CHAIN=og_newton
 
-# AI Agent (shell env)
-OG_COMPUTE_API_KEY=                  # 0G Compute API key
+# AI Agent (.env)
+OG_COMPUTE_PRIVATE_KEY=              # Funded wallet for 0G Compute broker
+OG_COMPUTE_RPC=https://evmrpc-testnet.0g.ai
 OG_COMPUTE_BROKER_URL=https://broker.0g.ai
 OG_COMPUTE_MODEL=llama-3.1-8b-instruct
 
 # Blockchain (.env)
-PRIVATE_KEY=                         # deployer wallet private key
+PRIVATE_KEY=                         # Deployer wallet
 ```
 
 ---
@@ -138,24 +192,58 @@ PRIVATE_KEY=                         # deployer wallet private key
 
 ```
 SmartChain-Hub/
-├── smartchain_hub_frontend/     # Next.js 16 + TypeScript + Tailwind
+├── smartchain_hub_frontend/
 │   └── src/
-│       ├── pages/               # dashboard, transactions, revenue, profile
-│       ├── components/          # Sidebar, Header, Layout
+│       ├── pages/
+│       │   ├── dashboard.tsx        # Agent ID card + stats
+│       │   ├── transactions.tsx     # AI optimizer + confirm flow
+│       │   ├── revenue.tsx          # Revenue sharing + claim
+│       │   ├── payments.tsx         # Send/stake/withdraw
+│       │   └── api/
+│       │       ├── storage-upload.ts  # 0G Storage server route
+│       │       └── agent-memory.ts    # 0G KV memory server route
+│       ├── components/
+│       │   └── AgentIDCard.tsx      # Soulbound identity display
 │       └── utils/
-│           └── storage.ts       # 0G Storage SDK integration
+│           ├── agentId.ts           # Agent ID contract interactions
+│           ├── agentMemory.ts       # Persistent memory (KV + localStorage)
+│           ├── storage.ts           # 0G Storage client wrapper
+│           └── blockchain.ts        # ethers.js contract helpers
 ├── ai-agent/
-│   └── server/app.py            # Flask + 0G Compute + TF fallback
+│   ├── server/app.py                # Flask + 0G Compute broker + TF fallback
+│   ├── scripts/optimizer.py         # TransactionOptimizer (3 routes)
+│   └── models/savings_model.py      # TensorFlow 6-feature model
 ├── blockchain/
-│   ├── contracts/               # SmartChainTransaction.sol, SmartChainRevenue.sol
-│   ├── scripts/deploy.js        # Hardhat deploy → og_mainnet
-│   └── hardhat.config.js        # Chain ID 16661
+│   ├── contracts/
+│   │   ├── SmartChainAgentID.sol    # Soulbound Agent ID (NEW)
+│   │   ├── SmartChainTransaction.sol
+│   │   ├── SmartChainRevenue.sol
+│   │   └── SmartChainPayments.sol
+│   └── scripts/deploy.js
 └── docs/
-    └── qa.md                    # Test matrix and QA plan
+    └── backend/
+        ├── supabase_schema.sql
+        └── supabase_migration_002.sql
 ```
+
+---
+
+## 🗺️ Roadmap
+
+| Phase | Feature | 0G Module |
+|-------|---------|-----------|
+| ✅ Now | Agent ID soulbound NFT + memory root on-chain | 0G Chain |
+| ✅ Now | TEE-verified inference via 0G Compute broker | 0G Compute |
+| ✅ Now | Immutable receipts on 0G Storage Log layer | 0G Storage |
+| 🔜 Next | Fine-tune TF model on user data stored in 0G Storage | 0G Compute fine-tuning |
+| 🔜 Next | Agent-to-Agent micropayments (Agent A pays Agent B per API call) | 0G Chain + Agent ID |
+| 🔜 Next | Persistent Memory module integration when live | 0G Persistent Memory |
+| 🔜 Next | ZK-verified transaction proofs | 0G Privacy / TEE |
 
 ---
 
 ## ⚖️ License
 
 MIT — Built for the 0G APAC Hackathon 2026.
+
+#0GHackathon #BuildOn0G

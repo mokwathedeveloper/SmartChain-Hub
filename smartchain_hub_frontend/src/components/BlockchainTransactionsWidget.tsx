@@ -20,7 +20,7 @@ const BlockchainTransactionsWidget = () => {
           table: 'transactions',
           filter: `user_id=eq.${user.id}`
         }, (payload) => {
-          console.log('Real-time update:', payload);
+          console.info('Real-time update received');
           fetchTransactions(); // Refresh list on change
         })
         .subscribe();

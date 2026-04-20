@@ -40,7 +40,8 @@ const AIOptimizationWidget = ({ onStateChange }: WidgetProps) => {
     setOptimizedResult(null);
     
     try {
-      const response = await fetch('http://localhost:5000/optimize', {
+      const AI_URL = process.env.NEXT_PUBLIC_AI_AGENT_URL || 'http://localhost:5000';
+      const response = await fetch(`${AI_URL}/optimize`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount, priority })

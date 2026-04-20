@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sys, os, time, hashlib, json, requests
+from dotenv import load_dotenv
+
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from scripts.optimizer import TransactionOptimizer
@@ -13,8 +16,9 @@ optimizer = TransactionOptimizer()
 # 0G Compute configuration
 # Docs: https://docs.0g.ai/build-with-0g/compute-network/sdk
 OG_COMPUTE_BROKER_URL = os.environ.get("OG_COMPUTE_BROKER_URL", "https://broker.0g.ai")
-OG_COMPUTE_MODEL = os.environ.get("OG_COMPUTE_MODEL", "llama-3.1-8b-instruct")
-OG_COMPUTE_API_KEY = os.environ.get("OG_COMPUTE_API_KEY", "")
+OG_COMPUTE_MODEL     = os.environ.get("OG_COMPUTE_MODEL", "llama-3.1-8b-instruct")
+OG_COMPUTE_RPC       = os.environ.get("OG_COMPUTE_RPC", "https://evmrpc-testnet.0g.ai")
+OG_PRIVATE_KEY       = os.environ.get("OG_COMPUTE_PRIVATE_KEY", "")
 
 EXPLANATIONS = {
     'efficiency': "The AI prioritized lower gas fees by selecting a high-throughput route with minimized relay costs.",
@@ -25,39 +29,59 @@ EXPLANATIONS = {
 
 def call_0g_compute(prompt: str) -> dict:
     """
-    Routes inference through 0G Compute network with TEE verification.
-    Returns result + TEE proof metadata for UI display.
-    Docs: https://docs.0g.ai/build-with-0g/compute-network/sdk#inference
+    Routes inference through 0G Compute broker with TEE verification.
+    Uses @0glabs/0g-serving-broker pattern via direct HTTP to broker endpoint.
+    Docs: https://docs.0g.ai/build-with-0g/compute-network/for-developers/inference
     """
-    if not OG_COMPUTE_API_KEY:
+    if not OG_PRIVATE_KEY:
         return None  # Fall back to local optimizer
 
     try:
-        headers = {
-            "Authorization": f"Bearer {OG_COMPUTE_API_KEY}",
-            "Content-Type": "application/json",
-            # Request TeeML verification mode (model runs inside TEE, response signed by TEE key)
-            "X-Verification-Mode": "teeml",
-        }
+        # Step 1: Get available inference providers from broker
+        providers_resp = requests.get(
+            f"{OG_COMPUTE_BROKER_URL}/v1/providers",
+            timeout=10
+        )
+        providers_resp.raise_for_status()
+        providers = providers_resp.json()
+
+        # Pick first provider that supports our model
+        provider_addr = None
+        for p in providers:
+            models = p.get("models", [])
+            if any(OG_COMPUTE_MODEL in str(m) for m in models):
+                provider_addr = p.get("address") or p.get("provider")
+                break
+        if not provider_addr and providers:
+            provider_addr = providers[0].get("address") or providers[0].get("provider")
+        if not provider_addr:
+            return None
+
+        # Step 2: Request inference with wallet-signed header
+        # The broker handles fund deduction from sub-account
         payload = {
             "model": OG_COMPUTE_MODEL,
             "messages": [{"role": "user", "content": prompt}],
             "max_tokens": 256,
             "temperature": 0.1,
         }
+        headers = {
+            "Content-Type": "application/json",
+            "X-Provider-Address": provider_addr,
+            "X-Private-Key": OG_PRIVATE_KEY,   # broker signs request on-chain
+            "X-Verification-Mode": "teeml",
+        }
         resp = requests.post(
             f"{OG_COMPUTE_BROKER_URL}/v1/chat/completions",
             headers=headers,
             json=payload,
-            timeout=15
+            timeout=20
         )
         resp.raise_for_status()
         data = resp.json()
 
-        # Extract TEE proof from response headers / body
-        tee_proof = resp.headers.get("X-TEE-Proof", "")
+        tee_proof  = resp.headers.get("X-TEE-Proof", "")
         tee_signer = resp.headers.get("X-TEE-Signer", "")
-        provider_id = resp.headers.get("X-Provider-ID", "0g-compute-node")
 
         return {
             "content": data["choices"][0]["message"]["content"],
@@ -65,7 +89,7 @@ def call_0g_compute(prompt: str) -> dict:
             "tee_mode": "TeeML",
             "tee_proof": tee_proof,
             "tee_signer": tee_signer,
-            "provider_id": provider_id,
+            "provider_id": provider_addr,
             "model": OG_COMPUTE_MODEL,
         }
     except Exception as e:
@@ -78,8 +102,9 @@ def health():
     return jsonify({
         "status": "healthy",
         "agent": "SmartChain AI v1.0",
-        "og_compute": bool(OG_COMPUTE_API_KEY),
+        "og_compute": bool(OG_PRIVATE_KEY),
         "og_compute_model": OG_COMPUTE_MODEL,
+        "og_compute_rpc": OG_COMPUTE_RPC,
     })
 
 
@@ -144,4 +169,5 @@ def _local_optimize(amount: float, priority: str) -> dict:
 
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(port=port, debug=False)

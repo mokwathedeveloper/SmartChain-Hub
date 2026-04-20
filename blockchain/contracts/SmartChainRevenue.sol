@@ -6,7 +6,10 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title SmartChainRevenue
- * @dev Manages the automated distribution of transaction fees to stakeholders.
+ * @author SmartChain Hub
+ * @notice Automated revenue distribution to stakeholders on 0G Chain.
+ * @dev 10% of every transaction fee is distributed to community stakers.
+ *      Part of the SmartChain Hub economic flywheel on 0G APAC Hackathon 2026.
  */
 contract SmartChainRevenue is Ownable, ReentrancyGuard {
     

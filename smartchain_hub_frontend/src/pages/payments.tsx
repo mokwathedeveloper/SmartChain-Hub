@@ -1,6 +1,7 @@
 import Head from "next/head";
 import React, { useState, useEffect } from "react";
 import { useWeb3 } from "@/context/Web3Context";
+import { useNotification } from "@/context/NotificationContext";
 import { ethers } from "ethers";
 
 const PAYMENTS_ABI = [
@@ -17,6 +18,7 @@ const PAYMENTS_ABI = [
 
 export default function Payments() {
   const { signer, isConnected, address, connectWallet } = useWeb3();
+  const { addNotification } = useNotification();
   const [tab, setTab] = useState("Send");
   const [loading, setLoading] = useState(false);
 
@@ -56,10 +58,10 @@ export default function Payments() {
       const c = getContract();
       const tx = await c.sendFunds(sendTo, sendMemo || "Payment", { value: ethers.parseEther(sendAmt) });
       await tx.wait();
-      alert(`Sent ${sendAmt} A0GI to ${sendTo}`);
+      addNotification(`Sent ${sendAmt} A0GI to ${sendTo}`, 'success');
       setSendTo(""); setSendAmt(""); setSendMemo("");
     } catch (e: any) {
-      alert(`Error: ${e.message}`);
+      addNotification(`Error: ${e.message}`, 'error');
     } finally { setLoading(false); }
   };
 
@@ -70,10 +72,10 @@ export default function Payments() {
       const c = getContract();
       const tx = await c.stake({ value: ethers.parseEther(stakeAmt) });
       await tx.wait();
-      alert(`Staked ${stakeAmt} A0GI`);
+      addNotification(`Staked ${stakeAmt} A0GI`, 'success');
       setStakeAmt(""); fetchStakeData();
     } catch (e: any) {
-      alert(`Error: ${e.message}`);
+      addNotification(`Error: ${e.message}`, 'error');
     } finally { setLoading(false); }
   };
 
@@ -83,10 +85,10 @@ export default function Payments() {
       const c = getContract();
       const tx = await c.unstake();
       await tx.wait();
-      alert(`Unstaked ${staked.amount} A0GI + ${staked.reward} reward`);
+      addNotification(`Unstaked ${staked.amount} A0GI + ${staked.reward} reward`, 'success');
       fetchStakeData();
     } catch (e: any) {
-      alert(`Error: ${e.message}`);
+      addNotification(`Error: ${e.message}`, 'error');
     } finally { setLoading(false); }
   };
 
@@ -96,17 +98,17 @@ export default function Payments() {
       const c = getContract();
       const tx = await c.claimEarnings();
       await tx.wait();
-      alert(`Claimed ${earnings} A0GI`);
+      addNotification(`Claimed ${earnings} A0GI`, 'success');
       fetchStakeData();
     } catch (e: any) {
-      alert(`Error: ${e.message}`);
+      addNotification(`Error: ${e.message}`, 'error');
     } finally { setLoading(false); }
   };
 
   if (!isConnected) {
     return (
       <>
-        <Head><title>Payments | PayOptimize</title></Head>
+        <Head><title>Payments | SmartChain Hub</title></Head>
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,7 +126,7 @@ export default function Payments() {
 
   return (
     <>
-      <Head><title>Payments | PayOptimize</title></Head>
+      <Head><title>Payments | SmartChain Hub</title></Head>
       <div className="space-y-6">
 
         {/* Tabs */}

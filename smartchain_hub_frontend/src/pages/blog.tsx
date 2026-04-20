@@ -70,10 +70,10 @@ export default function Blog() {
       {/* Blog Posts */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6 max-w-6xl">
-          <h2 className="text-2xl font-bold text-gray-800 mb-10">New AI Agent Hub</h2>
+          <h2 className="text-2xl font-bold text-white mb-10">New AI Agent Hub</h2>
           <div className="space-y-8">
             {posts.map((post) => (
-              <div key={post.title} className="flex gap-6 border border-gray-100 rounded-2xl p-5 hover:shadow-lg transition-all">
+              <div key={post.title} className="flex gap-6 border border-gray-800 rounded-2xl p-5 hover:shadow-lg transition-all">
                 {/* Thumbnail */}
                 <div className={`w-32 h-24 rounded-xl bg-gradient-to-br ${post.color} shrink-0 flex items-center justify-center overflow-hidden`}>
                   <svg viewBox="0 0 100 80" className="w-full h-full opacity-80">
@@ -84,12 +84,12 @@ export default function Blog() {
                 </div>
                 {/* Content */}
                 <div className="flex-1">
-                  <h3 className="text-base font-bold text-gray-800 mb-2">{post.title}</h3>
+                  <h3 className="text-base font-bold text-white mb-2">{post.title}</h3>
                   <p className="text-sm text-gray-500 leading-relaxed mb-3">{post.excerpt}</p>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-400">{post.date}</span>
-                    <span className="text-xs text-gray-300">•</span>
-                    <span className="text-xs text-gray-400">{post.readTime} read</span>
+                    <span className="text-xs text-gray-500">{post.date}</span>
+                    <span className="text-xs text-gray-400">•</span>
+                    <span className="text-xs text-gray-500">{post.readTime} read</span>
                   </div>
                 </div>
               </div>

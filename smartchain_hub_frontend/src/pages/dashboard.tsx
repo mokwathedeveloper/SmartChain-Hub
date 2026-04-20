@@ -87,17 +87,17 @@ export default function Dashboard() {
         </div>
 
         {/* Bar Chart */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-gray-800">Transaction Volume</h2>
-            <div className="flex items-center gap-1 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-500 cursor-pointer">
+            <h2 className="text-base font-bold text-white">Transaction Volume</h2>
+            <div className="flex items-center gap-1 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-500 cursor-pointer">
               Last 30 Days
               <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/></svg>
             </div>
           </div>
           <div className="flex gap-3">
             {/* Y-axis */}
-            <div className="flex flex-col justify-between text-right pr-2 text-xs text-gray-400 h-36 shrink-0">
+            <div className="flex flex-col justify-between text-right pr-2 text-xs text-gray-500 h-36 shrink-0">
               <span>300</span><span>100</span><span>$0</span><span>0</span>
             </div>
             {/* Bars */}
@@ -111,23 +111,23 @@ export default function Dashboard() {
             </div>
           </div>
           {/* X-axis labels */}
-          <div className="flex justify-between mt-1 ml-8 text-xs text-gray-400">
+          <div className="flex justify-between mt-1 ml-8 text-xs text-gray-500">
             {['$10','$20','$30','$40','$50','$60','$70','$80','$90','$100'].map(l => <span key={l}>{l}</span>)}
           </div>
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-            <h2 className="text-base font-bold text-gray-800">Recent Activity</h2>
-            <button className="text-gray-300 hover:text-gray-500">
+        <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+            <h2 className="text-base font-bold text-white">Recent Activity</h2>
+            <button className="text-gray-400 hover:text-gray-500">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
           </div>
           <div className="overflow-x-auto">
           <table className="w-full min-w-[600px]">
             <thead>
-              <tr className="text-xs text-gray-400 border-b border-gray-50">
+              <tr className="text-xs text-gray-500 border-b border-gray-800">
                 <th className="px-6 py-3 text-left font-medium">Description</th>
                 <th className="px-6 py-3 text-left font-medium">Type</th>
                 <th className="px-6 py-3 text-left font-medium">Amount</th>
@@ -136,10 +136,10 @@ export default function Dashboard() {
             </thead>
             <tbody>
               {rows.map((row, i) => (
-                <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/50">
-                  <td className="px-6 py-4 text-sm text-gray-700 font-medium">{row.description}</td>
-                  <td className="px-6 py-4"><span className="text-xs bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full">{row.type}</span></td>
-                  <td className="px-6 py-4 text-sm text-gray-700 font-medium">{row.amount}</td>
+                <tr key={i} className="border-b border-gray-800 hover:bg-gray-800/50">
+                  <td className="px-6 py-4 text-sm text-gray-200 font-medium">{row.description}</td>
+                  <td className="px-6 py-4"><span className="text-xs bg-gray-800 text-gray-500 px-2.5 py-1 rounded-full">{row.type}</span></td>
+                  <td className="px-6 py-4 text-sm text-gray-200 font-medium">{row.amount}</td>
                   <td className="px-6 py-4"><span className={`text-xs px-2.5 py-1 rounded-full font-medium ${row.statusCls}`}>{row.status}</span></td>
                 </tr>
               ))}
@@ -149,10 +149,10 @@ export default function Dashboard() {
         </div>
 
         {/* Datasource */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-            <h2 className="text-base font-bold text-gray-800">Datasource</h2>
-            <button className="text-gray-300 hover:text-gray-500">
+        <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+            <h2 className="text-base font-bold text-white">Datasource</h2>
+            <button className="text-gray-400 hover:text-gray-500">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
           </div>
@@ -160,10 +160,10 @@ export default function Dashboard() {
           <table className="w-full min-w-[600px]">
             <tbody>
               {staticDatasource.map((row, i) => (
-                <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/50">
+                <tr key={i} className="border-b border-gray-800 hover:bg-gray-800/50">
                   <td className="px-6 py-4 text-sm text-blue-600 font-medium">{row.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{row.bank}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{row.amount}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{row.bank}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{row.amount}</td>
                   <td className="px-6 py-4 text-sm text-gray-500 truncate max-w-[180px]">{row.freq}</td>
                   <td className="px-6 py-4"><span className={`text-xs px-2.5 py-1 rounded-full font-medium ${row.statusCls}`}>Bankdu Reamoed</span></td>
                 </tr>

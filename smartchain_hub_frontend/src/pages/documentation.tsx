@@ -85,9 +85,9 @@ export default function Documentation() {
                 cta: "Get Started", href: "#"
               },
             ].map((card) => (
-              <div key={card.title} className="border border-gray-100 rounded-2xl p-8 hover:shadow-lg transition-all flex flex-col">
+              <div key={card.title} className="border border-gray-800 rounded-2xl p-8 hover:shadow-lg transition-all flex flex-col">
                 <div className="mb-5">{card.icon}</div>
-                <h3 className="text-lg font-bold text-gray-800 mb-3">{card.title}</h3>
+                <h3 className="text-lg font-bold text-white mb-3">{card.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed mb-6 flex-1">{card.desc}</p>
                 <Link href={card.href} className="inline-block px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors w-fit">
                   {card.cta}

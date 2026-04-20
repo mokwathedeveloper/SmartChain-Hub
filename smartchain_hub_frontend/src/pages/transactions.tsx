@@ -164,10 +164,10 @@ export default function Transactions() {
       <div className="space-y-6">
 
         {/* Tabs */}
-        <div className="flex gap-6 border-b border-gray-200">
+        <div className="flex gap-6 border-b border-gray-700">
           {["Optimize", "Analyze", "Simulate"].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)}
-              className={`pb-3 text-sm font-semibold transition-colors ${activeTab === tab ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"}`}>
+              className={`pb-3 text-sm font-semibold transition-colors ${activeTab === tab ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-200"}`}>
               {tab}
             </button>
           ))}
@@ -175,18 +175,18 @@ export default function Transactions() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <p className="text-xs text-gray-400 mb-1">Potential Savings</p>
-            <span className="text-3xl font-bold text-gray-800">${stats.savings.toFixed(2)}</span>
+          <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+            <p className="text-xs text-gray-500 mb-1">Potential Savings</p>
+            <span className="text-3xl font-bold text-white">${stats.savings.toFixed(2)}</span>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <p className="text-xs text-gray-400 mb-1">Efficiency Gain</p>
-            <span className="text-3xl font-bold text-gray-800">{stats.efficiency}%</span>
+          <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+            <p className="text-xs text-gray-500 mb-1">Efficiency Gain</p>
+            <span className="text-3xl font-bold text-white">{stats.efficiency}%</span>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <p className="text-xs text-gray-400 mb-1">Avg Confirmation</p>
+          <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+            <p className="text-xs text-gray-500 mb-1">Avg Confirmation</p>
             <div className="flex items-end gap-2">
-              <span className="text-3xl font-bold text-gray-800">{stats.avgConf}s</span>
+              <span className="text-3xl font-bold text-white">{stats.avgConf}s</span>
               <span className="text-sm text-green-500 font-medium mb-0.5">+8.3%</span>
             </div>
           </div>
@@ -194,18 +194,18 @@ export default function Transactions() {
 
         {/* ── OPTIMIZE TAB ── */}
         {activeTab === "Optimize" && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h2 className="text-base font-bold text-gray-800 mb-5">AI Transaction Optimizer</h2>
+          <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+            <h2 className="text-base font-bold text-white mb-5">AI Transaction Optimizer</h2>
             <div className="space-y-4 max-w-lg">
               <div>
                 <label className="block text-xs text-gray-500 mb-1.5">Transaction Amount ($)</label>
                 <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                  className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
               </div>
               <div className="flex gap-2">
                 {['efficiency','speed','security'].map(p => (
                   <button key={p} onClick={() => setPriority(p)}
-                    className={`flex-1 py-2.5 text-xs font-semibold rounded-xl capitalize transition-all border ${priority === p ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}>
+                    className={`flex-1 py-2.5 text-xs font-semibold rounded-xl capitalize transition-all border ${priority === p ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-500 border-gray-700 hover:border-gray-300'}`}>
                     {p}
                   </button>
                 ))}
@@ -219,16 +219,16 @@ export default function Transactions() {
                 <div className="space-y-3">
                   <div className="p-4 bg-green-50 rounded-xl border border-green-100">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-3">
-                      <div><p className="text-xs text-gray-500">Optimized Fee</p><p className="text-lg font-bold text-gray-800">${result.fee}</p></div>
+                      <div><p className="text-xs text-gray-500">Optimized Fee</p><p className="text-lg font-bold text-white">${result.fee}</p></div>
                       <div><p className="text-xs text-gray-500">Savings</p><p className="text-lg font-bold text-green-600">${result.savings}</p></div>
                       <div><p className="text-xs text-gray-500">Est. Time</p><p className="text-lg font-bold text-blue-600">{result.estimated_time_s || 12}s</p></div>
                     </div>
-                    <p className="text-xs text-gray-500 mb-1">Route: <span className="font-medium text-gray-700">{result.route}</span></p>
+                    <p className="text-xs text-gray-500 mb-1">Route: <span className="font-medium text-gray-200">{result.route}</span></p>
                     <div className="flex items-center gap-3 mb-2">
                       {result.risk && <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${result.risk === 'Very Low' || result.risk === 'Low' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>Risk: {result.risk}</span>}
                       {result.congestion !== undefined && <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">Network: {result.congestion}% congestion</span>}
                     </div>
-                    <p className="text-xs text-gray-400 italic">{result.explanation}</p>
+                    <p className="text-xs text-gray-500 italic">{result.explanation}</p>
                     <div className="mt-2 flex items-center gap-2">
                       <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                         <div className="h-full bg-green-500 rounded-full" style={{ width: `${result.confidence}%` }}/>
@@ -238,7 +238,7 @@ export default function Transactions() {
                   </div>
 
                   {/* TEE Verification Badge */}
-                  <div className={`flex items-center gap-3 p-3 rounded-xl border ${result.tee_verified ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'}`}>
+                  <div className={`flex items-center gap-3 p-3 rounded-xl border ${result.tee_verified ? 'bg-blue-50 border-blue-200' : 'bg-gray-900 border-gray-700'}`}>
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${result.tee_verified ? 'bg-blue-600' : 'bg-gray-400'}`}>
                       <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
@@ -255,8 +255,8 @@ export default function Transactions() {
                         </>
                       ) : (
                         <>
-                          <p className="text-xs font-bold text-gray-600">Local TensorFlow — No TEE</p>
-                          <p className="text-xs text-gray-400">Set OG_COMPUTE_API_KEY to enable 0G Compute + TEE</p>
+                          <p className="text-xs font-bold text-gray-500">Local TensorFlow — No TEE</p>
+                          <p className="text-xs text-gray-500">Set OG_COMPUTE_API_KEY to enable 0G Compute + TEE</p>
                         </>
                       )}
                     </div>
@@ -266,7 +266,7 @@ export default function Transactions() {
                   </div>
 
                   <div className="flex gap-3">
-                    <button onClick={() => setResult(null)} className="flex-1 py-2.5 border border-gray-200 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-50">Reset</button>
+                    <button onClick={() => setResult(null)} className="flex-1 py-2.5 border border-gray-700 text-gray-500 text-sm font-medium rounded-xl hover:bg-gray-800">Reset</button>
                     <button onClick={handleConfirm} disabled={saving}
                       className="flex-[2] py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-50">
                       {saving ? 'Saving...' : 'Confirm & Save'}
@@ -281,8 +281,8 @@ export default function Transactions() {
         {/* ── ANALYZE TAB ── */}
         {activeTab === "Analyze" && (
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-base font-bold text-gray-800 mb-5">Transaction Analysis</h2>
+            <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+              <h2 className="text-base font-bold text-white mb-5">Transaction Analysis</h2>
               {analyzeRows.length > 0 ? (
                 <>
                   {/* Route breakdown */}
@@ -292,10 +292,10 @@ export default function Transactions() {
                       return (
                         <div key={i}>
                           <div className="flex justify-between text-sm mb-1">
-                            <span className="text-gray-700 font-medium">{row.route}</span>
+                            <span className="text-gray-200 font-medium">{row.route}</span>
                             <span className="text-gray-500">{row.count} tx · <span className="text-green-600 font-semibold">${row.totalSavings.toFixed(2)} saved</span></span>
                           </div>
-                          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
                             <div className="h-full bg-blue-500 rounded-full transition-all" style={{ width: `${(row.totalSavings / maxSavings) * 100}%` }}/>
                           </div>
                         </div>
@@ -305,7 +305,7 @@ export default function Transactions() {
                   {/* Summary table */}
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="text-xs text-gray-400 border-b border-gray-100">
+                      <tr className="text-xs text-gray-500 border-b border-gray-800">
                         <th className="py-2 text-left font-medium">Route</th>
                         <th className="py-2 text-left font-medium">Transactions</th>
                         <th className="py-2 text-left font-medium">Total Fees</th>
@@ -315,10 +315,10 @@ export default function Transactions() {
                     </thead>
                     <tbody>
                       {analyzeRows.map((row, i) => (
-                        <tr key={i} className="border-b border-gray-50">
-                          <td className="py-3 text-gray-700 font-medium">{row.route}</td>
-                          <td className="py-3 text-gray-600">{row.count}</td>
-                          <td className="py-3 text-gray-600">${row.totalFees.toFixed(2)}</td>
+                        <tr key={i} className="border-b border-gray-800">
+                          <td className="py-3 text-gray-200 font-medium">{row.route}</td>
+                          <td className="py-3 text-gray-500">{row.count}</td>
+                          <td className="py-3 text-gray-500">${row.totalFees.toFixed(2)}</td>
                           <td className="py-3 text-green-600 font-semibold">${row.totalSavings.toFixed(2)}</td>
                           <td className="py-3">
                             <span className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded-full font-medium">
@@ -331,7 +331,7 @@ export default function Transactions() {
                   </table>
                 </>
               ) : (
-                <div className="text-center py-12 text-gray-400">
+                <div className="text-center py-12 text-gray-500">
                   <p className="text-sm">No transaction data to analyze yet.</p>
                   <p className="text-xs mt-1">Use the Optimize tab to create transactions first.</p>
                 </div>
@@ -340,8 +340,8 @@ export default function Transactions() {
 
             {/* Savings over time mini chart */}
             {txList.length > 1 && (
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <h3 className="text-sm font-bold text-gray-800 mb-4">Savings Over Time</h3>
+              <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+                <h3 className="text-sm font-bold text-white mb-4">Savings Over Time</h3>
                 <div className="flex items-end gap-1 h-20">
                   {txList.slice().reverse().map((tx, i) => {
                     const maxS = Math.max(...txList.map(t => Number(t.savings || 0)), 1);
@@ -352,7 +352,7 @@ export default function Transactions() {
                     );
                   })}
                 </div>
-                <p className="text-xs text-gray-400 mt-2">Each bar = one transaction, sorted oldest → newest</p>
+                <p className="text-xs text-gray-500 mt-2">Each bar = one transaction, sorted oldest → newest</p>
               </div>
             )}
           </div>
@@ -360,21 +360,21 @@ export default function Transactions() {
 
         {/* ── SIMULATE TAB ── */}
         {activeTab === "Simulate" && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h2 className="text-base font-bold text-gray-800 mb-2">Transaction Simulator</h2>
-            <p className="text-xs text-gray-400 mb-6">Test different routes and amounts without executing a real transaction.</p>
+          <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+            <h2 className="text-base font-bold text-white mb-2">Transaction Simulator</h2>
+            <p className="text-xs text-gray-500 mb-6">Test different routes and amounts without executing a real transaction.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Input */}
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs text-gray-500 mb-1.5">Amount to Simulate ($)</label>
                   <input type="number" value={simAmount} onChange={e => setSimAmount(e.target.value)} placeholder="0.00"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                    className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1.5">Route</label>
                   <select value={simRoute} onChange={e => setSimRoute(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                    className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                     <option>0G Chain Flash</option>
                     <option>Standard Route</option>
                     <option>High Speed</option>
@@ -391,33 +391,33 @@ export default function Transactions() {
               <div>
                 {simResult ? (
                   <div className="space-y-3">
-                    <h3 className="text-sm font-bold text-gray-700">Simulation Result</h3>
+                    <h3 className="text-sm font-bold text-gray-200">Simulation Result</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {[
-                        { label: 'Estimated Fee',  value: `$${simResult.estimatedFee}`,    color: 'text-gray-800' },
+                        { label: 'Estimated Fee',  value: `$${simResult.estimatedFee}`,    color: 'text-white' },
                         { label: 'Est. Savings',   value: `$${simResult.savings}`,          color: 'text-green-600' },
                         { label: 'Confirmation',   value: `~${simResult.estimatedTime}s`,   color: 'text-blue-600' },
-                        { label: 'Success Rate',   value: `${simResult.successRate}%`,      color: 'text-gray-800' },
+                        { label: 'Success Rate',   value: `${simResult.successRate}%`,      color: 'text-white' },
                       ].map(item => (
-                        <div key={item.label} className="p-3 bg-gray-50 rounded-xl">
-                          <p className="text-xs text-gray-400 mb-1">{item.label}</p>
+                        <div key={item.label} className="p-3 bg-gray-900 rounded-xl">
+                          <p className="text-xs text-gray-500 mb-1">{item.label}</p>
                           <p className={`text-lg font-bold ${item.color}`}>{item.value}</p>
                         </div>
                       ))}
                     </div>
                     <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs text-gray-500">
                         <span className="font-semibold">Route:</span> {simResult.route} &nbsp;·&nbsp;
                         <span className="font-semibold">Risk:</span>{' '}
                         <span className={simResult.risk === 'Low' ? 'text-green-600' : 'text-yellow-600'}>{simResult.risk}</span>
                       </p>
-                      <p className="text-xs text-gray-400 mt-1 italic">This is a simulation only — no funds are moved.</p>
+                      <p className="text-xs text-gray-500 mt-1 italic">This is a simulation only — no funds are moved.</p>
                     </div>
                   </div>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl p-8">
+                  <div className="h-full flex items-center justify-center text-center text-gray-500 border-2 border-dashed border-gray-700 rounded-xl p-8">
                     <div>
-                      <svg className="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-10 h-10 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                       </svg>
                       <p className="text-sm">Enter an amount and run the simulation to see results</p>
@@ -430,13 +430,13 @@ export default function Transactions() {
         )}
 
         {/* Recommendations table — always visible */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="text-base font-bold text-gray-800">Recommendations</h2>
+        <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-800">
+            <h2 className="text-base font-bold text-white">Recommendations</h2>
           </div>
           <div className="overflow-x-auto"><table className="w-full min-w-[600px]">
             <thead>
-              <tr className="text-xs text-gray-400 border-b border-gray-50">
+              <tr className="text-xs text-gray-500 border-b border-gray-800">
                 <th className="px-6 py-3 text-left font-medium"><span className="flex items-center gap-1">Tx Hash <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/></svg></span></th>
                 <th className="px-6 py-3 text-left font-medium"><span className="flex items-center gap-1">Date <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/></svg></span></th>
                 <th className="px-6 py-3 text-left font-medium">Amount</th>
@@ -447,11 +447,11 @@ export default function Transactions() {
             </thead>
             <tbody>
               {txList.length > 0 ? txList.map((tx, i) => (
-                <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/50">
-                  <td className="px-6 py-4 text-sm text-gray-700 font-mono">{tx.tx_hash?.slice(0, 16)}...</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{new Date(tx.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">${Number(tx.amount).toLocaleString()}</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">${Number(tx.optimized_fee || 0).toFixed(2)}</td>
+                <tr key={i} className="border-b border-gray-800 hover:bg-gray-800/50">
+                  <td className="px-6 py-4 text-sm text-gray-200 font-mono">{tx.tx_hash?.slice(0, 16)}...</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{new Date(tx.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
+                  <td className="px-6 py-4 text-sm text-gray-200">${Number(tx.amount).toLocaleString()}</td>
+                  <td className="px-6 py-4 text-sm text-gray-200">${Number(tx.optimized_fee || 0).toFixed(2)}</td>
                   <td className="px-6 py-4"><span className="text-xs px-2.5 py-1 rounded-full font-medium bg-green-50 text-green-600">${Number(tx.savings || 0).toFixed(2)}</span></td>
                   <td className="px-6 py-4">
                     <button onClick={() => { setActiveTab("Optimize"); setAmount(String(tx.amount)); }}
@@ -461,7 +461,7 @@ export default function Transactions() {
                   </td>
                 </tr>
               )) : (
-                <tr><td colSpan={6} className="px-6 py-12 text-center text-sm text-gray-400">No transactions yet. Use the Optimize tab to get started.</td></tr>
+                <tr><td colSpan={6} className="px-6 py-12 text-center text-sm text-gray-500">No transactions yet. Use the Optimize tab to get started.</td></tr>
               )}
             </tbody>
           </table>

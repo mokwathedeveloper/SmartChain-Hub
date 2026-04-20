@@ -66,18 +66,18 @@ export default function OnRamp() {
     <>
       <Head><title>Buy A0GI | SmartChain Hub</title></Head>
       <div className="space-y-6">
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 max-w-lg">
-          <h2 className="text-base font-bold text-gray-800 mb-1">Buy A0GI</h2>
-          <p className="text-xs text-gray-400 mb-6">Pay with card or M-Pesa → receive A0GI directly to your wallet</p>
+        <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800 max-w-lg">
+          <h2 className="text-base font-bold text-white mb-1">Buy A0GI</h2>
+          <p className="text-xs text-gray-500 mb-6">Pay with card or M-Pesa → receive A0GI directly to your wallet</p>
 
           {/* Method selector */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
             <button onClick={() => setMethod("card")}
-              className={`py-3 rounded-xl border-2 text-sm font-semibold transition-all flex items-center justify-center gap-2 ${method === "card" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-200 text-gray-500"}`}>
+              className={`py-3 rounded-xl border-2 text-sm font-semibold transition-all flex items-center justify-center gap-2 ${method === "card" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-700 text-gray-500"}`}>
               💳 Credit Card
             </button>
             <button onClick={() => setMethod("mpesa")}
-              className={`py-3 rounded-xl border-2 text-sm font-semibold transition-all flex items-center justify-center gap-2 ${method === "mpesa" ? "border-green-600 bg-green-50 text-green-700" : "border-gray-200 text-gray-500"}`}>
+              className={`py-3 rounded-xl border-2 text-sm font-semibold transition-all flex items-center justify-center gap-2 ${method === "mpesa" ? "border-green-600 bg-green-50 text-green-700" : "border-gray-700 text-gray-500"}`}>
               📱 M-Pesa
             </button>
           </div>
@@ -86,8 +86,8 @@ export default function OnRamp() {
           <div className="mb-4">
             <label className="block text-xs text-gray-500 mb-1.5">Amount (USD)</label>
             <input type="number" value={amount} onChange={e => setAmount(e.target.value)} min="5" placeholder="10"
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-            <p className="text-xs text-gray-400 mt-1.5">≈ {estimated} A0GI · Rate: 1 USD = 2 A0GI</p>
+              className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
+            <p className="text-xs text-gray-500 mt-1.5">≈ {estimated} A0GI · Rate: 1 USD = 2 A0GI</p>
           </div>
 
           {/* M-Pesa phone */}
@@ -95,14 +95,14 @@ export default function OnRamp() {
             <div className="mb-4">
               <label className="block text-xs text-gray-500 mb-1.5">M-Pesa Phone Number</label>
               <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+254712345678"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"/>
+                className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"/>
             </div>
           )}
 
           {/* Wallet destination */}
-          <div className="mb-5 p-3 bg-gray-50 rounded-xl">
-            <p className="text-xs text-gray-400">Sending to wallet:</p>
-            <p className="text-xs font-mono text-gray-700 truncate">{address}</p>
+          <div className="mb-5 p-3 bg-gray-900 rounded-xl">
+            <p className="text-xs text-gray-500">Sending to wallet:</p>
+            <p className="text-xs font-mono text-gray-200 truncate">{address}</p>
           </div>
 
           {status && (

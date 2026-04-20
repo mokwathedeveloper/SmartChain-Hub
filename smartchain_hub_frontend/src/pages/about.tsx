@@ -53,17 +53,17 @@ export default function About() {
             <div className="flex-1">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {team.slice(0, 3).map((m, i) => (
-                  <div key={i} className="bg-white rounded-2xl p-4 flex flex-col items-center shadow-sm border border-gray-100">
+                  <div key={i} className="bg-white rounded-2xl p-4 flex flex-col items-center shadow-sm border border-gray-800">
                     <AvatarPlaceholder seed={i} />
-                    <p className="text-xs font-bold text-gray-700 mt-2 text-center">{m.name}</p>
-                    <p className="text-xs text-gray-400 text-center">{m.role}</p>
+                    <p className="text-xs font-bold text-gray-200 mt-2 text-center">{m.name}</p>
+                    <p className="text-xs text-gray-500 text-center">{m.role}</p>
                   </div>
                 ))}
                 {team.slice(3, 5).map((m, i) => (
-                  <div key={i} className="bg-white rounded-2xl p-4 flex flex-col items-center shadow-sm border border-gray-100">
+                  <div key={i} className="bg-white rounded-2xl p-4 flex flex-col items-center shadow-sm border border-gray-800">
                     <AvatarPlaceholder seed={i + 3} />
-                    <p className="text-xs font-bold text-gray-700 mt-2 text-center">{m.name}</p>
-                    <p className="text-xs text-gray-400 text-center">{m.role}</p>
+                    <p className="text-xs font-bold text-gray-200 mt-2 text-center">{m.name}</p>
+                    <p className="text-xs text-gray-500 text-center">{m.role}</p>
                   </div>
                 ))}
               </div>
@@ -78,7 +78,7 @@ export default function About() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Our Mission */}
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Our Mission</h2>
+              <h2 className="text-2xl font-bold text-white mb-4">Our Mission</h2>
               <p className="text-gray-500 leading-relaxed mb-6">
                 SmartChain Hub is dedicated to revolutionizing digital commerce by bridging the gap between advanced AI intelligence and decentralized blockchain security. We believe that autonomous systems should work for people — reducing friction, cutting costs, and ensuring every transaction is transparent and fair.
               </p>
@@ -89,17 +89,17 @@ export default function About() {
 
             {/* Our Technology */}
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Our Technology</h2>
+              <h2 className="text-2xl font-bold text-white mb-6">Our Technology</h2>
               <div className="space-y-4">
                 {[
                   { icon: "⛓️", title: "Blockchain Integration", desc: "Secure, tamper-proof transactions on 0G Chain with full auditability and smart contract automation." },
                   { icon: "🤖", title: "AI Intelligence", desc: "Self-learning agents that optimize transaction routes, fees, and timing in real-time." },
                   { icon: "🌐", title: "0G Ecosystem", desc: "Leveraging 0G Storage and 0G Compute for decentralized data management and AI processing." },
                 ].map((tech) => (
-                  <div key={tech.title} className="flex items-start gap-4 p-4 border border-gray-100 rounded-xl hover:shadow-sm transition-all">
+                  <div key={tech.title} className="flex items-start gap-4 p-4 border border-gray-800 rounded-xl hover:shadow-sm transition-all">
                     <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-xl shrink-0">{tech.icon}</div>
                     <div>
-                      <h3 className="font-bold text-gray-800 text-sm mb-1">{tech.title}</h3>
+                      <h3 className="font-bold text-white text-sm mb-1">{tech.title}</h3>
                       <p className="text-xs text-gray-500 leading-relaxed">{tech.desc}</p>
                     </div>
                   </div>

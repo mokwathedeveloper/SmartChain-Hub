@@ -93,8 +93,8 @@ export default function Features() {
               { title: "Formalization", desc: "Formalize business logic into smart contracts that execute automatically, removing the need for intermediaries.", variant: 1 },
               { title: "Promising Technology", desc: "Built on cutting-edge 0G Chain infrastructure with Rust-optimized WASM contracts for maximum performance.", variant: 2 },
             ].map((card) => (
-              <div key={card.title} className="border border-gray-100 rounded-2xl p-6 hover:shadow-lg transition-all">
-                <h3 className="text-lg font-bold text-gray-800 mb-2">{card.title}</h3>
+              <div key={card.title} className="border border-gray-800 rounded-2xl p-6 hover:shadow-lg transition-all">
+                <h3 className="text-lg font-bold text-white mb-2">{card.title}</h3>
                 <p className="text-sm text-gray-500 mb-5 leading-relaxed">{card.desc}</p>
                 <FeatureIllustration variant={card.variant} />
               </div>

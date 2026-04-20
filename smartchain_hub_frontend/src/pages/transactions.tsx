@@ -2,9 +2,15 @@ import Head from "next/head";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
+import { optimizeTransaction as apiOptimize } from "@/utils/api";
+import { storageService } from "@/utils/storage";
+import { loadAgentMemory, saveAgentMemory, mergeOptimizationIntoMemory } from "@/utils/agentMemory";
+import { useWeb3 } from "@/context/Web3Context";
+import { hasAgentID, mintAgentID, updateAgentMemory } from "@/utils/agentId";
 
 export default function Transactions() {
   const { user } = useAuth();
+  const { signer, isConnected } = useWeb3();
   const [activeTab, setActiveTab] = useState("Optimize");
   const [amount, setAmount] = useState("");
   const [priority, setPriority] = useState("efficiency");
@@ -19,6 +25,15 @@ export default function Transactions() {
   const [simRoute, setSimRoute] = useState("0G Chain Flash");
   const [simResult, setSimResult] = useState<any>(null);
   const [simRunning, setSimRunning] = useState(false);
+
+  // Load persistent agent memory from 0G Storage on mount
+  useEffect(() => {
+    if (!user) return;
+    const mem = loadAgentMemory(user.id);
+    if (!mem) return;
+    if (mem.preferredPriority) setPriority(mem.preferredPriority);
+    if (mem.lastAmount) setAmount(String(mem.lastAmount));
+  }, [user]);
 
   const fetchTxList = async () => {
     if (!user) return;
@@ -38,21 +53,16 @@ export default function Transactions() {
     setOptimizing(true);
     setResult(null);
     try {
-      const res = await fetch('http://localhost:5000/optimize', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount, priority })
-      });
-      if (!res.ok) throw new Error("offline");
-      setResult(await res.json());
+      setResult(await apiOptimize(parseFloat(amount), priority));
     } catch {
-      await new Promise(r => setTimeout(r, 1200));
       const amt = parseFloat(amount);
       setResult({
         fee: (amt * 0.005).toFixed(2),
         savings: (amt * 0.015).toFixed(2),
         route: "0G Chain Flash Route",
         explanation: `Optimized for ${priority} using 0G Newton heuristics.`,
-        confidence: 87
+        confidence: 87,
+        tee_verified: false,
       });
     } finally { setOptimizing(false); }
   };
@@ -60,14 +70,57 @@ export default function Transactions() {
   const handleConfirm = async () => {
     if (!result || !user) return;
     setSaving(true);
-    const { error } = await supabase.from('transactions').insert([{
-      user_id: user.id, amount: parseFloat(amount),
-      optimized_fee: parseFloat(result.fee), savings: parseFloat(result.savings),
-      route: result.route, status: 'pending',
-      tx_hash: `0x${Math.random().toString(16).slice(2)}${Math.random().toString(16).slice(2, 10)}`
-    }]);
-    setSaving(false);
-    if (!error) { setResult(null); setAmount(""); fetchTxList(); }
+    try {
+      // Upload metadata to 0G Storage and get immutable root hash
+      const storageResult = await storageService.uploadWithProof({
+        user_id: user.id,
+        amount: parseFloat(amount),
+        fee: parseFloat(result.fee),
+        savings: parseFloat(result.savings),
+        route: result.route,
+        tee_verified: result.tee_verified,
+        tee_proof: result.tee_proof || "",
+        timestamp: Date.now(),
+      });
+
+      await supabase.from('transactions').insert([{
+        user_id: user.id,
+        amount: parseFloat(amount),
+        optimized_fee: parseFloat(result.fee),
+        savings: parseFloat(result.savings),
+        route: result.route,
+        status: 'pending',
+        tx_hash: storageResult.txHash ||
+          `0x${Math.random().toString(16).slice(2)}${Math.random().toString(16).slice(2, 10)}`,
+        storage_root: storageResult.rootHash,
+        storage_scan_url: storageResult.storageScanUrl,
+      }]);
+
+      // Persist agent memory to 0G Storage KV
+      const existing = loadAgentMemory(user.id);
+      const updated = mergeOptimizationIntoMemory(
+        existing, user.id, priority,
+        parseFloat(amount), result.route, parseFloat(result.savings)
+      );
+      await saveAgentMemory(updated);
+
+      // Update Agent ID on-chain with new memory root + reputation increment
+      if (isConnected && signer) {
+        try {
+          const minted = await hasAgentID(signer);
+          if (!minted) await mintAgentID(signer);
+          await updateAgentMemory(signer, storageResult.rootHash, parseFloat(result.savings));
+        } catch (e) {
+          console.warn("Agent ID update skipped:", e);
+        }
+      }
+
+      setResult(null);
+      setAmount("");
+      fetchTxList();
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleSimulate = async () => {
@@ -107,7 +160,7 @@ export default function Transactions() {
 
   return (
     <>
-      <Head><title>Transaction Optimization | PayOptimize</title></Head>
+      <Head><title>Transaction Optimization | SmartChain Hub</title></Head>
       <div className="space-y-6">
 
         {/* Tabs */}

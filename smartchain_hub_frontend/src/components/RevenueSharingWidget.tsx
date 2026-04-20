@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/utils/supabase';
 import { useAuth } from '@/hooks/useAuth';
+import { useNotification } from '@/context/NotificationContext';
 
 const RevenueSharingWidget = () => {
   const { user } = useAuth();
+  const { addNotification } = useNotification();
   const [revenue, setRevenue] = useState<{ total_platform_revenue: number; user_share: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [claiming, setClaiming] = useState(false);
@@ -69,10 +71,10 @@ const RevenueSharingWidget = () => {
 
       if (balanceError) throw balanceError;
 
-      alert(`Successfully claimed $${revenue.user_share}!`);
+      addNotification(`Successfully claimed $${revenue.user_share}!`, 'success');
       setRevenue({ total_platform_revenue: 0, user_share: 0 });
     } catch (error: any) {
-      alert(`Error claiming revenue: ${error.message}`);
+      addNotification(`Error claiming revenue: ${error.message}`, 'error');
     } finally {
       setClaiming(false);
     }

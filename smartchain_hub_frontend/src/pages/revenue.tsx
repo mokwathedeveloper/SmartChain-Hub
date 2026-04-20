@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { useWeb3 } from "@/context/Web3Context";
+import { useNotification } from "@/context/NotificationContext";
 import { ethers } from "ethers";
 
 const CLAIM_ABI = ["function claimEarnings() external", "function pendingEarnings(address) external view returns (uint256)"];
@@ -50,6 +51,7 @@ const DonutChart = ({ pct }: { pct: number }) => {
 export default function Revenue() {
   const { user } = useAuth();
   const { signer, isConnected, address } = useWeb3();
+  const { addNotification } = useNotification();
   const [shares, setShares] = useState<any[]>([]);
   const [unclaimed, setUnclaimed] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,7 +102,7 @@ export default function Revenue() {
         fetchRevenue();
       }
     } catch (e: any) {
-      alert(`Claim failed: ${e.message}`);
+      addNotification(`Claim failed: ${e.message}`, 'error');
     } finally { setClaiming(false); }
   };
 
@@ -108,7 +110,7 @@ export default function Revenue() {
 
   return (
     <>
-      <Head><title>Revenue Sharing | PayOptimize</title></Head>
+      <Head><title>Revenue Sharing | SmartChain Hub</title></Head>
       <div className="space-y-6">
         <div className="flex gap-6 border-b border-gray-200">
           <button className="pb-3 text-sm font-semibold text-blue-600 border-b-2 border-blue-600">Total Pool</button>

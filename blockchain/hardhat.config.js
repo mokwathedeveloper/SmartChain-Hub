@@ -1,4 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("dotenv").config();  // loads blockchain/.env automatically
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -14,8 +15,8 @@ module.exports = {
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
     og_newton: {
-      url: "https://rpc-testnet.0g.ai",
-      chainId: 16600,
+      url: "https://evmrpc-testnet.0g.ai",
+      chainId: 16602,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
     // ── Ethereum Networks ─────────────────────────────────────────

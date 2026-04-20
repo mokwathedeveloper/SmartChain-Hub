@@ -30,7 +30,7 @@ export default function HistoryPage() {
 
   return (
     <>
-      <Head><title>Blockchain | PayOptimize</title></Head>
+      <Head><title>Blockchain | SmartChain Hub</title></Head>
       <div className="space-y-6">
         {/* Search + header */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">

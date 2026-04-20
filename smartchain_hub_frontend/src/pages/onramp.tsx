@@ -52,7 +52,7 @@ export default function OnRamp() {
 
   if (!isConnected) return (
     <>
-      <Head><title>Buy A0GI | PayOptimize</title></Head>
+      <Head><title>Buy A0GI | SmartChain Hub</title></Head>
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
           <p className="text-gray-500 mb-4">Connect your wallet to buy A0GI</p>
@@ -64,7 +64,7 @@ export default function OnRamp() {
 
   return (
     <>
-      <Head><title>Buy A0GI | PayOptimize</title></Head>
+      <Head><title>Buy A0GI | SmartChain Hub</title></Head>
       <div className="space-y-6">
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 max-w-lg">
           <h2 className="text-base font-bold text-gray-800 mb-1">Buy A0GI</h2>

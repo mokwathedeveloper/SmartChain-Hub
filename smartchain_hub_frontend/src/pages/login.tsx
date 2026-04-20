@@ -25,7 +25,7 @@ export default function Login() {
 
   return (
     <>
-      <Head><title>Sign In | PayOptimize</title></Head>
+      <Head><title>Sign In | SmartChain Hub</title></Head>
       <div className="min-h-screen flex items-center justify-center bg-[#F0F2F5] px-4">
         <div className="w-full max-w-md bg-white rounded-3xl shadow-lg p-10">
           {/* Logo */}
@@ -36,7 +36,7 @@ export default function Login() {
                 <path d="M20 8L30 14V22L20 28L10 22V14L20 8Z" fill="#3B82F6" opacity="0.8"/>
                 <path d="M20 14L26 17.5V24.5L20 28L14 24.5V17.5L20 14Z" fill="#22C55E" opacity="0.9"/>
               </svg>
-              <span className="text-2xl font-bold text-gray-800">PayOptimize</span>
+              <span className="text-2xl font-bold text-gray-800">SmartChain Hub</span>
             </div>
             <p className="text-gray-400 text-sm">Optimize Today. Earn Tomorrow.</p>
           </div>

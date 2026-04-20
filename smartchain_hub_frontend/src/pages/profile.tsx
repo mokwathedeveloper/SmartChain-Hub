@@ -42,7 +42,7 @@ export default function Profile() {
 
   return (
     <>
-      <Head><title>Profile Settings | PayOptimize</title></Head>
+      <Head><title>Profile Settings | SmartChain Hub</title></Head>
       <div className="max-w-2xl space-y-6">
         {/* Avatar */}
         <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 flex flex-col items-center">

@@ -1,81 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --background: #FFFFFF;
-  --foreground: #1A1A2E;
-  --deep-blue: #1A1A2E;
-  --electric-purple: #9B4DFF;
-  --soft-white: #F8F9FA;
-  --success-green: #28A745;
-  --warning-yellow: #FFC107;
-  --error-red: #DC3545;
+  --background: #030712;
+  --foreground: #f9fafb;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-deep-blue: var(--deep-blue);
-  --color-electric-purple: var(--electric-purple);
   --font-sans: 'Plus Jakarta Sans', sans-serif;
 }
 
 body {
-  background: var(--soft-white);
+  background: var(--background);
   color: var(--foreground);
   overflow-x: hidden;
 }
 
 @layer utilities {
-  .glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-  }
-  
   .glass-dark {
-    background: rgba(26, 26, 46, 0.8);
+    background: rgba(17, 24, 39, 0.8);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
-
-  .text-gradient {
-    background: linear-gradient(135deg, #9B4DFF 0%, #1A1A2E 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out forwards;
   }
-
-  .bg-mesh {
-    background-color: #f8f9fa;
-    background-image: 
-      radial-gradient(at 0% 0%, rgba(155, 77, 255, 0.15) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(26, 26, 46, 0.1) 0px, transparent 50%);
-  }
-
-  .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
-  .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; }
-  .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
-  .animate-float { animation: float 6s ease-in-out infinite; }
 }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Custom scrollbar for modern feel */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #f1f1f1; }
-::-webkit-scrollbar-thumb { background: #9B4DFF; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #1A1A2E; }
+/* Dark scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #111827; }
+::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #3B82F6; }

@@ -66,22 +66,22 @@ export default function Dashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <p className="text-xs text-gray-400 mb-1">Total Transactions</p>
+          <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+            <p className="text-xs text-gray-500 mb-1">Total Transactions</p>
             <div className="flex items-end gap-2">
-              <span className="text-3xl font-bold text-gray-800">{stats.totalTx.toLocaleString()}</span>
-              <span className="text-sm text-green-500 font-medium mb-0.5">+18.4%</span>
+              <span className="text-3xl font-bold text-white">{stats.totalTx.toLocaleString()}</span>
+              <span className="text-sm text-green-400 font-medium mb-0.5">+18.4%</span>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <p className="text-xs text-gray-400 mb-1">Revenue Earned</p>
-            <span className="text-3xl font-bold text-gray-800">${stats.revenue.toLocaleString()}</span>
+          <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+            <p className="text-xs text-gray-500 mb-1">Revenue Earned</p>
+            <span className="text-3xl font-bold text-white">${stats.revenue.toLocaleString()}</span>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <p className="text-xs text-gray-400 mb-1">Active Nodescore</p>
+          <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+            <p className="text-xs text-gray-500 mb-1">Agent Reputation</p>
             <div className="flex items-end gap-2">
-              <span className="text-3xl font-bold text-gray-800">{stats.nodescore}</span>
-              <span className="text-sm text-green-500 font-medium mb-0.5">+12.4%</span>
+              <span className="text-3xl font-bold text-white">{stats.nodescore}</span>
+              <span className="text-sm text-green-400 font-medium mb-0.5">+12.4%</span>
             </div>
           </div>
         </div>

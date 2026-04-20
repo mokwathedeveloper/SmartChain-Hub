@@ -20,10 +20,10 @@ const Layout = ({ children }: LayoutProps) => {
 
   if (isAppRoute) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-gray-950">
         {/* Mobile overlay */}
         {isSidebarOpen && (
-          <div className="fixed inset-0 bg-black/30 z-[60] lg:hidden" onClick={() => setIsSidebarOpen(false)}/>
+          <div className="fixed inset-0 bg-black/60 z-[60] lg:hidden" onClick={() => setIsSidebarOpen(false)}/>
         )}
         {/* Sidebar */}
         <div className={`fixed lg:sticky lg:top-0 lg:h-screen z-[70] transition-transform duration-300 shrink-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
@@ -32,7 +32,7 @@ const Layout = ({ children }: LayoutProps) => {
         {/* Main content */}
         <div className="flex-1 flex flex-col min-h-screen min-w-0 overflow-hidden">
           <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
-          <main className="flex-grow p-4 sm:p-6 overflow-y-auto">
+          <main className="flex-grow p-4 sm:p-6 overflow-y-auto bg-gray-950">
             {children}
           </main>
         </div>

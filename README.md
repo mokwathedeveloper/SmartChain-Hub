@@ -2,6 +2,8 @@
 
 > **0G APAC Hackathon 2026 — Track 3: Agentic Economy & Autonomous Applications**
 
+🌐 **Live Demo:** https://smartchainhubfrontend.vercel.app
+
 SmartChain Hub is a decentralized AI commerce platform where every user has a **sovereign AI agent** with on-chain identity, persistent memory, and verifiable intelligence — powered by the full 0G modular stack.
 
 The agent optimizes blockchain transactions using **0G Compute** (TEE-verified LLaMA inference), stores immutable receipts on **0G Storage** (Log + KV layers), commits memory roots to a **soulbound Agent ID** on **0G Chain**, and distributes revenue automatically via smart contracts.

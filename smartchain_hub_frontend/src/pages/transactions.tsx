@@ -7,6 +7,7 @@ import { storageService } from "@/utils/storage";
 import { loadAgentMemory, saveAgentMemory, mergeOptimizationIntoMemory } from "@/utils/agentMemory";
 import { useWeb3 } from "@/context/Web3Context";
 import { hasAgentID, mintAgentID, updateAgentMemory } from "@/utils/agentId";
+import { recordTransactionOnChain } from "@/utils/blockchain";
 
 export default function Transactions() {
   const { user } = useAuth();
@@ -110,6 +111,8 @@ export default function Transactions() {
           const minted = await hasAgentID(signer);
           if (!minted) await mintAgentID(signer);
           await updateAgentMemory(signer, storageResult.rootHash, parseFloat(result.savings));
+          // Also record transaction on SmartChainTransaction contract
+          await recordTransactionOnChain(signer, parseFloat(amount), parseFloat(result.fee), result.route);
         } catch (e) {
           console.warn("Agent ID update skipped:", e);
         }

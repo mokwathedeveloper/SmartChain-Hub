@@ -59,7 +59,7 @@ const ConsolePage = () => {
                   <span className="text-gray-300">{log.msg}</span>
                 </div>
               ))}
-              <div className="animate-pulse text-electric-purple mt-4">_</div>
+              <div className="animate-pulse text-blue-400 mt-4">_</div>
             </div>
 
             <div className="space-y-6">

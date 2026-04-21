@@ -62,13 +62,13 @@ const BlockchainTransactionsWidget = () => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 h-full animate-pulse">
-        <div className="h-8 bg-gray-100 rounded w-1/3 mb-8"></div>
+      <div className="bg-gray-900 rounded-2xl shadow-sm border border-gray-800 p-8 h-full animate-pulse">
+        <div className="h-8 bg-gray-800 rounded w-1/3 mb-8"></div>
         <div className="space-y-6">
           {[1, 2, 3].map(i => (
             <div key={i} className="flex justify-between">
-              <div className="h-10 w-10 bg-gray-100 rounded-full"></div>
-              <div className="flex-1 ml-4 h-10 bg-gray-100 rounded"></div>
+              <div className="h-10 w-10 bg-gray-800 rounded-full"></div>
+              <div className="flex-1 ml-4 h-10 bg-gray-800 rounded"></div>
             </div>
           ))}
         </div>
@@ -77,9 +77,9 @@ const BlockchainTransactionsWidget = () => {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 h-full">
+    <div className="bg-gray-900 rounded-2xl shadow-sm border border-gray-800 p-8 h-full">
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-bold text-gray-800">Recent Transactions</h2>
+        <h2 className="text-2xl font-bold text-white">Recent Transactions</h2>
         <button className="text-blue-600 font-semibold text-sm hover:underline">View All</button>
       </div>
       
@@ -102,12 +102,12 @@ const BlockchainTransactionsWidget = () => {
                   )}
                 </div>
                 <div>
-                  <p className="font-bold text-gray-800 font-mono text-sm">{tx.tx_hash}</p>
+                  <p className="font-bold text-white font-mono text-sm">{tx.tx_hash}</p>
                   <p className="text-xs text-gray-400">{getTimeAgo(tx.created_at)}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-bold text-gray-800">${tx.amount.toLocaleString()}</p>
+                <p className="font-bold text-white">${tx.amount.toLocaleString()}</p>
                 <p className={`text-xs font-bold uppercase ${
                   tx.status === 'confirmed' ? 'text-green-500' : 'text-yellow-500'
                 }`}>{tx.status}</p>
@@ -126,7 +126,7 @@ const BlockchainTransactionsWidget = () => {
           <span className="text-gray-400">Network Status</span>
           <div className="flex items-center">
             <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-            <span className="text-gray-700 font-medium">0G Chain Connected</span>
+            <span className="text-gray-200 font-medium">0G Chain Connected</span>
           </div>
         </div>
       </div>

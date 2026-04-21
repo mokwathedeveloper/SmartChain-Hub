@@ -112,7 +112,7 @@ export default function Dashboard() {
           </div>
           {/* X-axis labels */}
           <div className="flex justify-between mt-1 ml-8 text-xs text-gray-500">
-            {['$10','$20','$30','$40','$50','$60','$70','$80','$90','$100'].map(l => <span key={l}>{l}</span>)}
+            {['1','5','10','15','20','25','30'].map(l => <span key={l}>{l}</span>)}
           </div>
         </div>
 

@@ -52,11 +52,11 @@ const OptimizationAnalytics = () => {
     }
   };
 
-  if (loading) return <div className="animate-pulse h-64 bg-gray-100 rounded-2xl"></div>;
+  if (loading) return <div className="animate-pulse h-64 bg-gray-800 rounded-2xl"></div>;
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-      <h3 className="text-xl font-bold text-gray-800 mb-8 flex items-center">
+    <div className="bg-gray-900 rounded-2xl shadow-sm border border-gray-800 p-8">
+      <h3 className="text-xl font-bold text-white mb-8 flex items-center">
         <svg className="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
@@ -84,9 +84,9 @@ const OptimizationAnalytics = () => {
           </div>
         </div>
 
-        <div className="p-6 bg-indigo-50 rounded-2xl border border-indigo-100 transform transition hover:scale-105">
-          <p className="text-xs text-indigo-600 font-bold uppercase mb-2">Active AI Agent</p>
-          <p className="text-2xl font-black text-indigo-900">Efficiency</p>
+        <div className="p-6 bg-indigo-500/10 rounded-2xl border border-indigo-100 transform transition hover:scale-105">
+          <p className="text-xs text-indigo-300 font-bold uppercase mb-2">Active AI Agent</p>
+          <p className="text-2xl font-black text-white">Efficiency</p>
           <div className="mt-2 text-xs text-indigo-500 flex items-center">
             <span className="w-2 h-2 bg-indigo-500 rounded-full mr-2 animate-pulse"></span>
             Running on 0G
@@ -101,8 +101,8 @@ const OptimizationAnalytics = () => {
       </div>
 
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-          <h4 className="font-bold text-gray-700 mb-4">Savings Projection</h4>
+        <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+          <h4 className="font-bold text-gray-200 mb-4">Savings Projection</h4>
           <div className="relative pt-1">
             <div className="flex mb-2 items-center justify-between">
               <div>
@@ -123,9 +123,9 @@ const OptimizationAnalytics = () => {
           </div>
         </div>
 
-        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 flex items-center justify-between">
+        <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800 flex items-center justify-between">
           <div>
-            <h4 className="font-bold text-gray-700 mb-1">Decentralization Score</h4>
+            <h4 className="font-bold text-gray-200 mb-1">Decentralization Score</h4>
             <p className="text-xs text-gray-500">How distributed are your transactions?</p>
           </div>
           <div className="text-center">

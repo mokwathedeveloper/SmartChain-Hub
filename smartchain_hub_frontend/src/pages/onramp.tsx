@@ -3,12 +3,30 @@ import React, { useState } from "react";
 import { useWeb3 } from "@/context/Web3Context";
 
 export default function OnRamp() {
-  const { address, isConnected } = useWeb3();
+  const { address, isConnected, connectWallet } = useWeb3();
   const [method, setMethod] = useState<"card" | "mpesa">("card");
   const [amount, setAmount] = useState("10");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [manualAddress, setManualAddress] = useState("");
+  const [useManual, setUseManual] = useState(false);
+
+  const displayAddress = address || manualAddress;
+  const isWalletConnected = isConnected || (manualAddress && manualAddress.length > 0);
+  
+  const handleManualConnect = () => {
+    if (!manualAddress.trim()) {
+      setStatus({ type: "error", msg: "Please enter a wallet address" });
+      return;
+    }
+    if (!/^0x[a-fA-F0-9]{40}$/.test(manualAddress.trim())) {
+      setStatus({ type: "error", msg: "Invalid Ethereum address format" });
+      return;
+    }
+    setUseManual(true);
+    setStatus({ type: "success", msg: "Wallet connected in read-only mode" });
+  };
 
   const estimated = (parseFloat(amount || "0") * 2).toFixed(2);
 
@@ -18,7 +36,7 @@ export default function OnRamp() {
       const res = await fetch("/api/onramp/stripe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: parseFloat(amount), walletAddress: address }),
+        body: JSON.stringify({ amount: parseFloat(amount), walletAddress: displayAddress }),
       });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
@@ -35,7 +53,7 @@ export default function OnRamp() {
       const res = await fetch("/api/onramp/mpesa", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: parseFloat(amount), phone, walletAddress: address }),
+        body: JSON.stringify({ amount: parseFloat(amount), phone, walletAddress: displayAddress }),
       });
       const data = await res.json();
       if (data.success) setStatus({ type: "success", msg: `M-Pesa prompt sent to ${phone}. Check your phone.` });
@@ -45,7 +63,7 @@ export default function OnRamp() {
     } finally { setLoading(false); }
   };
 
-  if (!isConnected) {
+  if (!isWalletConnected) {
     return (
       <>
         <Head><title>Buy A0GI | SmartChain Hub</title></Head>
@@ -57,8 +75,43 @@ export default function OnRamp() {
               </svg>
             </div>
             <h2 className="text-white font-bold text-lg mb-2">Connect your wallet first</h2>
-            <p className="text-gray-500 text-sm mb-6">We need your wallet address to send A0GI after payment.</p>
-            <p className="text-gray-600 text-xs">Click "Connect Wallet" in the top right header</p>
+            <p className="text-gray-500 text-sm mb-4">We need your wallet address to send A0GI after payment.</p>
+            
+            {/* MetaMask Connection */}
+            <button onClick={connectWallet}
+              className="w-full max-w-sm mx-auto mb-4 flex items-center justify-center gap-3 px-6 py-3 bg-orange-600/10 border border-orange-600/30 text-orange-400 rounded-xl hover:bg-orange-600/20 transition-colors">
+              <svg className="w-5 h-5" viewBox="0 0 40 40" fill="none">
+                <path d="M35.5 4L22.5 13.5L25 8L35.5 4Z" fill="#E17726"/>
+                <path d="M4.5 4L17.4 13.6L15 8L4.5 4Z" fill="#E27625"/>
+                <path d="M30.5 27.5L27 33L34.5 35L36.5 27.5H30.5Z" fill="#E27625"/>
+                <path d="M3.5 27.5L5.5 35L13 33L9.5 27.5H3.5Z" fill="#E27625"/>
+              </svg>
+              Connect with MetaMask
+            </button>
+            
+            {/* Manual Address Input */}
+            <div className="w-full max-w-sm mx-auto">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="flex-1 h-px bg-gray-800"/>
+                <span className="text-xs text-gray-600">or enter manually</span>
+                <div className="flex-1 h-px bg-gray-800"/>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={manualAddress}
+                  onChange={e => setManualAddress(e.target.value)}
+                  placeholder="0x604cDbDBE7850bAd105C28bFE01Ad680520D451F"
+                  className="flex-1 px-3 py-2 bg-gray-950 border border-gray-700 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 text-sm font-mono"
+                />
+                <button onClick={handleManualConnect}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg transition-colors text-sm">
+                  Connect
+                </button>
+              </div>
+            </div>
+            
+            <p className="text-gray-600 text-xs mt-4">Click "Connect Wallet" in the top right header or use manual entry above</p>
           </div>
         </div>
       </>
@@ -152,7 +205,7 @@ export default function OnRamp() {
           {/* Destination wallet */}
           <div className="p-4 bg-gray-950 border border-gray-800 rounded-xl">
             <p className="text-xs text-gray-600 mb-1">A0GI will be sent to:</p>
-            <p className="text-xs font-mono text-blue-400 truncate">{address}</p>
+            <p className="text-xs font-mono text-blue-400 truncate">{displayAddress}</p>
             <p className="text-xs text-gray-600 mt-1">0G Galileo Testnet · Chain ID 16602</p>
           </div>
 

@@ -45,6 +45,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
   const [signer, setSigner]     = useState<ethers.Signer | null>(null);
   const [chainId, setChainId]   = useState<string | null>(null);
   const [noWallet, setNoWallet] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const switchToOG = async () => {
     if (!window.ethereum) return;
@@ -71,16 +72,21 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
     }
     setNoWallet(false);
     try {
+      console.log('Connecting wallet...');
       const bp = new ethers.BrowserProvider(window.ethereum);
 
       // Request accounts first (triggers MetaMask popup)
       const accounts = await bp.send('eth_requestAccounts', []);
+      console.log('Accounts received:', accounts);
       if (!accounts.length) return;
 
       // Check chain and switch if needed
       const network = await bp.getNetwork();
       const currentChainId = network.chainId.toString();
+      console.log('Current chain:', currentChainId, 'Target:', TARGET_CHAIN_ID);
+      
       if (currentChainId !== TARGET_CHAIN_ID) {
+        console.log('Switching to 0G chain...');
         await switchToOG();
         // Re-create provider after chain switch
         const bp2 = new ethers.BrowserProvider(window.ethereum);
@@ -90,6 +96,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
         setSigner(sig2);
         setAddress(accounts[0]);
         setChainId(net2.chainId.toString());
+        console.log('Wallet connected after chain switch:', accounts[0]);
         return;
       }
 
@@ -98,7 +105,9 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
       setSigner(sig);
       setAddress(accounts[0]);
       setChainId(currentChainId);
+      console.log('Wallet connected:', accounts[0]);
     } catch (e: any) {
+      console.error('Wallet connection error:', e);
       if (e.code !== 4001) console.error('Wallet error:', e);
     }
   };
@@ -109,15 +118,47 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (!window.ethereum) return;
-    window.ethereum.on('accountsChanged', (a: string[]) =>
-      a.length ? setAddress(a[0]) : disconnectWallet()
-    );
-    window.ethereum.on('chainChanged', () => window.location.reload());
+    
+    const handleAccountsChanged = (accounts: string[]) => {
+      console.log('Accounts changed:', accounts);
+      if (accounts.length) {
+        setAddress(accounts[0]);
+      } else {
+        disconnectWallet();
+      }
+    };
+    
+    const handleChainChanged = () => {
+      console.log('Chain changed, reloading...');
+      window.location.reload();
+    };
+    
+    window.ethereum.on('accountsChanged', handleAccountsChanged);
+    window.ethereum.on('chainChanged', handleChainChanged);
 
     // Auto-reconnect if already connected
-    window.ethereum.request({ method: 'eth_accounts' }).then((accounts: string[]) => {
-      if (accounts.length) connectWallet();
-    }).catch(() => {});
+    const checkConnection = async () => {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        console.log('Auto-reconnect check:', accounts);
+        if (accounts.length) {
+          await connectWallet();
+        }
+      } catch (e: any) {
+        console.log('Auto-reconnect failed:', e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    checkConnection();
+      
+    return () => {
+      if (window.ethereum) {
+        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+        window.ethereum.removeListener('chainChanged', handleChainChanged);
+      }
+    };
   }, []);
 
   const chainName =
@@ -127,7 +168,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
     chainId === '1'     ? 'Ethereum'   :
     chainId ? `Chain ${chainId}` : '';
 
-  return (
+    return (
     <Web3Context.Provider value={{
       address, isConnected: !!address, chainId, chainName,
       connectWallet, disconnectWallet, switchToOG, provider, signer, noWallet,

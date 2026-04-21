@@ -17,10 +17,21 @@ const PAYMENTS_ABI = [
 ];
 
 export default function Payments() {
-  const { signer, isConnected, address } = useWeb3();
+  const { signer, isConnected, address, connectWallet } = useWeb3();
   const { addNotification } = useNotification();
   const [tab, setTab] = useState("Send");
   const [loading, setLoading] = useState(false);
+  const [manualAddress, setManualAddress] = useState("");
+  const [useManual, setUseManual] = useState(false);
+
+  const displayAddress = address || manualAddress;
+  const isWalletConnected = isConnected || (manualAddress && manualAddress.length > 0);
+  
+  const handleManualConnect = () => {
+    if (!manualAddress.trim()) return;
+    if (!/^0x[a-fA-F0-9]{40}$/.test(manualAddress.trim())) return;
+    setUseManual(true);
+  };
 
   // Send
   const [sendTo, setSendTo] = useState("");
@@ -39,17 +50,24 @@ export default function Payments() {
   };
 
   const fetchStakeData = async () => {
-    if (!signer || !address) return;
+    if (!displayAddress) return;
     try {
       const c = getContract();
-      const [amt, rew] = await c.getStake(address);
+      const [amt, rew] = await c.getStake(displayAddress);
       setStaked({ amount: ethers.formatEther(amt), reward: ethers.formatEther(rew) });
-      const earn = await c.pendingEarnings(address);
+      const earn = await c.pendingEarnings(displayAddress);
       setEarnings(ethers.formatEther(earn));
-    } catch {}
+    } catch (e) {
+      console.log('Failed to fetch stake data:', e);
+    }
   };
 
-  useEffect(() => { fetchStakeData(); }, [signer, address]);
+  useEffect(() => { fetchStakeData(); }, [displayAddress, signer]);
+
+  // Debug wallet connection
+  useEffect(() => {
+    console.log('Wallet state:', { isConnected, address, signer: !!signer });
+  }, [isConnected, address, signer]);
 
   const handleSend = async () => {
     if (!sendTo || !sendAmt) return;
@@ -105,7 +123,7 @@ export default function Payments() {
     } finally { setLoading(false); }
   };
 
-  if (!isConnected) {
+  if (!isWalletConnected) {
     return (
       <>
         <Head><title>Payments | SmartChain Hub</title></Head>
@@ -117,8 +135,41 @@ export default function Payments() {
               </svg>
             </div>
             <h2 className="text-white font-bold text-lg mb-2">Connect your wallet</h2>
-            <p className="text-gray-500 text-sm mb-2">Click <span className="text-blue-400 font-semibold">Connect Wallet</span> in the top right to get started.</p>
-            <p className="text-gray-600 text-xs">Supports MetaMask and manual address entry</p>
+            <p className="text-gray-500 text-sm mb-4">Click Connect Wallet in the top right to get started.</p>
+            
+            {/* MetaMask Connection */}
+            <button onClick={connectWallet}
+              className="w-full max-w-sm mx-auto mb-4 flex items-center justify-center gap-3 px-6 py-3 bg-orange-600/10 border border-orange-600/30 text-orange-400 rounded-xl hover:bg-orange-600/20 transition-colors">
+              <svg className="w-5 h-5" viewBox="0 0 40 40" fill="none">
+                <path d="M35.5 4L22.5 13.5L25 8L35.5 4Z" fill="#E17726"/>
+                <path d="M4.5 4L17.4 13.6L15 8L4.5 4Z" fill="#E27625"/>
+              </svg>
+              Connect with MetaMask
+            </button>
+            
+            {/* Manual Address Input */}
+            <div className="w-full max-w-sm mx-auto">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="flex-1 h-px bg-gray-800"/>
+                <span className="text-xs text-gray-600">or enter manually</span>
+                <div className="flex-1 h-px bg-gray-800"/>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={manualAddress}
+                  onChange={e => setManualAddress(e.target.value)}
+                  placeholder="0x604cDbDBE7850bAd105C28bFE01Ad680520D451F"
+                  className="flex-1 px-3 py-2 bg-gray-950 border border-gray-700 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 text-sm font-mono"
+                />
+                <button onClick={handleManualConnect}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg transition-colors text-sm">
+                  Connect
+                </button>
+              </div>
+            </div>
+            
+            <p className="text-gray-600 text-xs mt-4">Supports MetaMask and manual address entry</p>
           </div>
         </div>
       </>
@@ -175,9 +226,9 @@ export default function Payments() {
             <h2 className="text-base font-bold text-white mb-5">Receive A0GI</h2>
             <p className="text-sm text-gray-500 mb-4">Share your address to receive payments:</p>
             <div className="p-4 bg-gray-900 rounded-xl border border-gray-700 font-mono text-sm text-gray-200 break-all">
-              {address}
+              {displayAddress}
             </div>
-            <button onClick={() => navigator.clipboard.writeText(address || '')}
+            <button onClick={() => navigator.clipboard.writeText(displayAddress || '')}
               className="w-full mt-4 py-2.5 border border-gray-700 text-gray-500 font-medium rounded-xl hover:bg-gray-800 transition-colors">
               Copy Address
             </button>

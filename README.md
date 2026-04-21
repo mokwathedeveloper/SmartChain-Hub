@@ -55,15 +55,15 @@ Most "AI + Web3" projects are just ChatGPT with a tip jar. SmartChain Hub is dif
      ┌─────┴──────────────────────────────────────┐
      │                                            │
 ┌────▼─────────────┐   ┌────────────────────────────────────────┐
-│  0G COMPUTE      │   │  0G STORAGE (TypeScript SDK)           │
+│  0G COMPUTE      │   │  0G STORAGE (Next.js API Routes)       │
 │  ─────────────── │   │  ──────────────────────────────────── │
-│  Model: LLaMA 3  │   │  Log Layer → immutable tx receipts     │
-│  Mode:  TeeML    │   │  KV Layer  → agent memory (fast read)  │
-│  Proof: TEE sig  │   │  Returns   → Merkle root hash          │
+│  Model: LLaMA 3  │   │  /api/storage-upload → Log layer       │
+│  Mode:  TeeML    │   │  /api/agent-memory   → KV layer        │
+│  Proof: TEE sig  │   │  Returns Merkle root hash              │
 └──────────────────┘   └────────────────┬───────────────────────┘
                                         │ rootHash committed
                        ┌────────────────▼───────────────────────┐
-                       │  0G CHAIN — 4 Contracts                 │
+│  0G CHAIN — 4 Contracts                 │
                        │  ──────────────────────────────────── │
                        │  SmartChainAgentID   → soulbound NFT   │
                        │    .mintAgentID()    → one per wallet  │
@@ -113,8 +113,52 @@ Every optimization generates: 1 Storage upload + 1 Agent ID update + 1 revenue e
 
 ---
 
-## 🚀 Reproduction Steps
+## 🚀 Production Deployment
 
+### Quick Deploy AI Agent
+
+```bash
+# Option 1: Automated deployment script
+./deploy.sh
+
+# Option 2: Manual deployment to Render
+git add . && git commit -m "deploy: production" && git push
+# Then connect GitHub repo to Render dashboard
+
+# Option 3: Railway CLI
+cd ai-agent/
+npm install -g @railway/cli
+railway login && railway up
+railway variables set OG_COMPUTE_PRIVATE_KEY=your_key
+
+# Option 4: Fly.io
+cd ai-agent/
+curl -L https://fly.io/install.sh | sh
+fly auth login && fly launch --no-deploy
+fly secrets set OG_COMPUTE_PRIVATE_KEY=your_key
+fly deploy
+```
+
+### Update Frontend Environment
+
+```bash
+# After AI agent deployment, update frontend
+./update-env.sh
+# Or manually edit smartchain_hub_frontend/.env.local:
+# NEXT_PUBLIC_AI_AGENT_URL=https://your-deployed-url.com
+```
+
+### Production URLs
+
+| Service | URL | Status |
+|---------|-----|--------|
+| Frontend | https://smartchainhubfrontend.vercel.app | ✅ Live |
+| AI Agent | *Deploy using scripts above* | 🔄 Deploy needed |
+| Contracts | 0G Galileo Testnet | ✅ Deployed |
+
+---
+
+## 🚀 Reproduction Steps
 ### Prerequisites
 - Node.js 20+, Python 3.12+
 - Funded 0G Galileo wallet (get tokens: https://hub.0g.ai/faucet)
@@ -194,6 +238,14 @@ PRIVATE_KEY=                         # Deployer wallet
 
 ```
 SmartChain-Hub/
+├── ai-agent/
+│   ├── server/app.py                # Flask + 0G Compute broker + TF fallback
+│   ├── scripts/optimizer.py         # TransactionOptimizer (3 routes)
+│   ├── models/savings_model.py      # TensorFlow 6-feature model
+│   ├── render.yaml                  # Render deployment config
+│   ├── railway.json                 # Railway deployment config
+│   ├── fly.toml                     # Fly.io deployment config
+│   └── DEPLOY.md                    # Cloud deployment guide
 ├── smartchain_hub_frontend/
 │   └── src/
 │       ├── pages/
@@ -203,21 +255,21 @@ SmartChain-Hub/
 │       │   ├── payments.tsx         # Send/stake/withdraw
 │       │   └── api/
 │       │       ├── storage-upload.ts  # 0G Storage server route
-│       │       └── agent-memory.ts    # 0G KV memory server route
+│       │       ├── agent-memory.ts    # 0G KV memory server route
+│       │       └── onramp/
+│       │           ├── stripe.ts      # Stripe payment processing
+│       │           └── mpesa.ts       # Flutterwave M-Pesa
 │       ├── components/
 │       │   └── AgentIDCard.tsx      # Soulbound identity display
 │       └── utils/
 │           ├── agentId.ts           # Agent ID contract interactions
 │           ├── agentMemory.ts       # Persistent memory (KV + localStorage)
 │           ├── storage.ts           # 0G Storage client wrapper
-│           └── blockchain.ts        # ethers.js contract helpers
-├── ai-agent/
-│   ├── server/app.py                # Flask + 0G Compute broker + TF fallback
-│   ├── scripts/optimizer.py         # TransactionOptimizer (3 routes)
-│   └── models/savings_model.py      # TensorFlow 6-feature model
+│           ├── blockchain.ts        # ethers.js contract helpers
+│           └── api.ts               # AI agent API client
 ├── blockchain/
 │   ├── contracts/
-│   │   ├── SmartChainAgentID.sol    # Soulbound Agent ID (NEW)
+│   │   ├── SmartChainAgentID.sol    # Soulbound Agent ID
 │   │   ├── SmartChainTransaction.sol
 │   │   ├── SmartChainRevenue.sol
 │   │   └── SmartChainPayments.sol

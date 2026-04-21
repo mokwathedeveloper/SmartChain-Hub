@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: smartchain-hub-backend
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://smartchainhubfrontend.vercel.app
+      - key: SUPABASE_URL
+        sync: false  # Set in dashboard
+      - key: SUPABASE_SERVICE_KEY
+        sync: false  # Set in dashboard
+      - key: AI_AGENT_URL
+        sync: false  # Set in dashboard

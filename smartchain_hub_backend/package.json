@@ -1,0 +1,28 @@
+{
+  "name": "smartchain-hub-backend",
+  "version": "2.0.0",
+  "description": "SmartChain Hub Backend API - Centralized service layer for AI optimization, blockchain integration, and 0G Storage",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["blockchain", "ai", "0g", "defi", "optimization"],
+  "author": "SmartChain Hub Team",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "axios": "^1.6.2",
+    "cors": "^2.8.5",
+    "ethers": "^6.8.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

@@ -46,16 +46,15 @@ Most "AI + Web3" projects are just ChatGPT with a tip jar. SmartChain Hub is dif
 └──────────────────────────┬──────────────────────────────────────┘
                            │ REST API
 ┌──────────────────────────▼──────────────────────────────────────┐
-│               AI AGENT SERVER (Python / Flask)                  │
-│  1. POST /optimize → 0G Compute Broker (TeeML inference)        │
-│  2. Returns: fee, savings, route, TEE proof, confidence         │
-│  3. Falls back to local TensorFlow if no broker key             │
+│             BACKEND API (Node.js / Express)                     │
+│  Centralized business logic, transaction processing, analytics  │
+│  /api/transactions/process → Complete optimization flow         │
 └──────────┬───────────────────────────────────────────────────────┘
-           │
+           │ Coordinates services
      ┌─────┴──────────────────────────────────────┐
      │                                            │
 ┌────▼─────────────┐   ┌────────────────────────────────────────┐
-│  0G COMPUTE      │   │  0G STORAGE (Next.js API Routes)       │
+│  AI AGENT        │   │  0G STORAGE (Next.js API Routes)       │
 │  ─────────────── │   │  ──────────────────────────────────── │
 │  Model: LLaMA 3  │   │  /api/storage-upload → Log layer       │
 │  Mode:  TeeML    │   │  /api/agent-memory   → KV layer        │
@@ -63,7 +62,7 @@ Most "AI + Web3" projects are just ChatGPT with a tip jar. SmartChain Hub is dif
 └──────────────────┘   └────────────────┬───────────────────────┘
                                         │ rootHash committed
                        ┌────────────────▼───────────────────────┐
-│  0G CHAIN — 4 Contracts                 │
+                       │  0G CHAIN — 4 Contracts                 │
                        │  ──────────────────────────────────── │
                        │  SmartChainAgentID   → soulbound NFT   │
                        │    .mintAgentID()    → one per wallet  │
@@ -246,6 +245,20 @@ SmartChain-Hub/
 │   ├── railway.json                 # Railway deployment config
 │   ├── fly.toml                     # Fly.io deployment config
 │   └── DEPLOY.md                    # Cloud deployment guide
+├── smartchain_hub_backend/
+│   ├── controllers/
+│   │   └── transactionController.js # Enhanced with 0G Storage integration
+│   ├── services/
+│   │   ├── aiService.js             # AI agent proxy with error handling
+│   │   └── blockchainService.js     # Smart contract interactions
+│   ├── config/
+│   │   ├── supabaseConfig.js        # Database configuration
+│   │   └── blockchainConfig.js      # 0G Chain configuration
+│   ├── routes/
+│   │   └── transactions.js          # API endpoints
+│   ├── app.js                       # Express server v2.0.0
+│   ├── render.yaml                  # Render deployment config
+│   └── README.md                    # Backend integration guide
 ├── smartchain_hub_frontend/
 │   └── src/
 │       ├── pages/

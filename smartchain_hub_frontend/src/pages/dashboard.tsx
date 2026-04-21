@@ -7,16 +7,16 @@ import AgentIDCard from "@/components/AgentIDCard";
 const barHeights = [20,35,25,45,30,40,55,35,45,50,60,42,50,38,58,48,55,65,52,62,44,55,58,48,52,62,55,58,48,65];
 
 const staticActivity = [
-  { description: "Optimization Payout", type: "Received", amount: "$1,200", status: "Paid", statusCls: "bg-green-100 text-green-700" },
-  { description: "Node Fee Collected",  type: "Received", amount: "$150",   status: "Received", statusCls: "bg-yellow-100 text-yellow-700" },
-  { description: "Revenue Share",       type: "Received", amount: "$1,850", status: "Paid",     statusCls: "bg-green-100 text-green-700" },
-  { description: "Gas Fee Reduction",   type: "Received", amount: "$45",    status: "Saved",    statusCls: "bg-blue-100 text-blue-700" },
+  { description: "Optimization Payout", type: "Received", amount: "$1,200", status: "Paid", statusCls: "bg-green-500/10 text-green-400" },
+  { description: "Node Fee Collected",  type: "Received", amount: "$150",   status: "Received", statusCls: "bg-yellow-500/10 text-yellow-400" },
+  { description: "Revenue Share",       type: "Received", amount: "$1,850", status: "Paid",     statusCls: "bg-green-500/10 text-green-400" },
+  { description: "Gas Fee Reduction",   type: "Received", amount: "$45",    status: "Saved",    statusCls: "bg-blue-500/10 text-blue-400" },
 ];
 
 const staticDatasource = [
-  { name: "Payment",  bank: "Bankspeed", amount: "$8th", freq: "Paintedact day Farcrybers",      statusCls: "bg-blue-100 text-blue-700" },
-  { name: "Bkld",     bank: "Bankybane", amount: "$8th", freq: "Randurfam doyy Facnyooes",       statusCls: "bg-blue-100 text-blue-700" },
-  { name: "Dpyeut",   bank: "Bantybao",  amount: "$8th", freq: "donidonfect doyy Fannyooes",     statusCls: "bg-blue-100 text-blue-700" },
+  { name: "Payment",  bank: "Bankspeed", amount: "$8th", freq: "Paintedact day Farcrybers",      statusCls: "bg-blue-500/10 text-blue-400" },
+  { name: "Bkld",     bank: "Bankybane", amount: "$8th", freq: "Randurfam doyy Facnyooes",       statusCls: "bg-blue-500/10 text-blue-400" },
+  { name: "Dpyeut",   bank: "Bantybao",  amount: "$8th", freq: "donidonfect doyy Fannyooes",     statusCls: "bg-blue-500/10 text-blue-400" },
 ];
 
 export default function Dashboard() {
@@ -52,7 +52,7 @@ export default function Dashboard() {
         type: "Received",
         amount: `$${Number(tx.amount).toLocaleString()}`,
         status: tx.status === 'confirmed' ? 'Paid' : tx.status === 'pending' ? 'Received' : 'Saved',
-        statusCls: tx.status === 'confirmed' ? 'bg-green-100 text-green-700' : tx.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-blue-100 text-blue-700',
+        statusCls: tx.status === 'confirmed' ? 'bg-green-500/10 text-green-400' : tx.status === 'pending' ? 'bg-yellow-500/10 text-yellow-400' : 'bg-blue-500/10 text-blue-400',
       }))
     : staticActivity;
 

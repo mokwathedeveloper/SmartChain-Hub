@@ -169,7 +169,7 @@ export default function Revenue() {
                   <td className="px-6 py-4 text-sm font-semibold text-gray-200">{new Date(r.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">${Number(r.user_share).toFixed(2)}</td>
                   <td className="px-6 py-4">
-                    <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${r.claimed ? 'bg-gray-800 text-gray-500' : 'bg-green-50 text-green-600'}`}>
+                    <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${r.claimed ? 'bg-gray-800 text-gray-500' : 'bg-green-500/10 text-green-400'}`}>
                       {r.claimed ? 'Claimed' : `$${Number(r.user_share).toFixed(2)}`}
                     </span>
                   </td>

@@ -103,12 +103,12 @@ export default function Profile() {
                 <span className="text-sm font-medium text-gray-200">Two-Factor Authentication</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs px-2.5 py-1 bg-green-100 text-green-700 rounded-full font-medium">Enabled</span>
+                <span className="text-xs px-2.5 py-1 bg-green-500/10 text-green-400 rounded-full font-medium">Enabled</span>
                 <button className="px-4 py-1.5 border border-gray-700 text-sm text-gray-500 rounded-lg hover:bg-gray-800">Manage 2FA</button>
               </div>
             </div>
             <div className="pt-2">
-              <button onClick={handleLogout} className="w-full py-3 border border-red-200 text-red-600 text-sm font-medium rounded-xl hover:bg-red-50 transition-colors">
+              <button onClick={handleLogout} className="w-full py-3 border border-red-600 text-red-400 text-sm font-medium rounded-xl hover:bg-red-500/10 transition-colors">
                 Log Out
               </button>
             </div>

@@ -208,7 +208,7 @@ export default function Transactions() {
               <div className="flex gap-2">
                 {['efficiency','speed','security'].map(p => (
                   <button key={p} onClick={() => setPriority(p)}
-                    className={`flex-1 py-2.5 text-xs font-semibold rounded-xl capitalize transition-all border ${priority === p ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-500 border-gray-700 hover:border-gray-300'}`}>
+                    className={`flex-1 py-2.5 text-xs font-semibold rounded-xl capitalize transition-all border ${priority === p ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-800 text-gray-400 border-gray-700 hover:border-gray-500'}`}>
                     {p}
                   </button>
                 ))}
@@ -220,7 +220,7 @@ export default function Transactions() {
                 </button>
               ) : (
                 <div className="space-y-3">
-                  <div className="p-4 bg-green-50 rounded-xl border border-green-100">
+                  <div className="p-4 bg-gray-800 rounded-xl border border-gray-700">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-3">
                       <div><p className="text-xs text-gray-500">Optimized Fee</p><p className="text-lg font-bold text-white">${result.fee}</p></div>
                       <div><p className="text-xs text-gray-500">Savings</p><p className="text-lg font-bold text-green-600">${result.savings}</p></div>
@@ -228,7 +228,7 @@ export default function Transactions() {
                     </div>
                     <p className="text-xs text-gray-500 mb-1">Route: <span className="font-medium text-gray-200">{result.route}</span></p>
                     <div className="flex items-center gap-3 mb-2">
-                      {result.risk && <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${result.risk === 'Very Low' || result.risk === 'Low' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>Risk: {result.risk}</span>}
+                      {result.risk && <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${result.risk === 'Very Low' || result.risk === 'Low' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}>Risk: {result.risk}</span>}
                       {result.congestion !== undefined && <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-medium">Network: {result.congestion}% congestion</span>}
                     </div>
                     <p className="text-xs text-gray-500 italic">{result.explanation}</p>
@@ -377,7 +377,7 @@ export default function Transactions() {
                 <div>
                   <label className="block text-xs text-gray-500 mb-1.5">Route</label>
                   <select value={simRoute} onChange={e => setSimRoute(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                    className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900">
                     <option>0G Chain Flash</option>
                     <option>Standard Route</option>
                     <option>High Speed</option>
@@ -408,7 +408,7 @@ export default function Transactions() {
                         </div>
                       ))}
                     </div>
-                    <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
+                    <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
                       <p className="text-xs text-gray-500">
                         <span className="font-semibold">Route:</span> {simResult.route} &nbsp;·&nbsp;
                         <span className="font-semibold">Risk:</span>{' '}
@@ -455,7 +455,7 @@ export default function Transactions() {
                   <td className="px-6 py-4 text-sm text-gray-500">{new Date(tx.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
                   <td className="px-6 py-4 text-sm text-gray-200">${Number(tx.amount).toLocaleString()}</td>
                   <td className="px-6 py-4 text-sm text-gray-200">${Number(tx.optimized_fee || 0).toFixed(2)}</td>
-                  <td className="px-6 py-4"><span className="text-xs px-2.5 py-1 rounded-full font-medium bg-green-50 text-green-600">${Number(tx.savings || 0).toFixed(2)}</span></td>
+                  <td className="px-6 py-4"><span className="text-xs px-2.5 py-1 rounded-full font-medium bg-green-500/10 text-green-400">${Number(tx.savings || 0).toFixed(2)}</span></td>
                   <td className="px-6 py-4">
                     <button onClick={() => { setActiveTab("Optimize"); setAmount(String(tx.amount)); }}
                       className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors">

@@ -1,16 +1,34 @@
-const AI_AGENT_URL = process.env.NEXT_PUBLIC_AI_AGENT_URL || 'http://localhost:5000';
+import { apiClient } from './secureApi';
+import { secureLogger } from './secureLogger';
 
+// Secure API functions using the secure client
 export async function optimizeTransaction(amount: number, priority: string) {
-  const res = await fetch(`${AI_AGENT_URL}/optimize`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ amount, priority }),
-  });
-  if (!res.ok) throw new Error('AI agent unavailable');
-  return res.json();
+  secureLogger.info('Optimizing transaction', { amount, priority });
+  
+  const transactionData = {
+    to: '0x0000000000000000000000000000000000000000', // Placeholder
+    value: amount.toString(),
+    gasLimit: 21000,
+    priority
+  };
+  
+  return apiClient.optimizeTransaction(transactionData);
 }
 
 export async function getAgentHealth() {
-  const res = await fetch(`${AI_AGENT_URL}/health`);
-  return res.json();
+  const AI_AGENT_URL = process.env.NEXT_PUBLIC_AI_AGENT_URL;
+  
+  if (!AI_AGENT_URL) {
+    throw new Error('AI_AGENT_URL not configured');
+  }
+  
+  const fullUrl = `${AI_AGENT_URL}/health`;
+  
+  try {
+    const response = await apiClient.secureRequest(fullUrl);
+    return await response.json();
+  } catch (error) {
+    secureLogger.error('Health check failed', error);
+    throw error;
+  }
 }

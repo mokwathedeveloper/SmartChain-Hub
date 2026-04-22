@@ -1,24 +1,30 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const { 
+  generalLimiter, 
+  securityHeaders, 
+  corsOptions, 
+  requestLogger, 
+  errorHandler, 
+  requestTimeout,
+  bodyLimiter 
+} = require('./middleware/security');
 const transactionRoutes = require('./routes/transactions');
 const userRoutes = require('./routes/users');
 
 const app = express();
 
-// Middleware
-app.use(cors({
-  origin: process.env.FRONTEND_URL || ['http://localhost:3000', 'https://smartchainhubfrontend.vercel.app'],
-  credentials: true
-}));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+// Security middleware - MUST be first
+app.use(securityHeaders);
+app.use(cors(corsOptions));
+app.use(generalLimiter);
+app.use(requestTimeout());
+app.use(requestLogger);
 
-// Request logging
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  next();
-});
+// Body parsing with security limits
+app.use(express.json(bodyLimiter.json));
+app.use(express.urlencoded(bodyLimiter.urlencoded));
 
 // Routes
 app.use('/api/transactions', transactionRoutes);
@@ -27,11 +33,17 @@ app.use('/api/users', userRoutes);
 // Root health check
 app.get('/health', (req, res) => {
   res.json({ 
-    status: 'ok', 
+    status: 'healthy', 
     service: 'SmartChain Hub Backend',
     version: '2.0.0',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    security: {
+      headers: 'enabled',
+      rateLimit: 'enabled',
+      cors: 'configured',
+      validation: 'enabled'
+    }
   });
 });
 
@@ -40,6 +52,7 @@ app.get('/api', (req, res) => {
   res.json({
     name: 'SmartChain Hub API',
     version: '2.0.0',
+    security: 'enhanced',
     endpoints: {
       transactions: {
         'GET /api/transactions/:userId': 'Get user transactions',
@@ -69,19 +82,17 @@ app.use('*', (req, res) => {
   });
 });
 
-// Error handler
-app.use((err, req, res, next) => {
-  console.error('Server Error:', err);
-  res.status(500).json({ 
-    error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
-  });
-});
+// Error handling middleware (MUST be last)
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`\n🚀 SmartChain Hub Backend v2.0.0`);
-  console.log(`📡 Server running on port ${PORT}`);
+// SECURITY FIX: Bind to localhost only in production
+const HOST = process.env.NODE_ENV === 'production' ? '127.0.0.1' : '0.0.0.0';
+
+app.listen(PORT, HOST, () => {
+  console.log(`\n🚀 SmartChain Hub Backend v2.0.0 (SECURE)`);
+  console.log(`📡 Server running on ${HOST}:${PORT}`);
+  console.log(`🔒 Security: Enhanced with rate limiting, CORS, headers`);
   console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🤖 AI Agent: ${process.env.AI_AGENT_URL || process.env.NEXT_PUBLIC_AI_AGENT_URL || 'http://localhost:5000'}`);
   console.log(`⛓️  Blockchain: 0G Galileo Testnet`);
@@ -90,7 +101,7 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`   GET  /health - Health check`);
   console.log(`   GET  /api - API documentation`);
   console.log(`   POST /api/transactions/process - Complete transaction flow`);
-  console.log(`\n✅ Backend ready for requests!\n`);
+  console.log(`\n✅ Secure backend ready for requests!\n`);
 });
 
 module.exports = app;

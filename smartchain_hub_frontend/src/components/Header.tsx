@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { supabase } from '@/utils/supabase';
 import { useAuth } from '@/hooks/useAuth';
@@ -158,6 +158,14 @@ const Header = ({ onMenuClick }: HeaderProps) => {
   const { address, isConnected, chainName, disconnectWallet, switchToOG } = useWeb3();
   const [showModal, setShowModal] = useState(false);
   const [manualAddress, setManualAddress] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  // Load avatar from profiles table whenever user changes
+  useEffect(() => {
+    if (!user) { setAvatarUrl(null); return; }
+    supabase.from('profiles').select('avatar_url').eq('id', user.id).single()
+      .then(({ data }) => setAvatarUrl(data?.avatar_url || null));
+  }, [user]);
 
   const isApp = APP_ROUTES.includes(router.pathname);
   const displayAddress = address || manualAddress;
@@ -198,9 +206,16 @@ const Header = ({ onMenuClick }: HeaderProps) => {
                   <Link href="/dashboard" className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-colors">
                     Dashboard
                   </Link>
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
-                    {user.email?.[0]?.toUpperCase()}
-                  </div>
+                  <Link href="/profile">
+                    <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-gray-800 hover:ring-blue-600 transition-all cursor-pointer">
+                      {avatarUrl
+                        ? <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                        : <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
+                            {user.email?.[0]?.toUpperCase()}
+                          </div>
+                      }
+                    </div>
+                  </Link>
                 </>
               ) : (
                 <>
@@ -271,8 +286,13 @@ const Header = ({ onMenuClick }: HeaderProps) => {
 
           {/* Avatar */}
           <Link href="/profile">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold cursor-pointer ring-2 ring-gray-800 hover:ring-blue-600 transition-all">
-              {user?.email?.[0]?.toUpperCase() || 'U'}
+            <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-gray-800 hover:ring-blue-600 transition-all cursor-pointer shrink-0">
+              {avatarUrl
+                ? <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                : <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
+                    {user?.email?.[0]?.toUpperCase() || 'U'}
+                  </div>
+              }
             </div>
           </Link>
         </div>

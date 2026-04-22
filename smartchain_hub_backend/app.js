@@ -8,7 +8,9 @@ const {
   requestLogger, 
   errorHandler, 
   requestTimeout,
-  bodyLimiter 
+  bodyLimiter,
+  csrfIssue,
+  csrfProtect
 } = require('./middleware/security');
 const transactionRoutes = require('./routes/transactions');
 const userRoutes = require('./routes/users');
@@ -25,6 +27,10 @@ app.use(requestLogger);
 // Body parsing with security limits
 app.use(express.json(bodyLimiter.json));
 app.use(express.urlencoded(bodyLimiter.urlencoded));
+
+// CSRF — issue token endpoint + protect all state-mutating routes
+app.get('/csrf-token', csrfIssue);
+app.use(csrfProtect);
 
 // Routes
 app.use('/api/transactions', transactionRoutes);

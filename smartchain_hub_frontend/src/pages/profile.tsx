@@ -46,8 +46,22 @@ export default function Profile() {
   const [showConfirm, setShowConfirm]   = useState(false);
 
   /* ── 2FA state ── */
-  const [twoFA, setTwoFA]       = useState(false);
+  const [twoFA, setTwoFA]           = useState(false);
   const [twoFASaving, setTwoFASaving] = useState(false);
+  // TOTP enrollment
+  const [show2FAModal, setShow2FAModal]   = useState(false);
+  const [totpQR, setTotpQR]               = useState("");
+  const [totpSecret, setTotpSecret]       = useState("");
+  const [totpFactorId, setTotpFactorId]   = useState("");
+  const [totpCode, setTotpCode]           = useState("");
+  const [totpError, setTotpError]         = useState("");
+  const [totpStep, setTotpStep]           = useState<"qr"|"verify"|"done">("qr");
+  const [totpLoading, setTotpLoading]     = useState(false);
+  // Disable 2FA
+  const [show2FADisable, setShow2FADisable] = useState(false);
+  const [disableCode, setDisableCode]       = useState("");
+  const [disableError, setDisableError]     = useState("");
+  const [disableLoading, setDisableLoading] = useState(false);
 
   /* ── load profile ── */
   useEffect(() => {
@@ -62,6 +76,11 @@ export default function Profile() {
         }
         setLoadingProfile(false);
       });
+    // Check Supabase MFA factors
+    supabase.auth.mfa.listFactors().then(({ data }) => {
+      const verified = data?.totp?.find((f: any) => f.status === 'verified');
+      if (verified) { setTwoFA(true); setTotpFactorId(verified.id); }
+    });
   }, [user]);
 
   /* ── avatar upload ── */
@@ -108,14 +127,46 @@ export default function Profile() {
     setTimeout(() => { setPwSaved(false); setShowPwModal(false); setCurrentPw(""); setNewPw(""); setConfirmPw(""); }, 2000);
   };
 
-  /* ── toggle 2FA ── */
-  const handle2FA = async () => {
-    if (!user) return;
-    setTwoFASaving(true);
-    const next = !twoFA;
-    await supabase.from("profiles").update({ two_fa_enabled: next }).eq("id", user.id);
-    setTwoFA(next);
-    setTwoFASaving(false);
+  /* ── 2FA: start enrollment ── */
+  const handle2FAEnable = async () => {
+    setTotpError(""); setTotpCode(""); setTotpStep("qr"); setTotpLoading(true);
+    const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'SmartChain Hub' });
+    setTotpLoading(false);
+    if (error || !data) { setTotpError(error?.message || 'Enrollment failed'); return; }
+    setTotpQR(data.totp.qr_code);
+    setTotpSecret(data.totp.secret);
+    setTotpFactorId(data.id);
+    setShow2FAModal(true);
+  };
+
+  /* ── 2FA: verify TOTP code ── */
+  const handle2FAVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (totpCode.length !== 6) { setTotpError('Enter the 6-digit code from your authenticator app.'); return; }
+    setTotpLoading(true); setTotpError("");
+    const { data: challengeData, error: challengeErr } = await supabase.auth.mfa.challenge({ factorId: totpFactorId });
+    if (challengeErr || !challengeData) { setTotpError(challengeErr?.message || 'Challenge failed'); setTotpLoading(false); return; }
+    const { error: verifyErr } = await supabase.auth.mfa.verify({ factorId: totpFactorId, challengeId: challengeData.id, code: totpCode });
+    setTotpLoading(false);
+    if (verifyErr) { setTotpError('Invalid code. Please try again.'); return; }
+    await supabase.from('profiles').update({ two_fa_enabled: true }).eq('id', user!.id);
+    setTwoFA(true); setTotpStep('done');
+    setTimeout(() => { setShow2FAModal(false); setTotpCode(""); }, 2000);
+  };
+
+  /* ── 2FA: disable ── */
+  const handle2FADisable = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (disableCode.length !== 6) { setDisableError('Enter the 6-digit code to confirm.'); return; }
+    setDisableLoading(true); setDisableError("");
+    const { data: ch, error: chErr } = await supabase.auth.mfa.challenge({ factorId: totpFactorId });
+    if (chErr || !ch) { setDisableError(chErr?.message || 'Challenge failed'); setDisableLoading(false); return; }
+    const { error: vErr } = await supabase.auth.mfa.verify({ factorId: totpFactorId, challengeId: ch.id, code: disableCode });
+    if (vErr) { setDisableError('Invalid code.'); setDisableLoading(false); return; }
+    await supabase.auth.mfa.unenroll({ factorId: totpFactorId });
+    await supabase.from('profiles').update({ two_fa_enabled: false }).eq('id', user!.id);
+    setTwoFA(false); setTotpFactorId(""); setDisableLoading(false);
+    setShow2FADisable(false); setDisableCode("");
   };
 
   /* ── logout ── */
@@ -134,7 +185,111 @@ export default function Profile() {
     <>
       <Head><title>Profile Settings | SmartChain Hub</title></Head>
 
-      {/* ── Password Modal ── */}
+      {/* ── 2FA Enrollment Modal ── */}
+      {show2FAModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-gray-900 border border-white/[0.08] rounded-2xl shadow-2xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-base font-bold text-white">Enable Two-Factor Authentication</h3>
+              <button onClick={() => setShow2FAModal(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-all">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+
+            {totpStep === "done" ? (
+              <div className="text-center py-6 space-y-3">
+                <div className="w-14 h-14 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto">
+                  <svg className="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </div>
+                <p className="text-white font-bold">2FA Enabled!</p>
+                <p className="text-sm text-gray-500">Your account is now protected.</p>
+              </div>
+            ) : (
+              <div className="space-y-5">
+                {totpStep === "qr" && (
+                  <>
+                    <p className="text-sm text-gray-400">Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)</p>
+                    <div className="flex justify-center">
+                      {totpLoading
+                        ? <div className="w-10 h-10 rounded-full border-2 border-blue-500/30 border-t-blue-500 animate-spin" />
+                        : <img src={totpQR} alt="TOTP QR Code" className="w-48 h-48 rounded-xl border border-white/10" />
+                      }
+                    </div>
+                    {/* Manual secret */}
+                    <div className="bg-gray-800 border border-white/[0.06] rounded-xl p-3">
+                      <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Manual entry key</p>
+                      <p className="text-xs font-mono text-gray-300 break-all select-all">{totpSecret}</p>
+                    </div>
+                    <button onClick={() => setTotpStep("verify")}
+                      className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-sm transition-all">
+                      I've scanned it →
+                    </button>
+                  </>
+                )}
+
+                {totpStep === "verify" && (
+                  <form onSubmit={handle2FAVerify} className="space-y-4">
+                    <p className="text-sm text-gray-400">Enter the 6-digit code from your authenticator app to confirm setup.</p>
+                    <input
+                      type="text" inputMode="numeric" maxLength={6}
+                      value={totpCode} onChange={e => setTotpCode(e.target.value.replace(/\D/g, ""))}
+                      placeholder="000000"
+                      className="w-full px-4 py-4 bg-gray-800 border border-white/[0.07] rounded-xl text-2xl font-mono text-white text-center tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    />
+                    {totpError && <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{totpError}</p>}
+                    <div className="flex gap-3">
+                      <button type="button" onClick={() => setTotpStep("qr")}
+                        className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/[0.08] text-gray-300 font-semibold rounded-xl text-sm transition-all">
+                        ← Back
+                      </button>
+                      <button type="submit" disabled={totpLoading || totpCode.length !== 6}
+                        className="flex-[2] py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-sm transition-all disabled:opacity-50">
+                        {totpLoading ? 'Verifying...' : 'Verify & Enable'}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── 2FA Disable Modal ── */}
+      {show2FADisable && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-sm bg-gray-900 border border-white/[0.08] rounded-2xl shadow-2xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-base font-bold text-white">Disable 2FA</h3>
+              <button onClick={() => setShow2FADisable(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-white hover:bg-white/5">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+            <form onSubmit={handle2FADisable} className="space-y-4">
+              <p className="text-sm text-gray-400">Enter your current authenticator code to disable 2FA.</p>
+              <input
+                type="text" inputMode="numeric" maxLength={6}
+                value={disableCode} onChange={e => setDisableCode(e.target.value.replace(/\D/g, ""))}
+                placeholder="000000"
+                className="w-full px-4 py-4 bg-gray-800 border border-white/[0.07] rounded-xl text-2xl font-mono text-white text-center tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-red-500/50"
+              />
+              {disableError && <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{disableError}</p>}
+              <button type="submit" disabled={disableLoading || disableCode.length !== 6}
+                className="w-full py-3 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-xl text-sm transition-all disabled:opacity-50">
+                {disableLoading ? 'Disabling...' : 'Confirm & Disable 2FA'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
       {showPwModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="w-full max-w-md bg-gray-900 border border-white/[0.08] rounded-2xl shadow-2xl p-6">
@@ -331,11 +486,11 @@ export default function Profile() {
                   }`}>
                     {twoFA ? "Enabled" : "Disabled"}
                   </span>
-                  {/* toggle switch */}
-                  <button onClick={handle2FA} disabled={twoFASaving}
+                  <button
+                    onClick={() => twoFA ? setShow2FADisable(true) : handle2FAEnable()}
                     className={`relative w-11 h-6 rounded-full transition-all duration-300 focus:outline-none ${
                       twoFA ? "bg-emerald-500" : "bg-gray-700"
-                    } disabled:opacity-50`}>
+                    }`}>
                     <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 ${
                       twoFA ? "translate-x-5" : "translate-x-0"
                     }`}/>

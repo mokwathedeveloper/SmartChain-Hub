@@ -5,6 +5,7 @@ import { useWeb3 } from '@/context/Web3Context';
 import { useNotification } from '@/context/NotificationContext';
 import { ethers } from 'ethers';
 import { storageService } from '@/utils/storage';
+import { apiClient } from '@/utils/secureApi';
 
 interface WidgetProps {
   onStateChange?: (loading: boolean, result: any) => void;
@@ -38,20 +39,20 @@ const AIOptimizationWidget = ({ onStateChange }: WidgetProps) => {
     if (!amount) return;
     setIsOptimizing(true);
     setOptimizedResult(null);
-    
+
     try {
       const AI_URL = process.env.NEXT_PUBLIC_AI_AGENT_URL || 'http://localhost:5000';
-      const response = await fetch(`${AI_URL}/optimize`, {
+      const response = await apiClient.secureRequest(`${AI_URL}/optimize`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount, priority })
+        body: JSON.stringify({ amount, priority }),
       });
 
-      if (!response.ok) throw new Error("AI API Offline");
-      
+      if (!response.ok) throw new Error('AI API Offline');
+
       const data = await response.json();
       setOptimizedResult(data);
-      addNotification("AI Neural Pathway Computed!", "success");
+      addNotification('AI Neural Pathway Computed!', 'success');
     } catch (error) {
       console.warn("Falling back to simulated AI logic:", error);
       setTimeout(() => {

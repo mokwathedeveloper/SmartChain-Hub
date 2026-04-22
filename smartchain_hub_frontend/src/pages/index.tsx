@@ -250,15 +250,16 @@ export default function Home() {
             <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">How It Works</span>
             <h2 className="text-4xl font-black text-white mt-3">From wallet to sovereign agent in 4 steps</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {steps.map((s, i) => (
-              <div key={s.n} className="relative">
-                {i < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-full w-full h-px bg-gradient-to-r from-blue-600/50 to-transparent z-10"/>
-                )}
-                <div className="bg-gray-950 border border-gray-800 rounded-2xl p-6">
-                  <div className="text-4xl font-black text-blue-600/30 mb-4">{s.n}</div>
-                  <h3 className="text-white font-bold mb-2">{s.title}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {steps.map((s) => (
+              <div key={s.n} className="bg-gray-950 border border-white/[0.06] rounded-2xl p-6 flex flex-col gap-4 hover:border-blue-500/30 transition-colors duration-300">
+                {/* Step badge */}
+                <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
+                  <span className="text-xs font-black text-blue-400">{s.n}</span>
+                </div>
+                {/* Text */}
+                <div>
+                  <h3 className="text-white font-bold text-sm mb-2">{s.title}</h3>
                   <p className="text-gray-500 text-sm leading-relaxed">{s.desc}</p>
                 </div>
               </div>

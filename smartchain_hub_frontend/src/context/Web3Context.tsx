@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { ethers } from 'ethers';
+import { secureLogger } from '../utils/secureLogger';
 
 declare global { interface Window { ethereum?: any; } }
 
@@ -72,23 +73,21 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
     }
     setNoWallet(false);
     try {
-      console.log('Connecting wallet...');
+      secureLogger.info('Initiating wallet connection');
       const bp = new ethers.BrowserProvider(window.ethereum);
 
-      // Request accounts first (triggers MetaMask popup)
       const accounts = await bp.send('eth_requestAccounts', []);
-      console.log('Accounts received:', accounts);
+      secureLogger.info('Wallet accounts received', { count: accounts.length });
+      
       if (!accounts.length) return;
 
-      // Check chain and switch if needed
       const network = await bp.getNetwork();
       const currentChainId = network.chainId.toString();
-      console.log('Current chain:', currentChainId, 'Target:', TARGET_CHAIN_ID);
+      secureLogger.info('Current network detected', { chainId: currentChainId });
       
       if (currentChainId !== TARGET_CHAIN_ID) {
-        console.log('Switching to 0G chain...');
+        secureLogger.info('Switching to target network', { target: TARGET_CHAIN_ID });
         await switchToOG();
-        // Re-create provider after chain switch
         const bp2 = new ethers.BrowserProvider(window.ethereum);
         const sig2 = await bp2.getSigner();
         const net2 = await bp2.getNetwork();
@@ -96,7 +95,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
         setSigner(sig2);
         setAddress(accounts[0]);
         setChainId(net2.chainId.toString());
-        console.log('Wallet connected after chain switch:', accounts[0]);
+        secureLogger.wallet('Wallet connected after network switch', accounts[0]);
         return;
       }
 
@@ -105,10 +104,12 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
       setSigner(sig);
       setAddress(accounts[0]);
       setChainId(currentChainId);
-      console.log('Wallet connected:', accounts[0]);
+      secureLogger.wallet('Wallet connected successfully', accounts[0]);
     } catch (e: any) {
-      console.error('Wallet connection error:', e);
-      if (e.code !== 4001) console.error('Wallet error:', e);
+      secureLogger.error('Wallet connection failed', e);
+      if (e.code !== 4001) {
+        secureLogger.error('Unexpected wallet error', e);
+      }
     }
   };
 
@@ -120,7 +121,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
     if (!window.ethereum) return;
     
     const handleAccountsChanged = (accounts: string[]) => {
-      console.log('Accounts changed:', accounts);
+      secureLogger.info('Accounts changed', { count: accounts.length });
       if (accounts.length) {
         setAddress(accounts[0]);
       } else {
@@ -129,7 +130,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
     };
     
     const handleChainChanged = () => {
-      console.log('Chain changed, reloading...');
+      secureLogger.info('Chain changed, reloading...');
       window.location.reload();
     };
     
@@ -140,12 +141,12 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
     const checkConnection = async () => {
       try {
         const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-        console.log('Auto-reconnect check:', accounts);
+        secureLogger.info('Auto-reconnect check', { count: accounts.length });
         if (accounts.length) {
           await connectWallet();
         }
       } catch (e: any) {
-        console.log('Auto-reconnect failed:', e);
+        secureLogger.error('Auto-reconnect failed', e);
       } finally {
         setIsLoading(false);
       }

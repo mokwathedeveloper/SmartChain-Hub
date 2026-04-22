@@ -3,42 +3,36 @@
  * Fixes CWE-918 SSRF and implements proper security measures
  */
 
-const ALLOWED_HOSTS = [
+const ALLOWED_HOSTS = new Set([
   'smartchain-hub.onrender.com',
   'localhost:5000',
-  '127.0.0.1:5000'
-];
+  '127.0.0.1:5000',
+]);
 
-const ALLOWED_PROTOCOLS = ['http:', 'https:'];
+const ALLOWED_PROTOCOLS = new Set(['http:', 'https:']);
+
+/** Sanitize a value for safe logging — strips newlines and control chars */
+function sanitizeForLog(value: unknown): string {
+  return String(value).replace(/[\r\n\t\x00-\x1f\x7f]/g, '_').slice(0, 100);
+}
 
 /**
- * Validates URL against security whitelist
- * @param url - URL to validate
- * @returns boolean indicating if URL is safe
+ * Validates URL against security allowlist — no user input reaches logs unsanitized.
  */
 function validateUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
-    
-    // Check protocol
-    if (!ALLOWED_PROTOCOLS.includes(parsed.protocol)) {
-      console.error(`Invalid protocol: ${parsed.protocol}`);
+    if (!ALLOWED_PROTOCOLS.has(parsed.protocol)) {
+      console.error('URL blocked: invalid protocol', sanitizeForLog(parsed.protocol));
       return false;
     }
-    
-    // Check hostname
-    const isAllowedHost = ALLOWED_HOSTS.some(host => {
-      return parsed.hostname === host || parsed.host === host;
-    });
-    
-    if (!isAllowedHost) {
-      console.error(`Host not in whitelist: ${parsed.hostname}`);
+    if (!ALLOWED_HOSTS.has(parsed.host)) {
+      console.error('URL blocked: host not in allowlist');
       return false;
     }
-    
     return true;
-  } catch (error) {
-    console.error('Invalid URL format:', error);
+  } catch {
+    console.error('URL blocked: malformed URL');
     return false;
   }
 }
@@ -73,36 +67,39 @@ class SecureApiClient {
   }
   
   async secureRequest(url: string, options: RequestInit = {}): Promise<Response> {
-    // Validate URL to prevent SSRF
-    if (!validateUrl(url)) {
-      throw new Error('URL validation failed - potential SSRF attempt blocked');
+    // Parse and validate — then reconstruct from trusted components only
+    let parsed: URL;
+    try {
+      parsed = new URL(url);
+    } catch {
+      throw new Error('Blocked: malformed URL');
     }
-    
+    if (!ALLOWED_PROTOCOLS.has(parsed.protocol)) throw new Error('Blocked: invalid protocol');
+    if (!ALLOWED_HOSTS.has(parsed.host))         throw new Error('Blocked: host not in allowlist');
+
+    // Reconstruct URL from validated components — taint is broken here
+    const safeUrl = `${parsed.protocol}//${parsed.host}${parsed.pathname}${parsed.search}`;
+
     // Get CSRF token for state-changing requests
     const needsCsrf = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(
       (options.method || 'GET').toUpperCase()
     );
-    
-    let headers: Record<string, string> = {
+
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
-      ...(options?.headers as Record<string, string> || {})
+      ...(options?.headers as Record<string, string> || {}),
     };
-    
+
     if (needsCsrf) {
       try {
-        const csrfToken = await this.getCsrfToken();
-        headers['X-CSRF-Token'] = csrfToken;
-      } catch (error) {
+        headers['X-CSRF-Token'] = await this.getCsrfToken();
+      } catch {
         console.warn('CSRF token not available, proceeding without it');
       }
     }
-    
-    return fetch(url, {
-      ...options,
-      credentials: 'include',
-      headers
-    });
+
+    return fetch(safeUrl, { ...options, credentials: 'include', headers });
   }
   
   /**
@@ -121,7 +118,8 @@ class SecureApiClient {
     }
     
     const fullUrl = `${AI_AGENT_URL}/optimize`;
-    
+    if (!validateUrl(fullUrl)) throw new Error('AI_AGENT_URL is not in the allowed hosts list');
+
     try {
       const response = await this.secureRequest(fullUrl, {
         method: 'POST',
@@ -150,7 +148,8 @@ class SecureApiClient {
     }
     
     const fullUrl = `${AI_AGENT_URL}/history`;
-    
+    if (!validateUrl(fullUrl)) throw new Error('AI_AGENT_URL is not in the allowed hosts list');
+
     try {
       const response = await this.secureRequest(fullUrl);
       

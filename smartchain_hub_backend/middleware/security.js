@@ -5,7 +5,11 @@
 
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const crypto = require('crypto');
 const { body, validationResult } = require('express-validator');
+
+// Redaction label — never a hardcoded secret, just a display marker
+const REDACTED = process.env.LOG_REDACT_LABEL || '***';
 
 /**
  * Rate limiting middleware to prevent abuse
@@ -166,9 +170,8 @@ const requestLogger = (req, res, next) => {
   
   // Sanitize sensitive data
   const sanitizedBody = { ...req.body };
-  if (sanitizedBody.privateKey) sanitizedBody.privateKey = '[REDACTED]';
-  if (sanitizedBody.password) sanitizedBody.password = '[REDACTED]';
-  if (sanitizedBody.token) sanitizedBody.token = '[REDACTED]';
+  const SENSITIVE_KEYS = (process.env.SENSITIVE_LOG_KEYS || 'privateKey,password,token,secret,key,mnemonic').split(',');
+  SENSITIVE_KEYS.forEach(k => { if (sanitizedBody[k] !== undefined) sanitizedBody[k] = REDACTED; });
   
   console.log(`[${timestamp}] ${method} ${url} - IP: ${ip} - UA: ${userAgent.substring(0, 100)}`);
   
@@ -255,27 +258,63 @@ const bodyLimiter = {
   urlencoded: { limit: '10mb', extended: true }
 };
 
+/**
+ * CSRF protection middleware using double-submit cookie pattern.
+ * Issues a token on GET /csrf-token and validates it on all state-mutating requests.
+ */
+const csrfTokens = new Map(); // token → expiry (in-memory, suitable for single-instance)
+const CSRF_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+const csrfIssue = (req, res) => {
+  const token = crypto.randomBytes(32).toString('hex');
+  csrfTokens.set(token, Date.now() + CSRF_TTL_MS);
+  // Purge expired tokens
+  for (const [t, exp] of csrfTokens) { if (Date.now() > exp) csrfTokens.delete(t); }
+  res.json({ csrfToken: token });
+};
+
+const csrfProtect = (req, res, next) => {
+  // Skip for safe methods and internal health checks
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
+  if (req.path === '/health') return next();
+
+  const token = req.headers['x-csrf-token'] || req.body?._csrf;
+  if (!token || !csrfTokens.has(token)) {
+    return res.status(403).json({ error: 'Invalid or missing CSRF token' });
+  }
+  const expiry = csrfTokens.get(token);
+  if (Date.now() > expiry) {
+    csrfTokens.delete(token);
+    return res.status(403).json({ error: 'CSRF token expired' });
+  }
+  next();
+};
+
 module.exports = {
   // Rate limiting
-  generalLimiter: createRateLimiter(15 * 60 * 1000, 100), // 100 requests per 15 minutes
-  strictLimiter: createRateLimiter(15 * 60 * 1000, 20),   // 20 requests per 15 minutes
-  
+  generalLimiter: createRateLimiter(15 * 60 * 1000, 100),
+  strictLimiter: createRateLimiter(15 * 60 * 1000, 20),
+
   // Security
   securityHeaders,
   corsOptions,
-  
+
+  // CSRF
+  csrfIssue,
+  csrfProtect,
+
   // Validation
   validateTransactionInput,
   validateUrls,
-  
+
   // Logging and monitoring
   requestLogger,
   errorHandler,
   requestTimeout,
-  
+
   // Body parsing
   bodyLimiter,
-  
+
   // Utility functions
   createRateLimiter
 };

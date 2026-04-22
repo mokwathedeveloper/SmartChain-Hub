@@ -1,19 +1,28 @@
 {
-  "name": "smartchain-hub-contracts",
-  "version": "1.0.0",
-  "description": "Smart contracts for SmartChain Hub on 0G Chain",
-  "main": "index.js",
+  "name": "@smartchain/hub-contracts",
+  "version": "2.0.0",
+  "description": "SmartChain Hub Smart Contracts with security updates",
   "scripts": {
-    "test": "npx hardhat test",
-    "compile": "npx hardhat compile",
-    "deploy": "npx hardhat run scripts/deploy.js"
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.js",
+    "verify": "hardhat verify"
+  },
+  "dependencies": {
+    "hardhat": "^2.22.0",
+    "@openzeppelin/contracts": "^5.1.0",
+    "ethers": "^6.13.0",
+    "lodash": "^4.17.21",
+    "serialize-javascript": "^6.0.2",
+    "elliptic": "^6.5.7",
+    "bn.js": "^5.2.1",
+    "tmp": "^0.2.3",
+    "cookie": "^0.6.0",
+    "undici": "^5.28.4"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "dotenv": "^16.4.5",
-    "hardhat": "^2.22.2"
-  },
-  "dependencies": {
-    "@openzeppelin/contracts": "^5.0.2"
+    "chai": "^4.3.10",
+    "mocha": "^10.7.0"
   }
 }

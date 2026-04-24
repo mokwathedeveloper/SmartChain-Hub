@@ -16,4 +16,7 @@ router.post('/process', ctrl.processTransaction);
 // Health check
 router.get('/health/check', ctrl.healthCheck);
 
+// Fine-tune TF model on real user transaction data from 0G Storage
+router.post('/fine-tune', ctrl.fineTuneModel);
+
 module.exports = router;

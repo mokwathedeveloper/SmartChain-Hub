@@ -7,6 +7,7 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from scripts.optimizer import TransactionOptimizer
+from scripts.fine_tuner import fine_tune
 
 app = Flask(__name__)
 CORS(app)
@@ -168,7 +169,29 @@ def _local_optimize(amount: float, priority: str) -> dict:
     return r
 
 
-if __name__ == '__main__':
+@app.route('/fine-tune', methods=['POST'])
+def fine_tune_model():
+    """
+    POST /fine-tune
+    Body: { root_hashes: ["0x...", ...], dry_run?: bool }
+
+    Fetches real transaction receipts from 0G Storage by root hash,
+    converts them to training features, and incrementally fine-tunes
+    the TensorFlow savings model.
+    """
+    data = request.json or {}
+    root_hashes = data.get("root_hashes", [])
+    dry_run     = bool(data.get("dry_run", False))
+
+    if not isinstance(root_hashes, list):
+        return jsonify({"error": "root_hashes must be an array"}), 400
+
+    result = fine_tune(root_hashes, dry_run=dry_run)
+    status = 200 if result.get("ok") else 422
+    return jsonify(result), status
+
+
+
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_ENV') == 'development'
     app.run(host='0.0.0.0', port=port, debug=debug)

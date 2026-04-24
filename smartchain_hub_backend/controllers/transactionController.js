@@ -219,3 +219,28 @@ exports.healthCheck = async (req, res) => {
     });
   }
 };
+
+// Fine-tune TF model on real user transaction data from 0G Storage
+exports.fineTuneModel = async (req, res) => {
+  const { root_hashes, dry_run } = req.body;
+
+  if (root_hashes !== undefined && !Array.isArray(root_hashes)) {
+    return res.status(400).json({ error: 'root_hashes must be an array' });
+  }
+
+  // If no root_hashes provided, fetch recent storage roots from DB
+  let hashes = root_hashes || [];
+  if (!hashes.length) {
+    const { data } = await supabase
+      .from('transactions')
+      .select('storage_root')
+      .not('storage_root', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    hashes = (data || []).map(r => r.storage_root).filter(Boolean);
+  }
+
+  const result = await aiService.fineTune(hashes, dry_run || false);
+  const status = result.ok ? 200 : 422;
+  res.status(status).json(result);
+};

@@ -109,6 +109,13 @@ class SavingsModel:
     def predict_savings(self, amount, priority_idx):
         return self.predict(float(amount), int(priority_idx))["savings_rate"]
 
+    @staticmethod
+    def _make_features_static(amount: float, priority_idx: int, congestion: float = 0.3, hour: float = 12.0) -> list:
+        """Static version of _make_features — usable without an instance (e.g. fine_tuner.py)."""
+        amount_norm = np.log1p(float(amount)) / SavingsModel.AMOUNT_LOG_MAX
+        one_hot = [float(priority_idx == i) for i in range(3)]
+        return [amount_norm] + one_hot + [float(congestion), float(hour) / 24.0]
+
 
 if __name__ == "__main__":
     m = SavingsModel()

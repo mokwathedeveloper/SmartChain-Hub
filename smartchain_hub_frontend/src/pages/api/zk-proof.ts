@@ -28,7 +28,7 @@ function validateInputs(amount: number, fee: number, savings: number): string | 
   if (fee < 0)                        return "fee must be >= 0";
   if (savings < 0)                    return "savings must be >= 0";
   if (fee >= amount * 0.02)           return "fee exceeds 2% of amount — invalid optimization";
-  if (savings / amount > 0.04)        return "savings rate exceeds 4% — suspicious";
+  if (savings / amount > 0.05)        return "savings rate exceeds 5% — suspicious";
   return null;
 }
 

@@ -19,6 +19,7 @@ export default function Transactions() {
   const [optimizing, setOptimizing] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [saving, setSaving] = useState(false);
+  const [zkCommitment, setZkCommitment] = useState("");
   const [txList, setTxList] = useState<any[]>([]);
   const [stats, setStats] = useState({ savings: 0, efficiency: 0, avgConf: 12 });
 
@@ -75,13 +76,14 @@ export default function Transactions() {
     setSaving(true);
     try {
       // Generate ZK proof for this optimization
-      let zkCommitment = "";
+      let localZkCommitment = "";
       try {
         const zkResult = await generateZKProof(
           parseFloat(amount), parseFloat(result.fee),
           parseFloat(result.savings), result.route, user.id
         );
-        zkCommitment = zkResult.commitment;
+        localZkCommitment = zkResult.commitment;
+        setZkCommitment(localZkCommitment);
       } catch { /* non-blocking — proceed without ZK proof */ }
 
       // Upload metadata to 0G Storage and get immutable root hash
@@ -93,7 +95,7 @@ export default function Transactions() {
         route: result.route,
         tee_verified: result.tee_verified,
         tee_proof: result.tee_proof || "",
-        zk_commitment: zkCommitment,
+        zk_commitment: localZkCommitment,
         timestamp: Date.now(),
       });
 
@@ -281,8 +283,25 @@ export default function Transactions() {
                     </span>
                   </div>
 
+                  {/* ZK Proof Badge */}
+                  {zkCommitment && (
+                    <div className="flex items-center gap-3 p-3 rounded-xl border bg-purple-500/10 border-purple-500/30">
+                      <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center shrink-0">
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-purple-400">✓ ZK Proof Generated</p>
+                        <p className="text-xs text-purple-300 font-mono truncate">Commitment: {zkCommitment.slice(0, 26)}...</p>
+                        <p className="text-xs text-gray-500">Proves: savings &gt; 0, fee &lt; 2%, rate in valid range</p>
+                      </div>
+                      <span className="text-xs px-2 py-1 rounded-full font-semibold shrink-0 bg-purple-600 text-white">ZK</span>
+                    </div>
+                  )}
+
                   <div className="flex gap-3">
-                    <button onClick={() => setResult(null)} className="flex-1 py-2.5 border border-gray-700 text-gray-500 text-sm font-medium rounded-xl hover:bg-gray-800">Reset</button>
+                    <button onClick={() => { setResult(null); setZkCommitment(""); }} className="flex-1 py-2.5 border border-gray-700 text-gray-500 text-sm font-medium rounded-xl hover:bg-gray-800">Reset</button>
                     <button onClick={handleConfirm} disabled={saving}
                       className="flex-[2] py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-50">
                       {saving ? 'Saving...' : 'Confirm & Save'}

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useWeb3 } from "@/context/Web3Context";
 import { useNotification } from "@/context/NotificationContext";
 import { ethers } from "ethers";
+import { depositToChannel, settleCall, withdrawFromChannel, getChannelState } from "@/utils/agentEscrow";
 
 const PAYMENTS_ABI = [
   "function sendFunds(address payable _to, string _memo) external payable",
@@ -42,6 +43,14 @@ export default function Payments() {
   const [stakeAmt, setStakeAmt] = useState("");
   const [staked, setStaked] = useState({ amount: "0", reward: "0" });
   const [earnings, setEarnings] = useState("0");
+
+  // Agent Escrow
+  const [escrowAgentB, setEscrowAgentB] = useState("");
+  const [escrowPrice, setEscrowPrice] = useState("");
+  const [escrowDeposit, setEscrowDeposit] = useState("");
+  const [escrowAgentA, setEscrowAgentA] = useState("");
+  const [escrowChannel, setEscrowChannel] = useState<any>(null);
+  const [escrowLoading, setEscrowLoading] = useState(false);
 
   const getContract = () => {
     const addr = process.env.NEXT_PUBLIC_PAYMENTS_CONTRACT;
@@ -123,6 +132,52 @@ export default function Payments() {
     } finally { setLoading(false); }
   };
 
+  const handleEscrowDeposit = async () => {
+    if (!escrowAgentB || !escrowPrice || !escrowDeposit || !signer) return;
+    setEscrowLoading(true);
+    try {
+      const txHash = await depositToChannel(signer, escrowAgentB, escrowPrice, escrowDeposit);
+      addNotification(`Channel opened. Tx: ${txHash.slice(0, 16)}...`, 'success');
+      setEscrowAgentB(""); setEscrowPrice(""); setEscrowDeposit("");
+    } catch (e: any) {
+      addNotification(`Escrow error: ${e.message}`, 'error');
+    } finally { setEscrowLoading(false); }
+  };
+
+  const handleEscrowSettle = async () => {
+    if (!escrowAgentA || !signer) return;
+    setEscrowLoading(true);
+    try {
+      const txHash = await settleCall(signer, escrowAgentA);
+      addNotification(`Call settled. Tx: ${txHash.slice(0, 16)}...`, 'success');
+    } catch (e: any) {
+      addNotification(`Settle error: ${e.message}`, 'error');
+    } finally { setEscrowLoading(false); }
+  };
+
+  const handleEscrowWithdraw = async () => {
+    if (!escrowAgentB || !signer) return;
+    setEscrowLoading(true);
+    try {
+      const txHash = await withdrawFromChannel(signer, escrowAgentB);
+      addNotification(`Withdrawn. Tx: ${txHash.slice(0, 16)}...`, 'success');
+    } catch (e: any) {
+      addNotification(`Withdraw error: ${e.message}`, 'error');
+    } finally { setEscrowLoading(false); }
+  };
+
+  const handleEscrowCheck = async () => {
+    if (!escrowAgentA || !escrowAgentB || !signer) return;
+    setEscrowLoading(true);
+    try {
+      const provider = (signer as any).provider;
+      const ch = await getChannelState(provider, escrowAgentA, escrowAgentB);
+      setEscrowChannel(ch);
+    } catch (e: any) {
+      addNotification(`Check error: ${e.message}`, 'error');
+    } finally { setEscrowLoading(false); }
+  };
+
   if (!isWalletConnected) {
     return (
       <>
@@ -183,7 +238,7 @@ export default function Payments() {
 
         {/* Tabs */}
         <div className="flex gap-6 border-b border-gray-700">
-          {["Send", "Receive", "Stake", "Withdraw"].map(t => (
+          {["Send", "Receive", "Stake", "Withdraw", "Agent Escrow"].map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`pb-3 text-sm font-semibold transition-colors ${tab === t ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-200"}`}>
               {t}
@@ -302,6 +357,86 @@ export default function Payments() {
                   className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-50">
                   {loading ? 'Claiming...' : `Claim ${earnings} A0GI`}
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Agent Escrow */}
+        {tab === "Agent Escrow" && (
+          <div className="space-y-5">
+            <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+              <h2 className="text-base font-bold text-white mb-1">Agent-to-Agent Micropayments</h2>
+              <p className="text-xs text-gray-500 mb-5">Open a payment channel with another agent. Agent B claims A0GI per API call rendered.</p>
+
+              {/* Open / Top-up Channel */}
+              <div className="space-y-3 mb-6">
+                <h3 className="text-sm font-semibold text-gray-300">Open Channel (Agent A → Agent B)</h3>
+                <input type="text" value={escrowAgentB} onChange={e => setEscrowAgentB(e.target.value)} placeholder="Agent B address (0x...)"
+                  className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Price per call (A0GI)</label>
+                    <input type="number" value={escrowPrice} onChange={e => setEscrowPrice(e.target.value)} placeholder="0.001"
+                      className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Deposit amount (A0GI)</label>
+                    <input type="number" value={escrowDeposit} onChange={e => setEscrowDeposit(e.target.value)} placeholder="0.1"
+                      className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
+                  </div>
+                </div>
+                <button onClick={handleEscrowDeposit} disabled={escrowLoading || !escrowAgentB || !escrowPrice || !escrowDeposit}
+                  className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-colors disabled:opacity-50">
+                  {escrowLoading ? 'Processing...' : 'Open / Top-up Channel'}
+                </button>
+              </div>
+
+              {/* Settle Call (Agent B) */}
+              <div className="space-y-3 mb-6 pt-5 border-t border-gray-800">
+                <h3 className="text-sm font-semibold text-gray-300">Claim Payment (Agent B)</h3>
+                <input type="text" value={escrowAgentA} onChange={e => setEscrowAgentA(e.target.value)} placeholder="Agent A address (0x...)"
+                  className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
+                <div className="grid grid-cols-2 gap-3">
+                  <button onClick={handleEscrowSettle} disabled={escrowLoading || !escrowAgentA}
+                    className="py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-colors disabled:opacity-50">
+                    {escrowLoading ? 'Processing...' : 'Claim Per Call'}
+                  </button>
+                  <button onClick={handleEscrowWithdraw} disabled={escrowLoading || !escrowAgentB}
+                    className="py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-colors disabled:opacity-50">
+                    {escrowLoading ? 'Processing...' : 'Withdraw Balance'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Check Channel */}
+              <div className="space-y-3 pt-5 border-t border-gray-800">
+                <h3 className="text-sm font-semibold text-gray-300">Check Channel State</h3>
+                <button onClick={handleEscrowCheck} disabled={escrowLoading || !escrowAgentA || !escrowAgentB}
+                  className="w-full py-2.5 border border-gray-700 text-gray-400 text-sm font-medium rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-50">
+                  {escrowLoading ? 'Loading...' : 'Check Channel'}
+                </button>
+                {escrowChannel && (
+                  <div className="grid grid-cols-2 gap-3 mt-3">
+                    {[
+                      { label: 'Balance',       value: `${escrowChannel.balance} A0GI` },
+                      { label: 'Price/Call',    value: `${escrowChannel.pricePerCall} A0GI` },
+                      { label: 'Total Calls',   value: escrowChannel.totalCalls },
+                      { label: 'Total Paid',    value: `${escrowChannel.totalPaid} A0GI` },
+                    ].map(item => (
+                      <div key={item.label} className="p-3 bg-gray-800 rounded-xl">
+                        <p className="text-xs text-gray-500 mb-1">{item.label}</p>
+                        <p className="text-sm font-bold text-white">{item.value}</p>
+                      </div>
+                    ))}
+                    <div className="col-span-2 p-3 bg-gray-800 rounded-xl">
+                      <p className="text-xs text-gray-500 mb-1">Status</p>
+                      <span className={`text-xs font-bold px-2 py-1 rounded-full ${
+                        escrowChannel.active ? 'bg-emerald-500/10 text-emerald-400' : 'bg-gray-700 text-gray-500'
+                      }`}>{escrowChannel.active ? 'Active' : 'Closed'}</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

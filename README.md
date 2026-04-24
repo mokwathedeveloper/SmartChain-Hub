@@ -79,13 +79,16 @@ Most "AI + Web3" projects are just ChatGPT with a tip jar. SmartChain Hub is dif
 
 ## 🧩 0G Components Used
 
-| Component | Integration | Proof |
+| **Component** | **Integration** | **Proof** |
 |-----------|-------------|-------|
 | **0G Compute** | TeeML inference via broker SDK — LLaMA 3.1 8B optimizes transactions | TEE proof in response headers, displayed in UI badge |
+| **0G Compute Fine-tuning** | `POST /fine-tune` endpoint reads real tx receipts from 0G Storage by root hash, converts to training features, incrementally fine-tunes TF model with lower LR | Model hash updated on-chain after each fine-tune run |
 | **0G Storage Log** | Immutable transaction receipts uploaded via `@0glabs/0g-ts-sdk` MemData | Merkle root stored in Supabase + on-chain |
-| **0G Storage KV** | Agent memory persisted cross-session via `/api/agent-memory` server route | Memory root committed to Agent ID contract |
-| **0G Chain** | 4 contracts deployed on Galileo Testnet — settlement, revenue, Agent ID | All addresses verified on ChainScan |
+| **0G Storage KV** | Agent memory persisted cross-session via `/api/agent-memory` — GET reads back from KV, POST writes with versioning | Memory root committed to Agent ID contract; version field prevents stale overwrites |
+| **0G Chain** | 5 contracts deployed on Galileo Testnet — settlement, revenue, Agent ID, **AgentEscrow** | All addresses verified on ChainScan |
 | **Agent ID** | `SmartChainAgentID.sol` — soulbound NFT storing modelHash + memoryRoot + reputation | Non-transferable, updated on every optimization |
+| **Agent Escrow** | `SmartChainAgentEscrow.sol` — per-API-call micropayments between agents via deposit/payPerCall/withdraw | Channel state on-chain; 1% platform fee collected by owner |
+| **ZK Proofs** | `POST /api/zk-proof` generates Groth16 proof (or SHA-256 commitment fallback) proving savings > 0, fee < 2%, savings rate in valid range | Commitment stored in 0G Storage receipt alongside TEE proof |
 
 ---
 
@@ -297,15 +300,19 @@ SmartChain-Hub/
 
 ## 🗺️ Roadmap
 
-| Phase | Feature | 0G Module |
-|-------|---------|-----------|
-| ✅ Now | Agent ID soulbound NFT + memory root on-chain | 0G Chain |
-| ✅ Now | TEE-verified inference via 0G Compute broker | 0G Compute |
-| ✅ Now | Immutable receipts on 0G Storage Log layer | 0G Storage |
-| 🔜 Next | Fine-tune TF model on user data stored in 0G Storage | 0G Compute fine-tuning |
-| 🔜 Next | Agent-to-Agent micropayments (Agent A pays Agent B per API call) | 0G Chain + Agent ID |
-| 🔜 Next | Persistent Memory module integration when live | 0G Persistent Memory |
-| 🔜 Next | ZK-verified transaction proofs | 0G Privacy / TEE |
+| Phase | Feature | 0G Module | Status |
+|-------|---------|-----------|--------|
+| ✅ Now | Agent ID soulbound NFT + memory root on-chain | 0G Chain | Live |
+| ✅ Now | TEE-verified inference via 0G Compute broker | 0G Compute | Live |
+| ✅ Now | Immutable receipts on 0G Storage Log layer | 0G Storage | Live |
+| ✅ Now | **Fine-tune TF model on real user tx data from 0G Storage** | 0G Compute fine-tuning | **Implemented** |
+| ✅ Now | **Agent-to-Agent micropayments via `SmartChainAgentEscrow.sol`** | 0G Chain + Agent ID | **Implemented** |
+| ✅ Now | **Persistent Memory — 0G KV as source of truth with versioned hydration** | 0G Storage KV | **Implemented** |
+| ✅ Now | **ZK-verified transaction proofs via Groth16 / SHA-256 commitment** | 0G Privacy / TEE | **Implemented** |
+| 🔜 Next | Deploy `SmartChainAgentEscrow` to Galileo Testnet | 0G Chain | Deploy needed |
+| 🔜 Next | Compile Circom ZK circuit + generate proving keys | 0G Privacy | Circuit needed |
+| 🔜 Next | Fine-tune with production user data (requires live traffic) | 0G Compute | Data needed |
+| 🔜 Next | Persistent Memory module integration when officially live | 0G Persistent Memory | Awaiting SDK |
 
 ---
 

@@ -24,6 +24,7 @@
     "postcss": "^8.4.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "snarkjs": "^0.7.6",
     "stripe": "^22.0.2",
     "tailwindcss": "^4.2.4",
     "typescript": "^5.6.0"
@@ -32,6 +33,7 @@
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.0.0",
     "@types/jest": "^30.0.0",
+    "@types/snarkjs": "^0.7.9",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "eslint": "^9.0.0",

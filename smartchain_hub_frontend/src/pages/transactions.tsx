@@ -4,7 +4,8 @@ import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { optimizeTransaction as apiOptimize } from "@/utils/api";
 import { storageService } from "@/utils/storage";
-import { loadAgentMemory, saveAgentMemory, mergeOptimizationIntoMemory } from "@/utils/agentMemory";
+import { loadAgentMemory, saveAgentMemory, mergeOptimizationIntoMemory, hydrateAgentMemory } from "@/utils/agentMemory";
+import { generateZKProof } from "@/utils/zkProof";
 import { useWeb3 } from "@/context/Web3Context";
 import { hasAgentID, mintAgentID, updateAgentMemory } from "@/utils/agentId";
 import { recordTransactionOnChain } from "@/utils/blockchain";
@@ -27,13 +28,14 @@ export default function Transactions() {
   const [simResult, setSimResult] = useState<any>(null);
   const [simRunning, setSimRunning] = useState(false);
 
-  // Load persistent agent memory from 0G Storage on mount
+  // Hydrate from 0G KV on mount (authoritative persistent memory)
   useEffect(() => {
     if (!user) return;
-    const mem = loadAgentMemory(user.id);
-    if (!mem) return;
-    if (mem.preferredPriority) setPriority(mem.preferredPriority);
-    if (mem.lastAmount) setAmount(String(mem.lastAmount));
+    hydrateAgentMemory(user.id).then(mem => {
+      if (!mem) return;
+      if (mem.preferredPriority) setPriority(mem.preferredPriority);
+      if (mem.lastAmount) setAmount(String(mem.lastAmount));
+    });
   }, [user]);
 
   const fetchTxList = async () => {
@@ -72,6 +74,16 @@ export default function Transactions() {
     if (!result || !user) return;
     setSaving(true);
     try {
+      // Generate ZK proof for this optimization
+      let zkCommitment = "";
+      try {
+        const zkResult = await generateZKProof(
+          parseFloat(amount), parseFloat(result.fee),
+          parseFloat(result.savings), result.route, user.id
+        );
+        zkCommitment = zkResult.commitment;
+      } catch { /* non-blocking — proceed without ZK proof */ }
+
       // Upload metadata to 0G Storage and get immutable root hash
       const storageResult = await storageService.uploadWithProof({
         user_id: user.id,
@@ -81,6 +93,7 @@ export default function Transactions() {
         route: result.route,
         tee_verified: result.tee_verified,
         tee_proof: result.tee_proof || "",
+        zk_commitment: zkCommitment,
         timestamp: Date.now(),
       });
 

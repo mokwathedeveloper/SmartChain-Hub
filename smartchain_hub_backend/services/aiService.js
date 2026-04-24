@@ -7,7 +7,7 @@ const aiService = {
   optimize: async (amount, priority = 'efficiency') => {
     try {
       const res = await axios.post(`${AI_AGENT_URL}/optimize`, { amount, priority }, {
-        timeout: 30000, // 30 second timeout
+        timeout: 30000,
         headers: { 'Content-Type': 'application/json' }
       });
       return res.data;
@@ -16,7 +16,23 @@ const aiService = {
       throw new Error(`AI optimization failed: ${error.message}`);
     }
   },
-  
+
+  fineTune: async (rootHashes = [], dryRun = false) => {
+    try {
+      const res = await axios.post(`${AI_AGENT_URL}/fine-tune`, {
+        root_hashes: rootHashes,
+        dry_run: dryRun,
+      }, {
+        timeout: 120000, // 2 min — fine-tuning takes longer
+        headers: { 'Content-Type': 'application/json' }
+      });
+      return res.data;
+    } catch (error) {
+      console.error('Fine-tune Error:', error.message);
+      return { ok: false, reason: error.message };
+    }
+  },
+
   health: async () => {
     try {
       const res = await axios.get(`${AI_AGENT_URL}/health`, { timeout: 10000 });
@@ -26,7 +42,7 @@ const aiService = {
       return { status: 'unhealthy', error: error.message };
     }
   },
-  
+
   getAgentUrl: () => AI_AGENT_URL,
 };
 

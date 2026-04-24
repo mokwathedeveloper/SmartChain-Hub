@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import AgentIDCard from "@/components/AgentIDCard";
+import { hydrateAgentMemory } from "@/utils/agentMemory";
+import { triggerFineTune } from "@/utils/api";
 
 const barHeights = [20,35,25,45,30,40,55,35,45,50,60,42,50,38,58,48,55,65,52,62,44,55,58,48,52,62,55,58,48,65];
 
@@ -24,6 +26,13 @@ export default function Dashboard() {
   const [stats, setStats] = useState({ totalTx: 0, revenue: 0, nodescore: 0 });
   const [activity, setActivity] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fineTuning, setFineTuning] = useState(false);
+  const [fineTuneResult, setFineTuneResult] = useState<any>(null);
+
+  // Hydrate agent memory from 0G KV on mount
+  useEffect(() => {
+    if (user) hydrateAgentMemory(user.id).catch(() => {});
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -45,6 +54,19 @@ export default function Dashboard() {
     return () => { supabase.removeChannel(sub); };
   }, [user]);
 
+  const handleFineTune = async () => {
+    setFineTuning(true);
+    setFineTuneResult(null);
+    try {
+      const result = await triggerFineTune([], false);
+      setFineTuneResult(result);
+    } catch (e: any) {
+      setFineTuneResult({ ok: false, reason: e.message });
+    } finally {
+      setFineTuning(false);
+    }
+  };
+
   // Use real activity if available, else show static mockup rows
   const rows = activity.length > 0
     ? activity.map(tx => ({
@@ -63,6 +85,37 @@ export default function Dashboard() {
 
         {/* Agent ID Card */}
         <AgentIDCard />
+
+        {/* Fine-tune AI Model Panel */}
+        <div className="bg-gray-900 rounded-2xl p-5 border border-gray-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-bold text-white">AI Model Fine-tuning</h2>
+              <p className="text-xs text-gray-500 mt-0.5">Retrain the TF model on your real transaction data stored in 0G Storage</p>
+            </div>
+            <button
+              onClick={handleFineTune}
+              disabled={fineTuning}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl transition-all disabled:opacity-50">
+              {fineTuning ? (
+                <><div className="w-3 h-3 rounded-full border-2 border-white/30 border-t-white animate-spin" />Fine-tuning...</>
+              ) : (
+                <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Fine-tune Model</>
+              )}
+            </button>
+          </div>
+          {fineTuneResult && (
+            <div className={`mt-3 p-3 rounded-xl text-xs ${
+              fineTuneResult.ok ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+                                : 'bg-red-500/10 border border-red-500/20 text-red-400'
+            }`}>
+              {fineTuneResult.ok
+                ? `✓ Fine-tuned on ${fineTuneResult.samples} samples · Loss: ${fineTuneResult.final_loss?.toFixed(6)} · Hash: ${fineTuneResult.model_hash?.slice(0, 18)}...`
+                : `✗ ${fineTuneResult.reason || 'Fine-tune failed'} (${fineTuneResult.samples ?? 0} samples)`
+              }
+            </div>
+          )}
+        </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

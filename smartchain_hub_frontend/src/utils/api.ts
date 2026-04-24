@@ -1,34 +1,39 @@
-import { apiClient } from './secureApi';
+/**
+ * AI Agent API client.
+ * Calls the Flask AI agent directly for optimization.
+ * Uses secureApi for SSRF protection on the health endpoint.
+ */
 import { secureLogger } from './secureLogger';
 
-// Secure API functions using the secure client
-export async function optimizeTransaction(amount: number, priority: string) {
+const AI_URL = () => process.env.NEXT_PUBLIC_AI_AGENT_URL || 'http://localhost:5000';
+
+/** Optimize a transaction — calls POST /optimize on the AI agent. */
+export async function optimizeTransaction(amount: number, priority: string): Promise<any> {
   secureLogger.info('Optimizing transaction', { amount, priority });
-  
-  const transactionData = {
-    to: '0x0000000000000000000000000000000000000000', // Placeholder
-    value: amount.toString(),
-    gasLimit: 21000,
-    priority
-  };
-  
-  return apiClient.optimizeTransaction(transactionData);
+
+  const res = await fetch(`${AI_URL()}/optimize`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ amount, priority }),
+  });
+
+  if (!res.ok) throw new Error(`AI agent returned ${res.status}`);
+  return res.json();
 }
 
-export async function getAgentHealth() {
-  const AI_AGENT_URL = process.env.NEXT_PUBLIC_AI_AGENT_URL;
-  
-  if (!AI_AGENT_URL) {
-    throw new Error('AI_AGENT_URL not configured');
-  }
-  
-  const fullUrl = `${AI_AGENT_URL}/health`;
-  
-  try {
-    const response = await apiClient.secureRequest(fullUrl);
-    return await response.json();
-  } catch (error) {
-    secureLogger.error('Health check failed', error);
-    throw error;
-  }
+/** Health check for the AI agent. */
+export async function getAgentHealth(): Promise<any> {
+  const res = await fetch(`${AI_URL()}/health`);
+  if (!res.ok) throw new Error(`Health check failed: ${res.status}`);
+  return res.json();
+}
+
+/** Trigger fine-tuning via the backend (which proxies to AI agent). */
+export async function triggerFineTune(rootHashes: string[] = [], dryRun = false): Promise<any> {
+  const res = await fetch('/api/transactions/fine-tune', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ root_hashes: rootHashes, dry_run: dryRun }),
+  });
+  return res.json();
 }

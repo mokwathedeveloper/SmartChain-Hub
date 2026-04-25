@@ -1,9 +1,13 @@
 import Head from "next/head";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useWeb3 } from "@/context/Web3Context";
 import { useNotification } from "@/context/NotificationContext";
 import { ethers } from "ethers";
 import { depositToChannel, settleCall, withdrawFromChannel, getChannelState } from "@/utils/agentEscrow";
+
+const OG_RPC = "https://evmrpc-testnet.0g.ai";
+// Module-level provider — created once, never causes re-render
+const RPC_PROVIDER = typeof window !== "undefined" ? new ethers.JsonRpcProvider(OG_RPC) : null;
 
 const PAYMENTS_ABI = [
   "function sendFunds(address payable _to, string _memo) external payable",
@@ -54,11 +58,10 @@ export default function Payments() {
 
   const PAYMENTS_ADDR = process.env.NEXT_PUBLIC_PAYMENTS_CONTRACT;
 
-  // Read-only — uses direct RPC, works without MetaMask
+  // Read-only — uses module-level RPC provider, never causes re-render
   const getReadContract = () => {
-    const rpc = new ethers.JsonRpcProvider("https://evmrpc-testnet.0g.ai");
-    if (!PAYMENTS_ADDR) throw new Error("NEXT_PUBLIC_PAYMENTS_CONTRACT not set");
-    return new ethers.Contract(PAYMENTS_ADDR, PAYMENTS_ABI, rpc);
+    if (!PAYMENTS_ADDR || !RPC_PROVIDER) throw new Error("Provider not available");
+    return new ethers.Contract(PAYMENTS_ADDR, PAYMENTS_ABI, RPC_PROVIDER);
   };
 
   // Write — requires MetaMask signer
@@ -81,7 +84,7 @@ export default function Payments() {
     }
   };
 
-  useEffect(() => { fetchStakeData(); }, [displayAddress]);
+  useEffect(() => { fetchStakeData(); }, [displayAddress, PAYMENTS_ADDR]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSend = async () => {
     if (!sendTo || !sendAmt) return;

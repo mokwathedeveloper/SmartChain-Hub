@@ -25,34 +25,38 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user) return;
     const fetch = async () => {
-      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-      const sixtyDaysAgo  = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString();
+      try {
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+        const sixtyDaysAgo  = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString();
 
-      const [txRes, revRes, prevTxRes] = await Promise.all([
-        supabase.from('transactions').select('amount,savings,status,created_at,tx_hash,route').eq('user_id', user.id).gte('created_at', thirtyDaysAgo).order('created_at', { ascending: false }),
-        supabase.from('revenue_shares').select('user_share').eq('user_id', user.id),
-        supabase.from('transactions').select('id,status').eq('user_id', user.id).gte('created_at', sixtyDaysAgo).lt('created_at', thirtyDaysAgo),
-      ]);
-      const txs  = txRes.data  || [];
-      const revs = revRes.data || [];
-      const prevTxs = prevTxRes.data || [];
+        // Sequential queries to avoid HTTP2 stream exhaustion
+        const txRes     = await supabase.from('transactions').select('amount,savings,status,created_at,tx_hash,route').eq('user_id', user.id).gte('created_at', thirtyDaysAgo).order('created_at', { ascending: false });
+        const revRes    = await supabase.from('revenue_shares').select('user_share').eq('user_id', user.id);
+        const prevTxRes = await supabase.from('transactions').select('id,status').eq('user_id', user.id).gte('created_at', sixtyDaysAgo).lt('created_at', thirtyDaysAgo);
 
-      const totalRevenue = revs.reduce((s, r) => s + Number(r.user_share), 0);
-      const nodescore    = txs.filter((t: any) => t.status === 'confirmed').length;
-      const prevReputation = prevTxs.filter((t: any) => t.status === 'confirmed').length;
+        const txs     = txRes.data     || [];
+        const revs    = revRes.data    || [];
+        const prevTxs = prevTxRes.data || [];
 
-      // Build 30-day bar chart from real data
-      const buckets = Array(30).fill(0);
-      txs.forEach((tx: any) => {
-        const daysAgo = Math.floor((Date.now() - new Date(tx.created_at).getTime()) / (24 * 60 * 60 * 1000));
-        if (daysAgo >= 0 && daysAgo < 30) buckets[29 - daysAgo] += Number(tx.amount || 0);
-      });
-      const maxBucket = Math.max(...buckets, 1);
-      setBarData(buckets.map(v => Math.round((v / maxBucket) * 90) + 5));
+        const totalRevenue = revs.reduce((s, r) => s + Number(r.user_share), 0);
+        const nodescore    = txs.filter((t: any) => t.status === 'confirmed').length;
+        const prevReputation = prevTxs.filter((t: any) => t.status === 'confirmed').length;
 
-      setStats({ totalTx: txs.length, revenue: totalRevenue, nodescore, prevTx: prevTxs.length, prevReputation });
-      setActivity(txs.slice(0, 4));
-      setLoading(false);
+        const buckets = Array(30).fill(0);
+        txs.forEach((tx: any) => {
+          const daysAgo = Math.floor((Date.now() - new Date(tx.created_at).getTime()) / (24 * 60 * 60 * 1000));
+          if (daysAgo >= 0 && daysAgo < 30) buckets[29 - daysAgo] += Number(tx.amount || 0);
+        });
+        const maxBucket = Math.max(...buckets, 1);
+        setBarData(buckets.map(v => Math.round((v / maxBucket) * 90) + 5));
+
+        setStats({ totalTx: txs.length, revenue: totalRevenue, nodescore, prevTx: prevTxs.length, prevReputation });
+        setActivity(txs.slice(0, 4));
+      } catch {
+        // Supabase unavailable — show empty state
+      } finally {
+        setLoading(false);
+      }
     };
     fetch();
     const sub = supabase.channel('dash').on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${user.id}` }, fetch).subscribe();

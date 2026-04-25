@@ -9,7 +9,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!amount || !walletAddress) return res.status(400).json({ error: "amount and walletAddress required" });
 
   const stripeKey = process.env.STRIPE_SECRET_KEY;
-  if (!stripeKey) return res.status(503).json({ error: "Stripe not configured. Add STRIPE_SECRET_KEY to .env.local" });
+  if (!stripeKey || stripeKey.includes('placeholder') || !stripeKey.startsWith('sk_')) {
+    return res.status(503).json({ error: "Stripe not configured. Add a real STRIPE_SECRET_KEY to .env.local" });
+  }
 
   try {
     const Stripe = (await import("stripe")).default;

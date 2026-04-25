@@ -29,10 +29,20 @@ export default function AgentIDCard() {
     if (!signer) return;
     setMinting(true);
     try {
+      // Check balance before attempting mint to give clear error
+      const provider = (signer as any).provider;
+      const addr = await signer.getAddress();
+      const balance = await provider.getBalance(addr);
+      if (balance === 0n) {
+        addNotification("Insufficient A0GI - get testnet tokens from hub.0g.ai/faucet", "error");
+        return;
+      }
       await mintAgentID(signer);
       await fetchAgent();
+      addNotification("Agent ID minted successfully!", "success");
     } catch (e: any) {
-      addNotification(`Mint failed: ${e.message}`, "error");
+      const msg = e.reason || e.message || "Mint failed";
+      addNotification(`Mint failed: ${msg}`, "error");
     } finally { setMinting(false); }
   };
 

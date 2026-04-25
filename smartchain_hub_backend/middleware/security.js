@@ -277,6 +277,11 @@ const csrfProtect = (req, res, next) => {
   // Skip for safe methods and internal health checks
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
   if (req.path === '/health') return next();
+  // Skip CSRF for server-to-server calls from Next.js API routes
+  const origin = req.headers['origin'] || '';
+  const referer = req.headers['referer'] || '';
+  const isInternalNextCall = !origin && !referer;
+  if (isInternalNextCall) return next();
 
   const token = req.headers['x-csrf-token'] || req.body?._csrf;
   if (!token || !csrfTokens.has(token)) {

@@ -21,7 +21,7 @@ export default function Transactions() {
   const [saving, setSaving] = useState(false);
   const [zkCommitment, setZkCommitment] = useState("");
   const [txList, setTxList] = useState<any[]>([]);
-  const [stats, setStats] = useState({ savings: 0, efficiency: 0, avgConf: 12 });
+  const [stats, setStats] = useState({ savings: 0, efficiency: 0, avgConfMs: 0 });
 
   // Simulate tab state
   const [simAmount, setSimAmount] = useState("");
@@ -45,9 +45,17 @@ export default function Transactions() {
     const txs = data || [];
     setTxList(txs);
     const totalSavings = txs.reduce((s: number, t: any) => s + Number(t.savings || 0), 0);
-    const totalAmt = txs.reduce((s: number, t: any) => s + Number(t.amount || 0), 0);
-    const efficiency = totalAmt > 0 ? Math.min(Math.round((totalSavings / totalAmt) * 100), 99) : 0;
-    setStats({ savings: totalSavings, efficiency, avgConf: 12 });
+    const totalAmt     = txs.reduce((s: number, t: any) => s + Number(t.amount || 0), 0);
+    const efficiency   = totalAmt > 0 ? Math.min(Math.round((totalSavings / totalAmt) * 100), 99) : 0;
+    // Avg confirmation: use estimated_time_s from route if stored, else derive from route name
+    const routeTimes: Record<string, number> = { 'Flash': 8, 'Speed': 3, 'Bridge': 15, 'Economy': 45 };
+    const avgConfMs = txs.length > 0
+      ? Math.round(txs.reduce((s: number, t: any) => {
+          const key = Object.keys(routeTimes).find(k => (t.route || '').includes(k)) || '';
+          return s + (routeTimes[key] || 12);
+        }, 0) / txs.length)
+      : 0;
+    setStats({ savings: totalSavings, efficiency, avgConfMs });
   };
 
   useEffect(() => { fetchTxList(); }, [user]);
@@ -106,8 +114,7 @@ export default function Transactions() {
         savings: parseFloat(result.savings),
         route: result.route,
         status: 'pending',
-        tx_hash: storageResult.txHash ||
-          `0x${Math.random().toString(16).slice(2)}${Math.random().toString(16).slice(2, 10)}`,
+        tx_hash: storageResult.txHash || storageResult.rootHash?.slice(0, 42) || storageResult.rootHash,
         storage_root: storageResult.rootHash,
         storage_scan_url: storageResult.storageScanUrl,
       }]);
@@ -203,10 +210,7 @@ export default function Transactions() {
           </div>
           <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
             <p className="text-xs text-gray-500 mb-1">Avg Confirmation</p>
-            <div className="flex items-end gap-2">
-              <span className="text-3xl font-bold text-white">{stats.avgConf}s</span>
-              <span className="text-sm text-green-500 font-medium mb-0.5">+8.3%</span>
-            </div>
+            <span className="text-3xl font-bold text-white">{stats.avgConfMs > 0 ? `${stats.avgConfMs}s` : '—'}</span>
           </div>
         </div>
 

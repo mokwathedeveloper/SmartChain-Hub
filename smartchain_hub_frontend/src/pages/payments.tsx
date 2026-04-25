@@ -52,78 +52,92 @@ export default function Payments() {
   const [escrowChannel, setEscrowChannel] = useState<any>(null);
   const [escrowLoading, setEscrowLoading] = useState(false);
 
-  const getContract = () => {
-    const addr = process.env.NEXT_PUBLIC_PAYMENTS_CONTRACT;
-    if (!addr || !signer) throw new Error("Contract or signer not available");
-    return new ethers.Contract(addr, PAYMENTS_ABI, signer);
+  const PAYMENTS_ADDR = process.env.NEXT_PUBLIC_PAYMENTS_CONTRACT;
+
+  // Read-only — uses direct RPC, works without MetaMask
+  const getReadContract = () => {
+    const rpc = new ethers.JsonRpcProvider("https://evmrpc-testnet.0g.ai");
+    if (!PAYMENTS_ADDR) throw new Error("NEXT_PUBLIC_PAYMENTS_CONTRACT not set");
+    return new ethers.Contract(PAYMENTS_ADDR, PAYMENTS_ABI, rpc);
+  };
+
+  // Write — requires MetaMask signer
+  const getWriteContract = () => {
+    if (!PAYMENTS_ADDR) throw new Error("NEXT_PUBLIC_PAYMENTS_CONTRACT not set");
+    if (!signer) throw new Error("Wallet not connected — please connect MetaMask");
+    return new ethers.Contract(PAYMENTS_ADDR, PAYMENTS_ABI, signer);
   };
 
   const fetchStakeData = async () => {
-    if (!displayAddress) return;
+    if (!displayAddress || !PAYMENTS_ADDR) return;
     try {
-      const c = getContract();
+      const c = getReadContract();
       const [amt, rew] = await c.getStake(displayAddress);
       setStaked({ amount: ethers.formatEther(amt), reward: ethers.formatEther(rew) });
       const earn = await c.pendingEarnings(displayAddress);
       setEarnings(ethers.formatEther(earn));
     } catch {
-      // stake data unavailable — contract may not be deployed yet
+      // contract not yet deployed or RPC unavailable — show zeros
     }
   };
 
-  useEffect(() => { fetchStakeData(); }, [displayAddress, signer]);
+  useEffect(() => { fetchStakeData(); }, [displayAddress]);
 
-const handleSend = async () => {
+  const handleSend = async () => {
     if (!sendTo || !sendAmt) return;
+    if (!signer) { addNotification('Connect MetaMask to send funds', 'error'); return; }
     setLoading(true);
     try {
-      const c = getContract();
+      const c = getWriteContract();
       const tx = await c.sendFunds(sendTo, sendMemo || "Payment", { value: ethers.parseEther(sendAmt) });
       await tx.wait();
       addNotification(`Sent ${sendAmt} A0GI to ${sendTo}`, 'success');
       setSendTo(""); setSendAmt(""); setSendMemo("");
     } catch (e: any) {
-      addNotification(`Error: ${e.message}`, 'error');
+      addNotification(`Send failed: ${e.reason || e.message}`, 'error');
     } finally { setLoading(false); }
   };
 
   const handleStake = async () => {
     if (!stakeAmt) return;
+    if (!signer) { addNotification('Connect MetaMask to stake', 'error'); return; }
     setLoading(true);
     try {
-      const c = getContract();
+      const c = getWriteContract();
       const tx = await c.stake({ value: ethers.parseEther(stakeAmt) });
       await tx.wait();
-      addNotification(`Staked ${stakeAmt} A0GI`, 'success');
+      addNotification(`Staked ${stakeAmt} A0GI successfully`, 'success');
       setStakeAmt(""); fetchStakeData();
     } catch (e: any) {
-      addNotification(`Error: ${e.message}`, 'error');
+      addNotification(`Stake failed: ${e.reason || e.message}`, 'error');
     } finally { setLoading(false); }
   };
 
   const handleUnstake = async () => {
+    if (!signer) { addNotification('Connect MetaMask to unstake', 'error'); return; }
     setLoading(true);
     try {
-      const c = getContract();
+      const c = getWriteContract();
       const tx = await c.unstake();
       await tx.wait();
       addNotification(`Unstaked ${staked.amount} A0GI + ${staked.reward} reward`, 'success');
       fetchStakeData();
     } catch (e: any) {
-      addNotification(`Error: ${e.message}`, 'error');
+      addNotification(`Unstake failed: ${e.reason || e.message}`, 'error');
     } finally { setLoading(false); }
   };
 
   const handleClaimEarnings = async () => {
+    if (!signer) { addNotification('Connect MetaMask to claim', 'error'); return; }
     setLoading(true);
     try {
-      const c = getContract();
+      const c = getWriteContract();
       const tx = await c.claimEarnings();
       await tx.wait();
       addNotification(`Claimed ${earnings} A0GI`, 'success');
       fetchStakeData();
     } catch (e: any) {
-      addNotification(`Error: ${e.message}`, 'error');
+      addNotification(`Claim failed: ${e.reason || e.message}`, 'error');
     } finally { setLoading(false); }
   };
 

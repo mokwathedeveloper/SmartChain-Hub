@@ -6,25 +6,13 @@ import AgentIDCard from "@/components/AgentIDCard";
 import { hydrateAgentMemory } from "@/utils/agentMemory";
 import { triggerFineTune } from "@/utils/api";
 
-const barHeights = [20,35,25,45,30,40,55,35,45,50,60,42,50,38,58,48,55,65,52,62,44,55,58,48,52,62,55,58,48,65];
 
-const staticActivity = [
-  { description: "Optimization Payout", type: "Received", amount: "$1,200", status: "Paid", statusCls: "bg-green-500/10 text-green-400" },
-  { description: "Node Fee Collected",  type: "Received", amount: "$150",   status: "Received", statusCls: "bg-yellow-500/10 text-yellow-400" },
-  { description: "Revenue Share",       type: "Received", amount: "$1,850", status: "Paid",     statusCls: "bg-green-500/10 text-green-400" },
-  { description: "Gas Fee Reduction",   type: "Received", amount: "$45",    status: "Saved",    statusCls: "bg-blue-500/10 text-blue-400" },
-];
-
-const staticDatasource = [
-  { name: "Payment",  bank: "Bankspeed", amount: "$8th", freq: "Paintedact day Farcrybers",      statusCls: "bg-blue-500/10 text-blue-400" },
-  { name: "Bkld",     bank: "Bankybane", amount: "$8th", freq: "Randurfam doyy Facnyooes",       statusCls: "bg-blue-500/10 text-blue-400" },
-  { name: "Dpyeut",   bank: "Bantybao",  amount: "$8th", freq: "donidonfect doyy Fannyooes",     statusCls: "bg-blue-500/10 text-blue-400" },
-];
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const [stats, setStats] = useState({ totalTx: 0, revenue: 0, nodescore: 0 });
+  const [stats, setStats] = useState({ totalTx: 0, revenue: 0, nodescore: 0, prevTx: 0, prevReputation: 0 });
   const [activity, setActivity] = useState<any[]>([]);
+  const [barData, setBarData] = useState<number[]>(Array(30).fill(0));
   const [loading, setLoading] = useState(true);
   const [fineTuning, setFineTuning] = useState(false);
   const [fineTuneResult, setFineTuneResult] = useState<any>(null);
@@ -37,16 +25,33 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user) return;
     const fetch = async () => {
-      const [txRes, revRes] = await Promise.all([
-        supabase.from('transactions').select('amount,savings,status,created_at,tx_hash,route').eq('user_id', user.id).order('created_at', { ascending: false }).limit(4),
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const sixtyDaysAgo  = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString();
+
+      const [txRes, revRes, prevTxRes] = await Promise.all([
+        supabase.from('transactions').select('amount,savings,status,created_at,tx_hash,route').eq('user_id', user.id).gte('created_at', thirtyDaysAgo).order('created_at', { ascending: false }),
         supabase.from('revenue_shares').select('user_share').eq('user_id', user.id),
+        supabase.from('transactions').select('id,status').eq('user_id', user.id).gte('created_at', sixtyDaysAgo).lt('created_at', thirtyDaysAgo),
       ]);
-      const txs = txRes.data || [];
+      const txs  = txRes.data  || [];
       const revs = revRes.data || [];
+      const prevTxs = prevTxRes.data || [];
+
       const totalRevenue = revs.reduce((s, r) => s + Number(r.user_share), 0);
-      const nodescore = txs.filter((t: any) => t.status === 'confirmed').length;
-      setStats({ totalTx: txs.length, revenue: totalRevenue, nodescore });
-      setActivity(txs);
+      const nodescore    = txs.filter((t: any) => t.status === 'confirmed').length;
+      const prevReputation = prevTxs.filter((t: any) => t.status === 'confirmed').length;
+
+      // Build 30-day bar chart from real data
+      const buckets = Array(30).fill(0);
+      txs.forEach((tx: any) => {
+        const daysAgo = Math.floor((Date.now() - new Date(tx.created_at).getTime()) / (24 * 60 * 60 * 1000));
+        if (daysAgo >= 0 && daysAgo < 30) buckets[29 - daysAgo] += Number(tx.amount || 0);
+      });
+      const maxBucket = Math.max(...buckets, 1);
+      setBarData(buckets.map(v => Math.round((v / maxBucket) * 90) + 5));
+
+      setStats({ totalTx: txs.length, revenue: totalRevenue, nodescore, prevTx: prevTxs.length, prevReputation });
+      setActivity(txs.slice(0, 4));
       setLoading(false);
     };
     fetch();
@@ -67,16 +72,18 @@ export default function Dashboard() {
     }
   };
 
-  // Use real activity if available, else show static mockup rows
-  const rows = activity.length > 0
-    ? activity.map(tx => ({
-        description: tx.tx_hash?.slice(0, 20) + '...',
-        type: "Received",
-        amount: `$${Number(tx.amount).toLocaleString()}`,
-        status: tx.status === 'confirmed' ? 'Paid' : tx.status === 'pending' ? 'Received' : 'Saved',
-        statusCls: tx.status === 'confirmed' ? 'bg-green-500/10 text-green-400' : tx.status === 'pending' ? 'bg-yellow-500/10 text-yellow-400' : 'bg-blue-500/10 text-blue-400',
-      }))
-    : staticActivity;
+  const rows = activity.map(tx => ({
+    description: tx.tx_hash?.slice(0, 20) + '...',
+    type: "Optimization",
+    amount: `$${Number(tx.amount).toLocaleString()}`,
+    status: tx.status === 'confirmed' ? 'Confirmed' : tx.status === 'pending' ? 'Pending' : tx.status,
+    statusCls: tx.status === 'confirmed' ? 'bg-green-500/10 text-green-400' : tx.status === 'pending' ? 'bg-yellow-500/10 text-yellow-400' : 'bg-blue-500/10 text-blue-400',
+    route: tx.route || '—',
+    savings: Number(tx.savings || 0).toFixed(2),
+  }));
+
+  const txGrowth = stats.prevTx > 0 ? (((stats.totalTx - stats.prevTx) / stats.prevTx) * 100).toFixed(1) : null;
+  const repGrowth = stats.prevReputation > 0 ? (((stats.nodescore - stats.prevReputation) / stats.prevReputation) * 100).toFixed(1) : null;
 
   return (
     <>
@@ -120,10 +127,14 @@ export default function Dashboard() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
-            <p className="text-xs text-gray-500 mb-1">Total Transactions</p>
+            <p className="text-xs text-gray-500 mb-1">Transactions (30d)</p>
             <div className="flex items-end gap-2">
               <span className="text-3xl font-bold text-white">{stats.totalTx.toLocaleString()}</span>
-              <span className="text-sm text-green-400 font-medium mb-0.5">+18.4%</span>
+              {txGrowth !== null && (
+                <span className={`text-sm font-medium mb-0.5 ${Number(txGrowth) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {Number(txGrowth) >= 0 ? '+' : ''}{txGrowth}%
+                </span>
+              )}
             </div>
           </div>
           <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
@@ -134,7 +145,11 @@ export default function Dashboard() {
             <p className="text-xs text-gray-500 mb-1">Agent Reputation</p>
             <div className="flex items-end gap-2">
               <span className="text-3xl font-bold text-white">{stats.nodescore}</span>
-              <span className="text-sm text-green-400 font-medium mb-0.5">+12.4%</span>
+              {repGrowth !== null && (
+                <span className={`text-sm font-medium mb-0.5 ${Number(repGrowth) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {Number(repGrowth) >= 0 ? '+' : ''}{repGrowth}%
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -155,10 +170,10 @@ export default function Dashboard() {
             </div>
             {/* Bars */}
             <div className="flex-1 flex items-end gap-0.5 h-36">
-              {barHeights.map((h, i) => (
+              {barData.map((h, i) => (
                 <div key={i} className="flex-1 rounded-sm" style={{
                   height: `${h}%`,
-                  background: i % 3 === 0 ? '#3B82F6' : i % 3 === 1 ? '#93C5FD' : '#BFDBFE'
+                  background: h > 50 ? '#3B82F6' : h > 20 ? '#93C5FD' : '#BFDBFE'
                 }}/>
               ))}
             </div>
@@ -188,39 +203,59 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((row, i) => (
+              {rows.length > 0 ? rows.map((row, i) => (
                 <tr key={i} className="border-b border-gray-800 hover:bg-gray-800/50">
-                  <td className="px-6 py-4 text-sm text-gray-200 font-medium">{row.description}</td>
+                  <td className="px-6 py-4 text-sm text-gray-200 font-mono">{row.description}</td>
                   <td className="px-6 py-4"><span className="text-xs bg-gray-800 text-gray-500 px-2.5 py-1 rounded-full">{row.type}</span></td>
                   <td className="px-6 py-4 text-sm text-gray-200 font-medium">{row.amount}</td>
                   <td className="px-6 py-4"><span className={`text-xs px-2.5 py-1 rounded-full font-medium ${row.statusCls}`}>{row.status}</span></td>
                 </tr>
-              ))}
+              )) : (
+                <tr><td colSpan={4} className="px-6 py-10 text-center text-sm text-gray-500">No transactions in the last 30 days.</td></tr>
+              )}
             </tbody>
           </table>
           </div>
         </div>
 
-        {/* Datasource */}
+        {/* Route Performance */}
         <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
-            <h2 className="text-base font-bold text-white">Datasource</h2>
-            <button className="text-gray-400 hover:text-gray-500">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </button>
+          <div className="px-6 py-4 border-b border-gray-800">
+            <h2 className="text-base font-bold text-white">Route Performance</h2>
           </div>
           <div className="overflow-x-auto">
           <table className="w-full min-w-[600px]">
+            <thead>
+              <tr className="text-xs text-gray-500 border-b border-gray-800">
+                <th className="px-6 py-3 text-left font-medium">Route</th>
+                <th className="px-6 py-3 text-left font-medium">Transactions</th>
+                <th className="px-6 py-3 text-left font-medium">Total Savings</th>
+                <th className="px-6 py-3 text-left font-medium">Avg Savings</th>
+                <th className="px-6 py-3 text-left font-medium">Status</th>
+              </tr>
+            </thead>
             <tbody>
-              {staticDatasource.map((row, i) => (
-                <tr key={i} className="border-b border-gray-800 hover:bg-gray-800/50">
-                  <td className="px-6 py-4 text-sm text-blue-600 font-medium">{row.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{row.bank}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{row.amount}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500 truncate max-w-[180px]">{row.freq}</td>
-                  <td className="px-6 py-4"><span className={`text-xs px-2.5 py-1 rounded-full font-medium ${row.statusCls}`}>Bankdu Reamoed</span></td>
-                </tr>
-              ))}
+              {(() => {
+                const routeMap: Record<string, { count: number; savings: number }> = {};
+                activity.forEach((tx: any) => {
+                  const r = tx.route || 'Unknown';
+                  if (!routeMap[r]) routeMap[r] = { count: 0, savings: 0 };
+                  routeMap[r].count++;
+                  routeMap[r].savings += Number(tx.savings || 0);
+                });
+                const routes = Object.entries(routeMap);
+                return routes.length > 0 ? routes.map(([route, data], i) => (
+                  <tr key={i} className="border-b border-gray-800 hover:bg-gray-800/50">
+                    <td className="px-6 py-4 text-sm text-blue-400 font-medium">{route}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{data.count}</td>
+                    <td className="px-6 py-4 text-sm text-green-400 font-semibold">${data.savings.toFixed(2)}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">${(data.savings / data.count).toFixed(2)}</td>
+                    <td className="px-6 py-4"><span className="text-xs px-2.5 py-1 rounded-full font-medium bg-green-500/10 text-green-400">Active</span></td>
+                  </tr>
+                )) : (
+                  <tr><td colSpan={5} className="px-6 py-10 text-center text-sm text-gray-500">No route data yet.</td></tr>
+                );
+              })()}
             </tbody>
           </table>
           </div>

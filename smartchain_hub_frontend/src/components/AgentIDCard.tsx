@@ -33,7 +33,7 @@ export default function AgentIDCard() {
       const provider = (signer as any).provider;
       const addr = await signer.getAddress();
       const balance = await provider.getBalance(addr);
-      if (balance === 0n) {
+      if (balance === BigInt(0)) {
         addNotification("Insufficient A0GI - get testnet tokens from hub.0g.ai/faucet", "error");
         return;
       }

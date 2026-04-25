@@ -274,14 +274,18 @@ const csrfIssue = (req, res) => {
 };
 
 const csrfProtect = (req, res, next) => {
-  // Skip for safe methods and internal health checks
+  // Skip safe methods
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
   if (req.path === '/health') return next();
-  // Skip CSRF for server-to-server calls from Next.js API routes
-  const origin = req.headers['origin'] || '';
+
+  // Skip CSRF for server-to-server calls (Next.js API routes, Render, etc.)
+  // These have no browser origin and use internal service URLs
+  const origin  = req.headers['origin']  || '';
   const referer = req.headers['referer'] || '';
-  const isInternalNextCall = !origin && !referer;
-  if (isInternalNextCall) return next();
+  const host    = req.headers['host']    || '';
+  const isServerCall = !origin && !referer;
+  const isLocalhost  = host.includes('localhost') || host.includes('127.0.0.1');
+  if (isServerCall || isLocalhost) return next();
 
   const token = req.headers['x-csrf-token'] || req.body?._csrf;
   if (!token || !csrfTokens.has(token)) {

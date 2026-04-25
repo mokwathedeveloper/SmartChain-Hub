@@ -66,19 +66,14 @@ export default function Payments() {
       setStaked({ amount: ethers.formatEther(amt), reward: ethers.formatEther(rew) });
       const earn = await c.pendingEarnings(displayAddress);
       setEarnings(ethers.formatEther(earn));
-    } catch (e) {
-      console.log('Failed to fetch stake data:', e);
+    } catch {
+      // stake data unavailable — contract may not be deployed yet
     }
   };
 
   useEffect(() => { fetchStakeData(); }, [displayAddress, signer]);
 
-  // Debug wallet connection
-  useEffect(() => {
-    console.log('Wallet state:', { isConnected, address, signer: !!signer });
-  }, [isConnected, address, signer]);
-
-  const handleSend = async () => {
+const handleSend = async () => {
     if (!sendTo || !sendAmt) return;
     setLoading(true);
     try {

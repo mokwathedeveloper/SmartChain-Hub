@@ -6,13 +6,24 @@ from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from scripts.optimizer import TransactionOptimizer
+
+# Lazy-load TF optimizer — avoids OOM crash on Render free tier (512MB)
+# TF is only loaded on first /optimize or /fine-tune request
+_optimizer = None
+
+def get_optimizer():
+    global _optimizer
+    if _optimizer is None:
+        from scripts.optimizer import TransactionOptimizer
+        _optimizer = TransactionOptimizer()
+    return _optimizer
+
 from scripts.fine_tuner import fine_tune
 
 app = Flask(__name__)
 CORS(app)
 
-optimizer = TransactionOptimizer()# 0G Compute configuration
+# 0G Compute configuration
 # Docs: https://docs.0g.ai/build-with-0g/compute-network/sdk
 OG_COMPUTE_BROKER_URL = os.environ.get("OG_COMPUTE_BROKER_URL", "https://broker.0g.ai")
 OG_COMPUTE_MODEL     = os.environ.get("OG_COMPUTE_MODEL", "llama-3.1-8b-instruct")
@@ -157,7 +168,7 @@ def optimize_transaction():
 
 def _local_optimize(amount: float, priority: str) -> dict:
     """Local TensorFlow optimizer fallback."""
-    r = optimizer.optimize(amount, priority)
+    r = get_optimizer().optimize(amount, priority)
     r["explanation"] = EXPLANATIONS.get(priority, "AI optimized your transaction.")
     r["tee_mode"] = "local"
     r["tee_proof"] = ""

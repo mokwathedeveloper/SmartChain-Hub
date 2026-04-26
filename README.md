@@ -203,7 +203,14 @@ python3 server/app.py   # → http://localhost:5000
 
 ### 2. Supabase Setup
 
-Run `docs/backend/supabase_schema.sql` then `docs/backend/supabase_migration_002.sql` in your Supabase SQL editor.
+Run all migrations in order in your Supabase SQL editor:
+
+```
+docs/backend/supabase_schema.sql
+docs/backend/supabase_migration_002.sql
+docs/backend/supabase_migration_003.sql
+docs/backend/supabase_migration_004.sql
+```
 
 ### 3. Deploy Contracts
 
@@ -315,19 +322,19 @@ SmartChain-Hub/
 
 ## 🗺️ Roadmap
 
-| Status | Feature | 0G Module |
-|--------|---------|----------|
-| ✅ Live | Agent ID soulbound NFT + memory root on-chain | 0G Chain |
-| ✅ Live | TEE-verified inference via 0G Compute broker (TeeML) | 0G Compute |
-| ✅ Live | Immutable receipts on 0G Storage Log layer | 0G Storage |
-| ✅ Live | Agent memory — 0G Storage KV, versioned, cross-device | 0G Storage KV |
-| ✅ Live | Fine-tune TF model on real user tx data from 0G Storage | 0G Compute fine-tuning |
-| ✅ Live | Agent-to-Agent micropayments via `SmartChainAgentEscrow.sol` | 0G Chain |
-| ✅ Live | ZK-verified transaction proofs (Groth16 / SHA-256 commitment) | 0G Privacy / TEE |
-| 🔜 Next | Deploy `SmartChainAgentEscrow` to Galileo Testnet | 0G Chain |
-| 🔜 Next | Compile Circom ZK circuit + generate proving keys for full Groth16 | 0G Privacy |
-| 🔜 Next | Fine-tune with production user data (requires live traffic) | 0G Compute |
-| 🔜 Next | Official 0G Persistent Memory module (when SDK is live) | 0G Persistent Memory |
+| Status | Feature | 0G Module | Notes |
+|--------|---------|----------|-------|
+| ✅ Live | Agent ID soulbound NFT + memory root on-chain | 0G Chain | Deployed at `0x69C6...` |
+| ✅ Live | TEE-verified inference via 0G Compute broker (TeeML) | 0G Compute | Falls back to local TF when broker unavailable |
+| ✅ Live | Immutable receipts on 0G Storage Log layer | 0G Storage | `@0glabs/0g-ts-sdk` MemData upload |
+| ✅ Live | Agent memory — 0G Storage KV, versioned, cross-device | 0G Storage KV | `hydrateAgentMemory()` on mount; localStorage fallback |
+| ✅ Live | Fine-tune TF model on real user tx data from 0G Storage | 0G Compute | `POST /fine-tune`; requires ≥10 confirmed transactions |
+| ✅ Live | Agent-to-Agent micropayments — `SmartChainAgentEscrow.sol` | 0G Chain | Contract compiled; **deploy via `scripts/deployAgentEscrow.js`** |
+| ✅ Live | ZK-verified transaction proofs — SHA-256 commitment | 0G Privacy | SHA-256 commitment works; Groth16 requires Circom circuit compilation |
+| 🔜 Next | Deploy `SmartChainAgentEscrow` to Galileo Testnet | 0G Chain | Run `npx hardhat run scripts/deployAgentEscrow.js --network og_newton` |
+| 🔜 Next | Full Groth16 ZK proofs — compile Circom circuit + proving keys | 0G Privacy | Requires `circom` + `snarkjs` circuit compilation |
+| 🔜 Next | Fine-tune with production user data | 0G Compute | Needs ≥10 real transactions from live users |
+| 🔜 Next | Official 0G Persistent Memory module | 0G Persistent Memory | Awaiting official SDK release from 0G Labs |
 
 ---
 

@@ -9,7 +9,9 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 const OG_KV_RPC      = "https://indexer-storage-testnet-standard.0g.ai";
 const OG_STORAGE_RPC = "https://evmrpc.0g.ai";
-const STREAM_ID      = BigInt("0x736d617274636861696e6d656d6f7279");
+// Stream ID as hex string — avoid BigInt serialization issues in error responses
+const STREAM_ID_HEX  = "0x736d617274636861696e6d656d6f7279";
+const STREAM_ID      = BigInt(STREAM_ID_HEX);
 
 function memoryKey(userId: string): Uint8Array {
   return new TextEncoder().encode(`smartchain:memory:${userId}`);
@@ -37,8 +39,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const memory = JSON.parse(new TextDecoder().decode(value));
       return res.status(200).json({ memory });
     } catch (e: any) {
-      console.warn("0G KV read failed:", e.message);
-      return res.status(200).json({ memory: null, skipped: e.message });
+      // Stringify BigInt in error message to avoid JSON serialization crash
+      const msg = typeof e.message === 'string' ? e.message.replace(/\d+n/g, s => s.slice(0,-1)) : String(e);
+      return res.status(200).json({ memory: null, skipped: msg });
     }
   }
 
@@ -63,9 +66,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const rootHash = deterministicHash(JSON.stringify(memory));
       return res.status(200).json({ ok: true, rootHash });
     } catch (e: any) {
-      console.warn("0G KV write failed:", e.message);
+      const msg = typeof e.message === 'string' ? e.message.replace(/\d+n/g, s => s.slice(0,-1)) : String(e);
       const rootHash = deterministicHash(JSON.stringify(memory));
-      return res.status(200).json({ ok: true, skipped: e.message, rootHash });
+      return res.status(200).json({ ok: true, skipped: msg, rootHash });
     }
   }
 

@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import sys, os, time, hashlib, json, requests
+import sys, os, json, requests
 from dotenv import load_dotenv
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
@@ -12,9 +12,7 @@ from scripts.fine_tuner import fine_tune
 app = Flask(__name__)
 CORS(app)
 
-optimizer = TransactionOptimizer()
-
-# 0G Compute configuration
+optimizer = TransactionOptimizer()# 0G Compute configuration
 # Docs: https://docs.0g.ai/build-with-0g/compute-network/sdk
 OG_COMPUTE_BROKER_URL = os.environ.get("OG_COMPUTE_BROKER_URL", "https://broker.0g.ai")
 OG_COMPUTE_MODEL     = os.environ.get("OG_COMPUTE_MODEL", "llama-3.1-8b-instruct")

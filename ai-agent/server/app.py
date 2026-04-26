@@ -18,7 +18,10 @@ def get_optimizer():
         _optimizer = TransactionOptimizer()
     return _optimizer
 
-from scripts.fine_tuner import fine_tune
+# fine_tune is lazy-loaded to avoid TF import at startup
+def fine_tune(root_hashes, dry_run=False):
+    from scripts.fine_tuner import fine_tune as _fine_tune
+    return _fine_tune(root_hashes, dry_run=dry_run)
 
 app = Flask(__name__)
 CORS(app)

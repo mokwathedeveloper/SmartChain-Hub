@@ -1,7 +1,19 @@
 import os
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras import layers
+
+# TensorFlow is lazy-loaded to avoid import at startup on Render free tier
+# It loads on first instantiation of SavingsModel
+_tf = None
+_layers = None
+
+def _get_tf():
+    global _tf, _layers
+    if _tf is None:
+        import tensorflow as tf
+        from tensorflow.keras import layers
+        _tf = tf
+        _layers = layers
+    return _tf, _layers
 
 class SavingsModel:
     """
@@ -24,6 +36,7 @@ class SavingsModel:
     AMOUNT_LOG_MAX = np.log1p(100_000)  # normalize up to $100k
 
     def __init__(self, model_path=None):
+        tf, layers = _get_tf()
         if model_path is None:
             model_path = os.path.join(os.path.dirname(__file__), 'tf_savings_model.keras')
         self.model_path = model_path
@@ -34,6 +47,7 @@ class SavingsModel:
             self._train()
 
     def _build_model(self):
+        tf, layers = _get_tf()
         model = tf.keras.Sequential([
             layers.Input(shape=(6,)),
             layers.Dense(64, activation='relu'),
@@ -41,7 +55,7 @@ class SavingsModel:
             layers.Dropout(0.1),
             layers.Dense(32, activation='relu'),
             layers.Dense(16, activation='relu'),
-            layers.Dense(3, activation='sigmoid'),  # savings_rate, confidence, risk
+            layers.Dense(3, activation='sigmoid'),
         ])
         model.compile(optimizer=tf.keras.optimizers.Adam(0.001), loss='mse', metrics=['mae'])
         return model

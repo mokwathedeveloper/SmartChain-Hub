@@ -1,12 +1,14 @@
-# SmartChain Hub — AI × Web3 Commerce on 0G
+# SmartChain Hub — The Agentic Economy on 0G
 
 > **0G APAC Hackathon 2026 — Track 3: Agentic Economy & Autonomous Applications**
 
 🌐 **Live Demo:** https://smartchainhubfrontend.vercel.app
 
-SmartChain Hub is a decentralized AI commerce platform where every user has a **sovereign AI agent** with on-chain identity, persistent memory, and verifiable intelligence — powered by the full 0G modular stack.
+SmartChain Hub is the first **sovereign AI agent economy** built on the full 0G modular stack. Every user owns an autonomous AI agent with on-chain identity, persistent cross-device memory, and verifiable intelligence — agents that earn revenue, learn from real data, and transact with each other without human intermediaries.
 
-The agent optimizes blockchain transactions using **0G Compute** (TEE-verified LLaMA inference), stores immutable receipts on **0G Storage** (Log + KV layers), commits memory roots to a **soulbound Agent ID** on **0G Chain**, distributes revenue automatically via smart contracts, and supports **agent-to-agent micropayments** via an on-chain escrow contract.
+This is not a chatbot with a wallet. This is a new economic primitive: **AI agents as first-class economic actors** on 0G Chain.
+
+> *"Every optimization generates 4 verifiable on-chain actions. Every user interaction makes the agent smarter. Every agent earns revenue autonomously."*
 
 ---
 
@@ -24,20 +26,22 @@ The agent optimizes blockchain transactions using **0G Compute** (TEE-verified L
 
 ---
 
-## 🤖 What Makes This Different — Agent Sovereignty
+## 🤖 Why SmartChain Hub Wins Track 3: Agentic Economy
 
-Most "AI + Web3" projects are just ChatGPT with a tip jar. SmartChain Hub is different:
+Most "AI + Web3" projects are chatbots with tip jars. SmartChain Hub implements the full agentic economy stack:
 
-| Feature | Most Projects | SmartChain Hub |
-|---------|--------------|----------------|
-| Agent identity | EOA wallet (copyable) | Soulbound NFT on 0G Chain (non-transferable) |
-| Agent memory | localStorage / DB | 0G Storage KV — versioned, cross-device, survives browser resets |
-| Inference proof | None | TEE-verified via 0G Compute TeeML mode |
-| Transaction receipts | Centralized DB | Immutable 0G Storage Log layer + Merkle root |
-| Revenue sharing | Manual | Automated on-chain via SmartChainRevenue |
+| Capability | Traditional AI Apps | SmartChain Hub |
+|-----------|--------------------|-----------------|
+| Agent identity | API key (copyable, revocable) | Soulbound NFT on 0G Chain — non-transferable, permanent |
+| Agent memory | Session-only / centralized DB | 0G Storage KV — versioned, cross-device, survives resets |
+| Inference proof | None | TEE-verified via 0G Compute TeeML |
+| Agent receipts | Centralized logs | Immutable 0G Storage Log + Merkle root |
+| Revenue model | Platform takes all | Automated on-chain distribution via SmartChainRevenue |
 | Agent payments | None | Per-API-call micropayments via SmartChainAgentEscrow |
-| Model improvement | Static | Fine-tuned on real user tx data from 0G Storage |
-| Proof of savings | None | ZK commitment (SHA-256 / Groth16) stored on-chain |
+| Model improvement | Static, manual retraining | Fine-tuned on real user data from 0G Storage |
+| Proof of work | None | ZK commitment (SHA-256 / Groth16) stored on-chain |
+
+**The result:** An agent that owns itself, remembers everything, earns money, and gets smarter with every interaction — all verifiable on 0G Chain.
 
 ---
 

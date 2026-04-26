@@ -147,28 +147,40 @@ export default function AgentIDCard() {
               <p className="text-xs font-mono text-gray-300 truncate">{agent.modelHash}</p>
             </div>
 
-            {/* TEE badge */}
-            {agent.teeVerified && (
-              <div className="flex items-center justify-between rounded-xl bg-emerald-500/[0.06] border border-emerald-500/20 px-4 py-3">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
-                    <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"/>
-                    </svg>
+                  {/* TEE badge — always shown, reflects actual inference mode */}
+                  <div className={`flex items-center justify-between rounded-xl px-4 py-3 border ${
+                    agent.teeVerified
+                      ? 'bg-emerald-500/[0.06] border-emerald-500/20'
+                      : 'bg-blue-500/[0.06] border-blue-500/20'
+                  }`}>
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
+                        agent.teeVerified ? 'bg-emerald-500/20' : 'bg-blue-500/20'
+                      }`}>
+                        <svg className={`w-3.5 h-3.5 ${agent.teeVerified ? 'text-emerald-400' : 'text-blue-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"/>
+                        </svg>
+                      </div>
+                      <div className="min-w-0">
+                        {agent.teeVerified ? (
+                          <>
+                            <p className="text-xs font-semibold text-emerald-400">✓ Verified inside TEE — {agent.teeMode || 'TeeML'}</p>
+                            <p className="text-[10px] text-gray-500 truncate">Provider: {agent.providerId}</p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-xs font-semibold text-blue-400">✓ AI Inference Active — TensorFlow 2.16</p>
+                            <p className="text-[10px] text-gray-500">Routes to 0G Compute TeeML when broker available</p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <span className={`shrink-0 ml-3 text-[10px] font-bold text-white px-2.5 py-1 rounded-lg ${
+                      agent.teeVerified ? 'bg-emerald-600' : 'bg-blue-600'
+                    }`}>
+                      {agent.teeVerified ? '0G Compute' : 'Local AI'}
+                    </span>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-emerald-400">✓ Verified inside TEE — {agent.teeMode || "TeeML"}</p>
-                    <p className="text-[10px] text-gray-500 truncate">Provider: {agent.providerId}</p>
-                    {agent.teeProof && (
-                      <p className="text-[10px] font-mono text-gray-600 truncate">Proof: {agent.teeProof.slice(0, 18)}...</p>
-                    )}
-                  </div>
-                </div>
-                <span className="shrink-0 ml-3 text-[10px] font-bold text-white bg-blue-600 px-2.5 py-1 rounded-lg">
-                  0G Compute
-                </span>
-              </div>
-            )}
 
             <p className="text-[10px] text-gray-600 text-center pt-1">
               Non-transferable · Lives on 0G Chain · Updates on every optimization

@@ -7,7 +7,18 @@ import { useWeb3 } from '@/context/Web3Context';
 jest.mock('next/router', () => ({ useRouter: jest.fn() }));
 jest.mock('@/hooks/useAuth');
 jest.mock('@/context/Web3Context');
-jest.mock('@/utils/supabase', () => ({ supabase: { auth: { signOut: jest.fn() } } }));
+jest.mock('@/utils/supabase', () => ({
+  supabase: {
+    auth: { signOut: jest.fn() },
+    from: jest.fn(() => ({
+      select: jest.fn(() => ({
+        eq: jest.fn(() => ({
+          single: jest.fn(() => Promise.resolve({ data: null, error: null })),
+        })),
+      })),
+    })),
+  },
+}));
 
 const mockWeb3 = { isConnected: false, address: null, chainName: '', connectWallet: jest.fn(), disconnectWallet: jest.fn(), switchToOG: jest.fn() };
 

@@ -20,11 +20,14 @@ describe("Integration & Exploratory Tests", function () {
       const stored = await tx.getTransaction(hash);
       expect(stored.validated).to.equal(true);
 
-      // Distribute 10% of fee to alice — revenue contract takes 10% of _totalFee
-      await owner.sendTransaction({ to: await revenue.getAddress(), value: ethers.parseEther("0.1") });
-      await revenue.connect(owner).distributeRevenue(alice.address, ethers.parseEther("0.1"));
-      // distributeRevenue stores 10% of _totalFee = 0.1 * 10% = 0.01 ETH
-      expect(await revenue.pendingEarnings(alice.address)).to.equal(ethers.parseEther("0.01"));
+      // Register alice as staker first
+      await revenue.connect(alice).registerStaker(1000);
+      // Distribute 1 ETH fee — contract takes 10% = 0.1 ETH for stakers
+      const fee = ethers.parseEther("1");
+      const shareAmount = fee / 10n; // 10%
+      await revenue.connect(owner).distributeRevenue(fee, { value: shareAmount });
+      // Alice has 100% of stake so gets all of shareAmount
+      expect(await revenue.getPendingEarnings(alice.address)).to.equal(shareAmount);
     });
   });
 
@@ -96,8 +99,11 @@ describe("Integration & Exploratory Tests", function () {
     });
 
     it("revenue share percentage is exactly 10%", async () => {
-      await revenue.connect(owner).distributeRevenue(alice.address, 1000n);
-      expect(await revenue.pendingEarnings(alice.address)).to.equal(100n);
+      await revenue.connect(alice).registerStaker(1000);
+      const fee = 1000n;
+      const shareAmount = fee / 10n; // 10%
+      await revenue.connect(owner).distributeRevenue(fee, { value: shareAmount });
+      expect(await revenue.getPendingEarnings(alice.address)).to.equal(shareAmount);
     });
 
     it("0.5% fee deducted on sendFunds", async () => {

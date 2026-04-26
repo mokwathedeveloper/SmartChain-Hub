@@ -37,9 +37,12 @@ describe("SmartChain Contracts", function () {
   });
 
   describe("SmartChainRevenue", () => {
-    it("distributes 10% share", async () => {
-      await revenue.connect(owner).distributeRevenue(user.address, 1000n);
-      expect(await revenue.pendingEarnings(user.address)).to.equal(100n);
+    it("distributes 10% share to registered staker", async () => {
+      await revenue.connect(user).registerStaker(1000);
+      const fee = 1000n;
+      const shareAmount = fee / 10n; // 10%
+      await revenue.connect(owner).distributeRevenue(fee, { value: shareAmount });
+      expect(await revenue.getPendingEarnings(user.address)).to.equal(shareAmount);
     });
 
     it("reverts claim with no earnings", async () => {

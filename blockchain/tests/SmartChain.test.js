@@ -41,21 +41,21 @@ describe("SmartChain Hub Contracts", function () {
   describe("Revenue Sharing", function () {
     it("Should distribute revenue and allow claim", async function () {
       const fee = ethers.parseEther("1.0");
-      
-      // Send some ether to the contract for distribution
-      await owner.sendTransaction({ 
-        to: await revenue.getAddress(), 
-        value: fee 
-      });
-      
-      await revenue.distributeRevenue(addr1.address, fee);
-      const pending = await revenue.pendingEarnings(addr1.address);
-      expect(pending).to.equal(ethers.parseEther("0.1")); // 10%
+      const shareAmount = fee / 10n; // 10%
+
+      // Register addr1 as staker
+      await revenue.connect(addr1).registerStaker(1000);
+
+      // Distribute revenue — send shareAmount as msg.value
+      await revenue.connect(owner).distributeRevenue(fee, { value: shareAmount });
+
+      const pending = await revenue.getPendingEarnings(addr1.address);
+      expect(pending).to.equal(shareAmount); // addr1 has 100% stake
 
       const initialBalance = await ethers.provider.getBalance(addr1.address);
       await revenue.connect(addr1).claimEarnings();
       const finalBalance = await ethers.provider.getBalance(addr1.address);
-      
+
       expect(finalBalance).to.be.gt(initialBalance);
     });
   });

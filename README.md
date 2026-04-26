@@ -18,7 +18,7 @@ The agent optimizes blockchain transactions using **0G Compute** (TEE-verified L
 | SmartChainRevenue | `0x8858886AEE6342DFA4DE5Cf66dB25dCF75b31A08` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0x8858886AEE6342DFA4DE5Cf66dB25dCF75b31A08) |
 | SmartChainPayments | `0x540aFf6B167F8B5889d852d124C545F5f876A7eB` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0x540aFf6B167F8B5889d852d124C545F5f876A7eB) |
 | **SmartChainAgentID** | `0x69C619374c6B901b99941Df7238fceb80d7DCd08` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0x69C619374c6B901b99941Df7238fceb80d7DCd08) |
-| SmartChainAgentEscrow | *Deploy via `scripts/deployAgentEscrow.js`* | Galileo Testnet |
+| SmartChainAgentEscrow | `0x0A3951414c4097AF78953a97e49ad38293e9eA17` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0x0A3951414c4097AF78953a97e49ad38293e9eA17) |
 
 **Network:** 0G Galileo Testnet · Chain ID `16602` · RPC `https://evmrpc-testnet.0g.ai`
 
@@ -329,9 +329,9 @@ SmartChain-Hub/
 | ✅ Live | Immutable receipts on 0G Storage Log layer | 0G Storage | `@0glabs/0g-ts-sdk` MemData upload |
 | ✅ Live | Agent memory — 0G Storage KV, versioned, cross-device | 0G Storage KV | `hydrateAgentMemory()` on mount; localStorage fallback |
 | ✅ Live | Fine-tune TF model on real user tx data from 0G Storage | 0G Compute | `POST /fine-tune`; requires ≥10 confirmed transactions |
-| ✅ Live | Agent-to-Agent micropayments — `SmartChainAgentEscrow.sol` | 0G Chain | Contract compiled; **deploy via `scripts/deployAgentEscrow.js`** |
+| ✅ Live | Agent-to-Agent micropayments — `SmartChainAgentEscrow.sol` | 0G Chain | Deployed at `0x0A3951414c4097AF78953a97e49ad38293e9eA17` |
 | ✅ Live | ZK-verified transaction proofs — SHA-256 commitment | 0G Privacy | SHA-256 commitment works; Groth16 requires Circom circuit compilation |
-| 🔜 Next | Deploy `SmartChainAgentEscrow` to Galileo Testnet | 0G Chain | Run `npx hardhat run scripts/deployAgentEscrow.js --network og_newton` |
+| ✅ Done | Deploy `SmartChainAgentEscrow` to Galileo Testnet | 0G Chain | Deployed at `0x0A3951414c4097AF78953a97e49ad38293e9eA17` |
 | 🔜 Next | Full Groth16 ZK proofs — compile Circom circuit + proving keys | 0G Privacy | Requires `circom` + `snarkjs` circuit compilation |
 | 🔜 Next | Fine-tune with production user data | 0G Compute | Needs ≥10 real transactions from live users |
 | 🔜 Next | Official 0G Persistent Memory module | 0G Persistent Memory | Awaiting official SDK release from 0G Labs |

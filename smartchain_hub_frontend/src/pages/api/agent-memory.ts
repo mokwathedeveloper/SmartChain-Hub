@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json({ memory });
     } catch (e: any) {
       // Stringify BigInt in error message to avoid JSON serialization crash
-      const msg = typeof e.message === 'string' ? e.message.replace(/\d+n/g, s => s.slice(0,-1)) : String(e);
+      const msg = typeof e.message === 'string' ? e.message.replace(/\d+n/g, (s: string) => s.slice(0,-1)) : String(e);
       return res.status(200).json({ memory: null, skipped: msg });
     }
   }
@@ -66,7 +66,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const rootHash = deterministicHash(JSON.stringify(memory));
       return res.status(200).json({ ok: true, rootHash });
     } catch (e: any) {
-      const msg = typeof e.message === 'string' ? e.message.replace(/\d+n/g, s => s.slice(0,-1)) : String(e);
+      const msg = typeof e.message === 'string' ? e.message.replace(/\d+n/g, (s: string) => s.slice(0,-1)) : String(e);
       const rootHash = deterministicHash(JSON.stringify(memory));
       return res.status(200).json({ ok: true, skipped: msg, rootHash });
     }

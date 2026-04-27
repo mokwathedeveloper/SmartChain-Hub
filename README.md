@@ -96,7 +96,7 @@ Most "AI + Web3" projects are chatbots with tip jars. SmartChain Hub implements 
 
 | **Component** | **Integration** | **Evidence** |
 |-----------|-------------|-------|
-| **0G Compute** | TeeML inference via broker SDK — LLaMA 3.1 8B optimizes transactions | TEE proof in response headers, displayed in UI badge |
+| **0G Compute** | TeeML inference via broker SDK — LLaMA 3.1 8B optimizes transactions | TEE proof in response headers when broker is reachable; falls back to local TF model |
 | **0G Compute Fine-tuning** | `POST /fine-tune` fetches real tx receipts from 0G Storage by root hash, converts to 6-feature training vectors, incrementally fine-tunes TF model at lr=0.0001 | Model hash updated on-chain after each run; requires ≥10 real samples |
 | **0G Storage Log** | Immutable transaction receipts uploaded via `@0glabs/0g-ts-sdk` MemData | Merkle root stored in Supabase + on-chain |
 | **0G Storage KV** | Agent memory persisted cross-session — GET reads from KV, POST writes with version field; `hydrateAgentMemory()` syncs on mount | Memory root committed to Agent ID contract; version prevents stale overwrites |

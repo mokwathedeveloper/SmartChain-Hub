@@ -37,14 +37,12 @@ env/
 .Python
 
 # ── ML Models (large binary files) ───────────────────────────────
-*.keras
 *.h5
 *.pkl
 *.model
 *.ckpt
 *.pb
-ai-agent/models/tf_savings_model.keras
-ai-agent/data/
+# Note: tf_savings_model.keras is committed intentionally (78KB pre-trained model)
 
 # ── Next.js ───────────────────────────────────────────────────────
 .next/

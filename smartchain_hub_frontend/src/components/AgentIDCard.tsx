@@ -29,21 +29,31 @@ export default function AgentIDCard() {
     if (!signer) return;
     setMinting(true);
     try {
-      // Check balance before attempting mint to give clear error
       const provider = (signer as any).provider;
       const addr = await signer.getAddress();
       const balance = await provider.getBalance(addr);
       if (balance === BigInt(0)) {
-        addNotification("Insufficient A0GI - get testnet tokens from hub.0g.ai/faucet", "error");
+        addNotification("Insufficient A0GI — get tokens from hub.0g.ai/faucet", "error");
+        setMinting(false);
         return;
       }
       await mintAgentID(signer);
       await fetchAgent();
-      addNotification("Agent ID minted successfully!", "success");
+      addNotification("Agent ID minted successfully! ✓", "success");
     } catch (e: any) {
       const msg = e.reason || e.message || "Mint failed";
-      addNotification(`Mint failed: ${msg}`, "error");
-    } finally { setMinting(false); }
+      if (!msg.includes("denied")) {
+        addNotification(`Mint failed: ${msg}`, "error");
+      }
+    } finally {
+      setMinting(false);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setLoading(true);
+    await fetchAgent();
+    addNotification("Agent data refreshed", "success");
   };
 
   /* ── shared card shell ── */
@@ -186,13 +196,16 @@ export default function AgentIDCard() {
               Non-transferable · Lives on 0G Chain · Updates on every optimization
             </p>
 
-            {/* Update memory button */}
-            <button onClick={fetchAgent}
-              className="w-full flex items-center justify-center gap-2 py-2 border border-white/[0.06] rounded-xl text-xs text-gray-500 hover:text-gray-300 hover:border-white/[0.12] transition-all">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-              </svg>
-              Refresh Agent Data
+            {/* Refresh button */}
+            <button onClick={handleRefresh} disabled={loading}
+              className="w-full flex items-center justify-center gap-2 py-2 border border-white/[0.06] rounded-xl text-xs text-gray-500 hover:text-gray-300 hover:border-white/[0.12] transition-all disabled:opacity-50">
+              {loading ? (
+                <><div className="w-3 h-3 rounded-full border-2 border-gray-500/30 border-t-gray-400 animate-spin" />Refreshing...</>
+              ) : (
+                <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>Refresh Agent Data</>
+              )}
             </button>
           </div>
         )}

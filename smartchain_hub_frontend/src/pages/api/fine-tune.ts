@@ -13,10 +13,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { root_hashes = [], dry_run = false } = req.body || {};
 
   try {
-    // Fetch real transaction data from Supabase
+    // Use service role key to bypass RLS for server-side reads
     const supabase = createClient(
       (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim(),
-      (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim()
+      (process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim()
     );
 
     const { data: txs } = await supabase

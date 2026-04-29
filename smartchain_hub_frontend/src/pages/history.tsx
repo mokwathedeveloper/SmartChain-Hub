@@ -110,13 +110,22 @@ export default function HistoryPage() {
                   <tr key={tx.id} className="border-b border-gray-800 hover:bg-gray-800/30 transition-colors">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-2">
-                        <a href={`https://scan-testnet.0g.ai/tx/${tx.tx_hash}`} target="_blank" rel="noreferrer"
-                          className="text-xs font-mono text-blue-400 hover:text-blue-300 truncate max-w-[130px]">
-                          {tx.tx_hash?.slice(0, 14)}...
-                        </a>
-                        <svg className="w-3 h-3 text-gray-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                        </svg>
+                        {/* Only link if tx_hash is a real 64-char hex hash, not a zero/fallback hash */}
+                        {tx.tx_hash && /^0x[a-fA-F0-9]{64}$/.test(tx.tx_hash) && !tx.tx_hash.match(/^0x0+$/) ? (
+                          <a href={`https://scan-testnet.0g.ai/tx/${tx.tx_hash}`} target="_blank" rel="noreferrer"
+                            className="text-xs font-mono text-blue-400 hover:text-blue-300 truncate max-w-[130px]">
+                            {tx.tx_hash.slice(0, 14)}...
+                          </a>
+                        ) : (
+                          <span className="text-xs font-mono text-gray-500 truncate max-w-[130px]">
+                            {tx.tx_hash ? tx.tx_hash.slice(0, 14) + '...' : '—'}
+                          </span>
+                        )}
+                        {tx.tx_hash && /^0x[a-fA-F0-9]{64}$/.test(tx.tx_hash) && !tx.tx_hash.match(/^0x0+$/) && (
+                          <svg className="w-3 h-3 text-gray-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                          </svg>
+                        )}
                       </div>
                       <p className="text-xs text-gray-600 mt-0.5">{new Date(tx.created_at).toLocaleString()}</p>
                     </td>

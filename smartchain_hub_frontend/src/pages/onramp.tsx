@@ -257,24 +257,41 @@ export default function OnRamp() {
 
             {/* Bank transfer info */}
             {method === "bank" && (
-              <div className="p-4 bg-purple-500/5 border border-purple-500/20 rounded-xl space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-purple-400 text-sm">🏦</span>
-                  <p className="text-purple-300 font-semibold text-sm">How bank transfer works</p>
+              <div className="space-y-3">
+                <div className="p-4 bg-purple-500/5 border border-purple-500/20 rounded-xl space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-purple-400 text-sm">🏦</span>
+                    <p className="text-purple-300 font-semibold text-sm">How bank transfer works</p>
+                  </div>
+                  <div className="space-y-1.5 text-xs text-gray-400">
+                    <div className="flex items-start gap-2">
+                      <span className="text-purple-400 font-bold shrink-0">1.</span>
+                      <span>Click Pay — Stripe shows you the bank account details to transfer to</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-purple-400 font-bold shrink-0">2.</span>
+                      <span>Log in to your bank and send the exact amount shown</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-purple-400 font-bold shrink-0">3.</span>
+                      <span>A0GI delivered automatically when funds clear (1–3 business days)</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="space-y-1.5 text-xs text-gray-400">
-                  <div className="flex items-start gap-2">
-                    <span className="text-purple-400 font-bold shrink-0">1.</span>
-                    <span>Click Pay — Stripe provides your bank transfer details</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-purple-400 font-bold shrink-0">2.</span>
-                    <span>Transfer funds from your bank (SEPA / ACH / BACS)</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-purple-400 font-bold shrink-0">3.</span>
-                    <span>A0GI delivered automatically when funds clear (1–3 business days)</span>
-                  </div>
+
+                {/* Supported banks */}
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { name: "SEPA",  region: "Europe",    flag: "🇪🇺" },
+                    { name: "ACH",   region: "USA",       flag: "🇺🇸" },
+                    { name: "BACS",  region: "UK",        flag: "🇬🇧" },
+                  ].map(b => (
+                    <div key={b.name} className="p-3 bg-gray-950 border border-gray-800 rounded-xl text-center">
+                      <div className="text-lg mb-1">{b.flag}</div>
+                      <p className="text-white font-bold text-xs">{b.name}</p>
+                      <p className="text-gray-600 text-[10px]">{b.region}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

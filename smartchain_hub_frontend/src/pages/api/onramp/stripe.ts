@@ -35,8 +35,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
-    (req.headers.host?.includes('localhost') ? `http://${req.headers.host}` : `https://${req.headers.host}`);
+  // Build app URL from request headers to work both locally and in production
+  const protocol = req.headers['x-forwarded-proto'] || 'http';
+  const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
   const a0giAmount = (parseFloat(amount) * 2).toFixed(2);
   const txRef = `SCH-${Date.now()}-${walletAddress.slice(2, 8)}`;
 

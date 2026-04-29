@@ -23,7 +23,9 @@ export const MODEL_HASH = ethers.keccak256(
 function getContract(signer: ethers.Signer) {
   const addr = process.env.NEXT_PUBLIC_AGENT_ID_CONTRACT;
   if (!addr) throw new Error("NEXT_PUBLIC_AGENT_ID_CONTRACT not set");
-  return new ethers.Contract(addr, AGENT_ID_ABI, signer);
+  // Use checksummed address to prevent ethers from attempting ENS resolution
+  // 0G Galileo Testnet does not support ENS
+  return new ethers.Contract(ethers.getAddress(addr), AGENT_ID_ABI, signer);
 }
 
 /** Check if user already has an Agent ID minted. */

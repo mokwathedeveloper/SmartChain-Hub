@@ -106,8 +106,21 @@ export default function Payments() {
     if (!signer) { addNotification('Connect MetaMask to stake', 'error'); return; }
     setLoading(true);
     try {
+      // Check wallet balance before staking
+      const provider = (signer as any).provider;
+      const addr = await signer.getAddress();
+      const balance = await provider.getBalance(addr);
+      const stakeWei = ethers.parseEther(stakeAmt);
+      const gasBuffer = ethers.parseEther("0.01"); // reserve for gas
+      if (stakeWei + gasBuffer > balance) {
+        addNotification(
+          `Insufficient balance. You have ${parseFloat(ethers.formatEther(balance)).toFixed(4)} A0GI but need ${stakeAmt} A0GI + gas.`,
+          'error'
+        );
+        return;
+      }
       const c = getWriteContract();
-      const tx = await c.stake({ value: ethers.parseEther(stakeAmt) });
+      const tx = await c.stake({ value: stakeWei });
       await tx.wait();
       addNotification(`Staked ${stakeAmt} A0GI successfully`, 'success');
       setStakeAmt(""); fetchStakeData();

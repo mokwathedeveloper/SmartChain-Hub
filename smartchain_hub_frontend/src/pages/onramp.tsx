@@ -46,11 +46,11 @@ export default function OnRamp() {
     setStatus(null);
 
     try {
-      if (method === "card" || method === "bank") {
+      if (method === "card") {
         const res = await fetch("/api/onramp/stripe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount: parseFloat(amount), walletAddress: displayAddress, paymentType: method }),
+          body: JSON.stringify({ amount: parseFloat(amount), walletAddress: displayAddress, paymentType: "card" }),
         });
         const data = await res.json();
         if (data.url) {
@@ -58,6 +58,12 @@ export default function OnRamp() {
         } else {
           setStatus({ type: "error", msg: data.error || data.detail || "Payment session failed. Check your Stripe configuration." });
         }
+      } else if (method === "bank") {
+        // Show wire transfer instructions
+        setStatus({
+          type: "info",
+          msg: `To buy ${estimated} A0GI via bank transfer, send $${amount} USD to:\n\nBank: Stripe Treasury\nAccount: Contact support@smartchainhub.io with your wallet address (${displayAddress.slice(0,10)}...) and amount. We will process manually within 1 business day.`,
+        });
       } else {
         const res = await fetch("/api/onramp/mpesa", {
           method: "POST",

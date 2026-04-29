@@ -1,29 +1,38 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useWeb3 } from "@/context/Web3Context";
 import { useNotification } from "@/context/NotificationContext";
 import { hasAgentID, mintAgentID, getAgentIdentity } from "@/utils/agentId";
 
 export default function AgentIDCard() {
-  const { signer, isConnected, address, connectWallet } = useWeb3();
+  const { signer, isConnected, connectWallet } = useWeb3();
   const { addNotification } = useNotification();
-  const [agent, setAgent]     = useState<any>(null);
-  const [minting, setMinting] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const fetchAgent = async () => {
+  const [agent, setAgent]         = useState<any>(null);
+  const [initialLoad, setInitialLoad] = useState(true); // only true on first load
+  const [minting, setMinting]     = useState(false);
+  const [refreshing, setRefreshing] = useState(false);  // separate from initialLoad
+
+  // fetchAgent never sets initialLoad — only called internally
+  const fetchAgent = useCallback(async (showSpinner = false) => {
     if (!signer) return;
-    setLoading(true);
+    if (showSpinner) setRefreshing(true);
     try {
       const exists = await hasAgentID(signer);
-      if (exists) setAgent(await getAgentIdentity(signer));
-      else setAgent(null);
+      setAgent(exists ? await getAgentIdentity(signer) : null);
     } catch (e: any) {
-      console.warn("Agent ID fetch failed:", e);
+      // Silently fail — don't flicker to empty state on error
+    } finally {
+      if (showSpinner) setRefreshing(false);
+      setInitialLoad(false);
     }
-    setLoading(false);
-  };
+  }, [signer]);
 
-  useEffect(() => { fetchAgent(); }, [signer]);
+  // Initial load only
+  useEffect(() => {
+    if (!signer) { setInitialLoad(false); return; }
+    setInitialLoad(true);
+    fetchAgent(false);
+  }, [signer]);
 
   const handleMint = async () => {
     if (!signer) return;
@@ -34,15 +43,14 @@ export default function AgentIDCard() {
       const balance = await provider.getBalance(addr);
       if (balance === BigInt(0)) {
         addNotification("Insufficient A0GI — get tokens from hub.0g.ai/faucet", "error");
-        setMinting(false);
         return;
       }
       await mintAgentID(signer);
-      await fetchAgent();
+      await fetchAgent(false);
       addNotification("Agent ID minted successfully! ✓", "success");
     } catch (e: any) {
-      const msg = e.reason || e.message || "Mint failed";
-      if (!msg.includes("denied")) {
+      const msg = e.reason || e.message || "";
+      if (!msg.toLowerCase().includes("denied") && !msg.toLowerCase().includes("rejected")) {
         addNotification(`Mint failed: ${msg}`, "error");
       }
     } finally {
@@ -51,20 +59,16 @@ export default function AgentIDCard() {
   };
 
   const handleRefresh = async () => {
-    setLoading(true);
-    await fetchAgent();
-    addNotification("Agent data refreshed", "success");
+    await fetchAgent(true); // showSpinner=true uses refreshing state, NOT initialLoad
+    addNotification("Agent data refreshed ✓", "success");
   };
 
-  /* ── shared card shell ── */
   return (
     <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-gray-900 shadow-2xl">
-
-      {/* ambient glows */}
       <div className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 rounded-full bg-blue-500/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-16 -right-16 w-56 h-56 rounded-full bg-indigo-500/10 blur-3xl" />
 
-      {/* ── top bar ── */}
+      {/* Top bar */}
       <div className="relative flex items-center justify-between px-6 pt-5 pb-4 border-b border-white/[0.06]">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
@@ -92,7 +96,7 @@ export default function AgentIDCard() {
         )}
       </div>
 
-      {/* ── body ── */}
+      {/* Body */}
       <div className="relative px-6 py-5">
 
         {/* NOT CONNECTED */}
@@ -104,34 +108,26 @@ export default function AgentIDCard() {
                   d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
               </svg>
             </div>
-            <div>
-              <p className="text-sm font-semibold text-white mb-1">Wallet not connected</p>
-              <p className="text-xs text-gray-500 max-w-xs mx-auto leading-relaxed">
-                Connect your wallet to view or mint your soulbound Agent ID on 0G Chain.
-              </p>
-            </div>
+            <p className="text-sm font-semibold text-white">Wallet not connected</p>
+            <p className="text-xs text-gray-500 max-w-xs mx-auto">Connect your wallet to view or mint your soulbound Agent ID on 0G Chain.</p>
             <button onClick={connectWallet}
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-blue-500/20">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
-              </svg>
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-blue-500/20">
               Connect Wallet
             </button>
           </div>
         )}
 
-        {/* LOADING */}
-        {isConnected && loading && (
+        {/* INITIAL LOADING — only on first fetch, never on refresh */}
+        {isConnected && initialLoad && (
           <div className="flex items-center gap-3 py-6 justify-center">
             <div className="w-4 h-4 rounded-full border-2 border-blue-500/30 border-t-blue-500 animate-spin" />
             <p className="text-sm text-gray-500">Loading agent identity...</p>
           </div>
         )}
 
-        {/* AGENT EXISTS */}
-        {isConnected && !loading && agent && (
+        {/* AGENT EXISTS — stays visible even during refresh */}
+        {isConnected && !initialLoad && agent && (
           <div className="space-y-4">
-            {/* stats */}
             <div className="grid grid-cols-3 gap-3">
               {[
                 { label: "Reputation",    value: agent.reputation },
@@ -145,61 +141,52 @@ export default function AgentIDCard() {
               ))}
             </div>
 
-            {/* memory root */}
             <div className="rounded-xl bg-white/[0.03] border border-white/[0.05] p-3.5">
               <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Memory Root (0G KV)</p>
               <p className="text-xs font-mono text-gray-300 truncate">{agent.memoryRoot}</p>
             </div>
 
-            {/* model hash */}
             <div className="rounded-xl bg-white/[0.03] border border-white/[0.05] p-3.5">
               <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Model Hash (TF Weights)</p>
               <p className="text-xs font-mono text-gray-300 truncate">{agent.modelHash}</p>
             </div>
 
-                  {/* TEE badge — always shown, reflects actual inference mode */}
-                  <div className={`flex items-center justify-between rounded-xl px-4 py-3 border ${
-                    agent.teeVerified
-                      ? 'bg-emerald-500/[0.06] border-emerald-500/20'
-                      : 'bg-blue-500/[0.06] border-blue-500/20'
-                  }`}>
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
-                        agent.teeVerified ? 'bg-emerald-500/20' : 'bg-blue-500/20'
-                      }`}>
-                        <svg className={`w-3.5 h-3.5 ${agent.teeVerified ? 'text-emerald-400' : 'text-blue-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"/>
-                        </svg>
-                      </div>
-                      <div className="min-w-0">
-                        {agent.teeVerified ? (
-                          <>
-                            <p className="text-xs font-semibold text-emerald-400">✓ Verified inside TEE — {agent.teeMode || 'TeeML'}</p>
-                            <p className="text-[10px] text-gray-500 truncate">Provider: {agent.providerId}</p>
-                          </>
-                        ) : (
-                          <>
-                            <p className="text-xs font-semibold text-blue-400">✓ AI Inference Active — TensorFlow 2.16</p>
-                            <p className="text-[10px] text-gray-500">Routes to 0G Compute TeeML when broker available</p>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                    <span className={`shrink-0 ml-3 text-[10px] font-bold text-white px-2.5 py-1 rounded-lg ${
-                      agent.teeVerified ? 'bg-emerald-600' : 'bg-blue-600'
-                    }`}>
-                      {agent.teeVerified ? '0G Compute' : 'Local AI'}
-                    </span>
-                  </div>
+            <div className={`flex items-center justify-between rounded-xl px-4 py-3 border ${
+              agent.teeVerified ? 'bg-emerald-500/[0.06] border-emerald-500/20' : 'bg-blue-500/[0.06] border-blue-500/20'
+            }`}>
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${agent.teeVerified ? 'bg-emerald-500/20' : 'bg-blue-500/20'}`}>
+                  <svg className={`w-3.5 h-3.5 ${agent.teeVerified ? 'text-emerald-400' : 'text-blue-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </div>
+                <div className="min-w-0">
+                  {agent.teeVerified ? (
+                    <>
+                      <p className="text-xs font-semibold text-emerald-400">✓ Verified inside TEE — {agent.teeMode || 'TeeML'}</p>
+                      <p className="text-[10px] text-gray-500 truncate">Provider: {agent.providerId}</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-xs font-semibold text-blue-400">✓ AI Inference Active — TensorFlow 2.16</p>
+                      <p className="text-[10px] text-gray-500">Routes to 0G Compute TeeML when broker available</p>
+                    </>
+                  )}
+                </div>
+              </div>
+              <span className={`shrink-0 ml-3 text-[10px] font-bold text-white px-2.5 py-1 rounded-lg ${agent.teeVerified ? 'bg-emerald-600' : 'bg-blue-600'}`}>
+                {agent.teeVerified ? '0G Compute' : 'Local AI'}
+              </span>
+            </div>
 
             <p className="text-[10px] text-gray-600 text-center pt-1">
               Non-transferable · Lives on 0G Chain · Updates on every optimization
             </p>
 
-            {/* Refresh button */}
-            <button onClick={handleRefresh} disabled={loading}
+            {/* Refresh — uses refreshing state, agent data stays visible */}
+            <button onClick={handleRefresh} disabled={refreshing}
               className="w-full flex items-center justify-center gap-2 py-2 border border-white/[0.06] rounded-xl text-xs text-gray-500 hover:text-gray-300 hover:border-white/[0.12] transition-all disabled:opacity-50">
-              {loading ? (
+              {refreshing ? (
                 <><div className="w-3 h-3 rounded-full border-2 border-gray-500/30 border-t-gray-400 animate-spin" />Refreshing...</>
               ) : (
                 <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -211,7 +198,7 @@ export default function AgentIDCard() {
         )}
 
         {/* NO AGENT — MINT */}
-        {isConnected && !loading && !agent && (
+        {isConnected && !initialLoad && !agent && (
           <div className="py-6 text-center space-y-4">
             <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mx-auto">
               <svg className="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,19 +213,13 @@ export default function AgentIDCard() {
               </p>
             </div>
             <button onClick={handleMint} disabled={minting}
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-sm font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20">
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20">
               {minting ? (
-                <>
-                  <div className="w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                  Minting...
-                </>
+                <><div className="w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />Minting...</>
               ) : (
-                <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/>
-                  </svg>
-                  Mint Agent ID
-                </>
+                <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/>
+                </svg>Mint Agent ID</>
               )}
             </button>
           </div>

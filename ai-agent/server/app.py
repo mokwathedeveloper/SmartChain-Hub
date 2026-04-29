@@ -185,18 +185,43 @@ def _local_optimize(amount: float, priority: str) -> dict:
 def fine_tune_model():
     """
     POST /fine-tune
-    Body: { root_hashes: ["0x...", ...], dry_run?: bool }
+    Body: { root_hashes?: [...], transactions?: [...], dry_run?: bool }
 
-    Fetches real transaction receipts from 0G Storage by root hash,
-    converts them to training features, and incrementally fine-tunes
-    the TensorFlow savings model.
+    Accepts either:
+    - root_hashes: fetch from 0G Storage
+    - transactions: direct transaction data from Supabase
     """
     data = request.json or {}
-    root_hashes = data.get("root_hashes", [])
-    dry_run     = bool(data.get("dry_run", False))
+    root_hashes  = data.get("root_hashes", [])
+    transactions = data.get("transactions", [])  # direct data from frontend
+    dry_run      = bool(data.get("dry_run", False))
 
     if not isinstance(root_hashes, list):
         return jsonify({"error": "root_hashes must be an array"}), 400
+
+    # If direct transaction data provided, use it
+    if transactions:
+        from scripts.fine_tuner import transactions_to_features, fine_tune as _fine_tune
+        import numpy as np, hashlib
+        X, y = transactions_to_features(transactions)
+        n_samples = len(X)
+        if n_samples < 10:
+            return jsonify({"ok": False, "reason": "insufficient_samples", "samples": n_samples, "min": 10}), 422
+        if dry_run:
+            return jsonify({"ok": True, "dry_run": True, "samples": n_samples})
+        # Fine-tune with direct data
+        import tensorflow as tf
+        model_obj = get_optimizer().model if hasattr(get_optimizer(), 'model') else None
+        from models.savings_model import SavingsModel
+        sm = SavingsModel()
+        sm.model.compile(optimizer=tf.keras.optimizers.Adam(0.0001), loss='mse', metrics=['mae'])
+        history = sm.model.fit(X, y, epochs=50, batch_size=min(32, n_samples),
+                               validation_split=0.1 if n_samples >= 20 else 0.0, verbose=0)
+        sm.model.save(sm.model_path)
+        weights_bytes = b"".join(w.tobytes() for w in sm.model.get_weights())
+        model_hash = "0x" + hashlib.sha256(weights_bytes).hexdigest()
+        return jsonify({"ok": True, "samples": n_samples, "epochs": 50,
+                        "final_loss": float(history.history["loss"][-1]), "model_hash": model_hash})
 
     result = fine_tune(root_hashes, dry_run=dry_run)
     status = 200 if result.get("ok") else 422

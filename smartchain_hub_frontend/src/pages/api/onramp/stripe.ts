@@ -44,7 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const Stripe = (await import("stripe")).default;
-    const stripe = new Stripe(stripeKey, { apiVersion: "2024-06-20" as any });
+    const stripe = new Stripe(stripeKey);
 
     // Payment method types based on selection
     const paymentMethodTypes: string[] =

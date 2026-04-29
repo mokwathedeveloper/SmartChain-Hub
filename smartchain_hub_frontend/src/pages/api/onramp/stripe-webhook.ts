@@ -41,8 +41,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   let event: any;
   try {
     const Stripe = (await import("stripe")).default;
-    const stripe = new Stripe(stripeKey, { apiVersion: "2024-06-20" as any });
-    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
+      const stripe = new Stripe(stripeKey);
+      event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
   } catch (e: any) {
     console.error("Stripe webhook signature verification failed:", e.message);
     return res.status(400).json({ error: `Webhook signature invalid: ${e.message}` });

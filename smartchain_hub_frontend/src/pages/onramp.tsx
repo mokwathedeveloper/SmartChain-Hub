@@ -198,7 +198,7 @@ export default function OnRamp() {
               </p>
               <p className="text-gray-500 text-xs mt-0.5">
                 {method === "card"  ? "Visa, Mastercard, Amex · Instant delivery · Secured by Stripe" :
-                 method === "bank"  ? "SEPA · ACH · BACS · 1–3 business days · Secured by Stripe" :
+                 method === "bank"  ? "ACH (USA) · 1–3 business days · Secured by Stripe" :
                                       "Kenya · Tanzania · Uganda · Rwanda · Ghana · ~2 min delivery"}
               </p>
             </div>
@@ -282,9 +282,7 @@ export default function OnRamp() {
                 {/* Supported banks */}
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { name: "SEPA",  region: "Europe",    flag: "🇪🇺" },
                     { name: "ACH",   region: "USA",       flag: "🇺🇸" },
-                    { name: "BACS",  region: "UK",        flag: "🇬🇧" },
                   ].map(b => (
                     <div key={b.name} className="p-3 bg-gray-950 border border-gray-800 rounded-xl text-center">
                       <div className="text-lg mb-1">{b.flag}</div>

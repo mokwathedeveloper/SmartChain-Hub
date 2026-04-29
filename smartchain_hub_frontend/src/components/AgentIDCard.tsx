@@ -126,7 +126,7 @@ export default function AgentIDCard() {
               {[
                 { label: "Reputation",    value: agent.reputation },
                 { label: "Optimizations", value: agent.reputation },
-                { label: "Since",         value: new Date(Number(agent.mintedAt) * 1000).toLocaleDateString("en-US", { month: "short", year: "numeric" }) },
+                { label: "Since",         value: new Date(agent.mintedAt).toLocaleDateString("en-US", { month: "short", year: "numeric" }) },
               ].map(({ label, value }) => (
                 <div key={label} className="rounded-xl bg-white/[0.03] border border-white/[0.05] p-3 text-center">
                   <p className="text-[10px] text-gray-500 mb-1.5 uppercase tracking-wider">{label}</p>
@@ -185,6 +185,15 @@ export default function AgentIDCard() {
             <p className="text-[10px] text-gray-600 text-center pt-1">
               Non-transferable · Lives on 0G Chain · Updates on every optimization
             </p>
+
+            {/* Update memory button */}
+            <button onClick={fetchAgent}
+              className="w-full flex items-center justify-center gap-2 py-2 border border-white/[0.06] rounded-xl text-xs text-gray-500 hover:text-gray-300 hover:border-white/[0.12] transition-all">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              Refresh Agent Data
+            </button>
           </div>
         )}
 

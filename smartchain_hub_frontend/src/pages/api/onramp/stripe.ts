@@ -47,11 +47,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const stripe = new Stripe(stripeKey);
 
     // Payment method types based on selection
-    // For bank: use customer_balance which works globally without activation
-    const paymentMethodTypes: string[] =
-      paymentType === "bank"
-        ? ["us_bank_account"]
-        : ["card"];
+    // Bank transfer uses card payment with bank redirect note
+    // us_bank_account requires Financial Connections activation
+    const paymentMethodTypes: string[] = ["card"];
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: paymentMethodTypes as any,

@@ -29,7 +29,9 @@ function getContract(signer: ethers.Signer) {
 /** Check if user already has an Agent ID minted. */
 export async function hasAgentID(signer: ethers.Signer): Promise<boolean> {
   const addr = await signer.getAddress();
-  return getContract(signer).hasMinted(addr);
+  // Pass checksummed address directly — 0G chain does not support ENS
+  const contract = getContract(signer);
+  return contract.hasMinted(ethers.getAddress(addr));
 }
 
 /** Mint a soulbound Agent ID for the user. One per wallet. */
@@ -59,7 +61,8 @@ export async function updateAgentMemory(
 
 /** Fetch the agent's full on-chain identity. */
 export async function getAgentIdentity(signer: ethers.Signer) {
-  const addr = await signer.getAddress();
+  // Use checksummed address directly — 0G chain does not support ENS
+  const addr = ethers.getAddress(await signer.getAddress());
   const agent = await getContract(signer).getAgent(addr);
   return {
     exists:       agent.exists,

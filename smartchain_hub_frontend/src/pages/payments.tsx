@@ -56,7 +56,7 @@ export default function Payments() {
   const [escrowChannel, setEscrowChannel] = useState<any>(null);
   const [escrowLoading, setEscrowLoading] = useState(false);
 
-  const PAYMENTS_ADDR = process.env.NEXT_PUBLIC_PAYMENTS_CONTRACT;
+  const PAYMENTS_ADDR = (process.env.NEXT_PUBLIC_PAYMENTS_CONTRACT || '').trim();
 
   // Read-only — uses module-level RPC provider, never causes re-render
   const getReadContract = () => {

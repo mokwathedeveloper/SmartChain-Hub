@@ -6,10 +6,10 @@
  * localStorage in the browser is a read-through cache only.
  */
 import type { NextApiRequest, NextApiResponse } from "next";
+import crypto from "crypto";
 
 const OG_KV_RPC      = "https://indexer-storage-testnet-standard.0g.ai";
 const OG_STORAGE_RPC = "https://evmrpc.0g.ai";
-// Stream ID as hex string — avoid BigInt serialization issues in error responses
 const STREAM_ID_HEX  = "0x736d617274636861696e6d656d6f7279";
 const STREAM_ID      = BigInt(STREAM_ID_HEX);
 
@@ -18,8 +18,7 @@ function memoryKey(userId: string): Uint8Array {
 }
 
 function deterministicHash(content: string): string {
-  const hash = Array.from(content).reduce((h, c) => (Math.imul(31, h) + c.charCodeAt(0)) | 0, 0);
-  return `0x${Math.abs(hash).toString(16).padStart(64, "0")}`;
+  return "0x" + crypto.createHash("sha256").update(content).digest("hex");
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

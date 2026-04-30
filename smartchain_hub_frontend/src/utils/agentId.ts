@@ -11,6 +11,7 @@ const AGENT_ID_ABI = [
   "function getAgent(address owner) external view returns (tuple(address owner, bytes32 memoryRoot, bytes32 modelHash, uint256 reputation, uint256 totalSavings, uint256 mintedAt, bool exists))",
   "function hasMinted(address) external view returns (bool)",
   "function totalAgents() external view returns (uint256)",
+  "function resetMint(address wallet) external",
   "event AgentMinted(address indexed owner, bytes32 modelHash, uint256 timestamp)",
   "event MemoryUpdated(address indexed owner, bytes32 newMemoryRoot, uint256 reputation)",
 ];
@@ -66,6 +67,12 @@ export async function updateAgentMemory(
   const tx = await getContract(signer).updateMemory(memoryRoot, savingsWei);
   const receipt = await tx.wait();
   return receipt.hash;
+}
+
+/** Owner-only: reset mint status so wallet can mint again. */
+export async function resetMint(signer: ethers.Signer, wallet: string): Promise<void> {
+  const tx = await getContract(signer).resetMint(ethers.getAddress(wallet));
+  await tx.wait();
 }
 
 /** Fetch the agent's full on-chain identity. */

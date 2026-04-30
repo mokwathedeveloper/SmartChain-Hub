@@ -80,6 +80,17 @@ contract SmartChainAgentID is Ownable {
     }
 
     /**
+     * @dev Owner-only: reset a wallet's mint status so they can mint again.
+     * Used for testing and manual mint flows.
+     */
+    function resetMint(address _wallet) external onlyOwner {
+        require(hasMinted[_wallet], "Wallet has not minted");
+        hasMinted[_wallet] = false;
+        delete agents[_wallet];
+        if (totalAgents > 0) totalAgents--;
+    }
+
+    /**
      * @dev Soulbound — block all transfers.
      */
     function transfer(address, uint256) external pure {

@@ -6,8 +6,11 @@ import { ethers } from "ethers";
 import { depositToChannel, settleCall, withdrawFromChannel, getChannelState } from "@/utils/agentEscrow";
 
 const OG_RPC = "https://evmrpc-testnet.0g.ai";
-// Module-level provider — created once, never causes re-render
-const RPC_PROVIDER = typeof window !== "undefined" ? new ethers.JsonRpcProvider(OG_RPC) : null;
+const OG_NETWORK = ethers.Network.from({ chainId: 16602, name: 'og-galileo' });
+// Module-level static-network provider — created once, skips network detection, never causes re-render
+const RPC_PROVIDER = typeof window !== "undefined"
+  ? new ethers.JsonRpcProvider(OG_RPC, OG_NETWORK, { staticNetwork: OG_NETWORK })
+  : null;
 
 const PAYMENTS_ABI = [
   "function sendFunds(address payable _to, string _memo) external payable",
@@ -107,9 +110,9 @@ export default function Payments() {
     setLoading(true);
     try {
       // Check wallet balance before staking
-      const provider = (signer as any).provider;
+      const ethersProvider = signer.provider as ethers.Provider;
       const addr = await signer.getAddress();
-      const balance = await provider.getBalance(addr);
+      const balance = await ethersProvider.getBalance(addr);
       const stakeWei = ethers.parseEther(stakeAmt);
       const gasBuffer = ethers.parseEther("0.01"); // reserve for gas
       if (stakeWei + gasBuffer > balance) {
@@ -192,11 +195,11 @@ export default function Payments() {
   };
 
   const handleEscrowCheck = async () => {
-    if (!escrowAgentA || !escrowAgentB || !signer) return;
+    if (!escrowAgentA || !escrowAgentB) return;
     setEscrowLoading(true);
     try {
-      const provider = (signer as any).provider;
-      const ch = await getChannelState(provider, escrowAgentA, escrowAgentB);
+      if (!RPC_PROVIDER) throw new Error('Provider not available');
+      const ch = await getChannelState(RPC_PROVIDER, escrowAgentA, escrowAgentB);
       setEscrowChannel(ch);
     } catch (e: any) {
       addNotification(`Check error: ${e.message}`, 'error');

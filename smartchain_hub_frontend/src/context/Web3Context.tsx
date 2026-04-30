@@ -38,6 +38,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
   const [noWallet, setNoWallet]     = useState(false);
   const [sdkConnected, setSdkConnected] = useState(false);
   const sdkRef = useRef<any>(null);
+  const connectingRef = useRef(false); // guard against duplicate connect calls
 
   // Initialise MetaMask SDK on mount
   useEffect(() => {
@@ -114,6 +115,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
   };
 
   const connectWallet = async () => {
+    if (connectingRef.current) return; // already in-flight — ignore duplicate clicks
     const ethereum = _getEthereum();
     if (!ethereum) {
       setNoWallet(true);
@@ -121,6 +123,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
       return;
     }
     setNoWallet(false);
+    connectingRef.current = true;
     try {
       secureLogger.info('Initiating wallet connection');
       const accounts: string[] = await ethereum.request({ method: 'eth_requestAccounts' });
@@ -129,6 +132,8 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
       await _connect(ethereum, accounts[0]);
     } catch (e: any) {
       if (e.code !== 4001) secureLogger.error('Wallet connection failed', e);
+    } finally {
+      connectingRef.current = false;
     }
   };
 

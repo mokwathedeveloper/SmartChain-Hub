@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { ethers } from "ethers";
 import { useWeb3 } from "@/context/Web3Context";
 import { useNotification } from "@/context/NotificationContext";
 import { hasAgentID, mintAgentID, getAgentIdentity } from "@/utils/agentId";
@@ -64,9 +65,9 @@ export default function AgentIDCard() {
     if (!signer) return;
     setMinting(true);
     try {
-      const provider = (signer as any).provider;
+      const ethersProvider = signer.provider as ethers.Provider;
       const addr = await signer.getAddress();
-      const balance = await provider.getBalance(addr);
+      const balance = await ethersProvider.getBalance(addr);
       if (balance === BigInt(0)) {
         addNotification("Insufficient A0GI — get tokens from hub.0g.ai/faucet", "error");
         return;

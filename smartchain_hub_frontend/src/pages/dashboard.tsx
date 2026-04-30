@@ -9,7 +9,7 @@ import { triggerFineTune } from "@/utils/api";
 
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user } = useAuth(false); // false = don't redirect if no Supabase session — AgentIDCard works wallet-only
   const [stats, setStats] = useState({ totalTx: 0, revenue: 0, nodescore: 0, prevTx: 0, prevReputation: 0 });
   const [activity, setActivity] = useState<any[]>([]);
   const [barData, setBarData] = useState<number[]>(Array(30).fill(0));

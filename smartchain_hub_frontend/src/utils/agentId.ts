@@ -29,16 +29,14 @@ function getReadProvider() {
   return new ethers.JsonRpcProvider(OG_RPC, OG_NETWORK, { staticNetwork: OG_NETWORK });
 }
 
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_AGENT_ID_CONTRACT || '0x0Dd3Ac67C684630273d5369a5DBaC174EB44c911';
+
 function getContract(signer: ethers.Signer) {
-  const addr = process.env.NEXT_PUBLIC_AGENT_ID_CONTRACT;
-  if (!addr) throw new Error("NEXT_PUBLIC_AGENT_ID_CONTRACT not set");
-  return new ethers.Contract(ethers.getAddress(addr), AGENT_ID_ABI, signer);
+  return new ethers.Contract(ethers.getAddress(CONTRACT_ADDRESS), AGENT_ID_ABI, signer);
 }
 
 function getReadContract() {
-  const addr = process.env.NEXT_PUBLIC_AGENT_ID_CONTRACT;
-  if (!addr) throw new Error("NEXT_PUBLIC_AGENT_ID_CONTRACT not set");
-  return new ethers.Contract(ethers.getAddress(addr), AGENT_ID_ABI, getReadProvider());
+  return new ethers.Contract(ethers.getAddress(CONTRACT_ADDRESS), AGENT_ID_ABI, getReadProvider());
 }
 
 /** Check if user already has an Agent ID minted. */

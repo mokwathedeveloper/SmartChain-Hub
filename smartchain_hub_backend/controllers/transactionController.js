@@ -2,6 +2,7 @@ const { supabase } = require('../config/supabaseConfig');
 const aiService = require('../services/aiService');
 const blockchainService = require('../services/blockchainService');
 const axios = require('axios');
+const crypto = require('crypto');
 
 // 0G Storage integration via frontend API routes
 const uploadToStorage = async (data) => {
@@ -14,11 +15,8 @@ const uploadToStorage = async (data) => {
     return response.data;
   } catch (error) {
     console.warn('0G Storage upload failed, using fallback:', error.message);
-    // Fallback: generate deterministic hash
-    const content = JSON.stringify(data);
-    const hash = Array.from(content).reduce((h, c) => (Math.imul(31, h) + c.charCodeAt(0)) | 0, 0);
     return {
-      rootHash: `0x${Math.abs(hash).toString(16).padStart(64, "0")}`,
+      rootHash: `0x${crypto.createHash('sha256').update(JSON.stringify(data)).digest('hex')}`,
       txHash: "",
       storageScanUrl: ""
     };
@@ -102,8 +100,8 @@ exports.createTransaction = async (req, res) => {
     const storageResult = await uploadToStorage(storageData);
     
     // Generate transaction hash
-    const txHash = storageResult.txHash || 
-      `0x${Math.random().toString(16).slice(2)}${Math.random().toString(16).slice(2, 10)}`;
+    const txHash = storageResult.txHash ||
+      `0x${crypto.randomBytes(32).toString('hex')}`;
     
     // Save to database
     const { data, error } = await supabase

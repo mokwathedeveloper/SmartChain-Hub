@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 
 export default function Signup() {
@@ -16,6 +16,13 @@ export default function Signup() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) router.replace('/dashboard');
+    });
+  }, [router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) { setError("Passwords do not match"); return; }
@@ -23,7 +30,7 @@ export default function Signup() {
     setLoading(true); setError(null);
     const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
     if (error) setError(error.message);
-    else router.push("/login");
+    else router.push("/dashboard"); // go straight to dashboard after signup
     setLoading(false);
   };
 

@@ -166,13 +166,28 @@ export default function Payments() {
 
   const handleEscrowDeposit = async () => {
     if (!escrowAgentB || !escrowPrice || !escrowDeposit || !signer) return;
+    if (!/^0x[a-fA-F0-9]{40}$/.test(escrowAgentB)) {
+      addNotification('Invalid Agent B address format', 'error'); return;
+    }
+    const depositNum = parseFloat(escrowDeposit);
+    const priceNum   = parseFloat(escrowPrice);
+    if (isNaN(depositNum) || depositNum <= 0) {
+      addNotification('Deposit amount must be greater than 0', 'error'); return;
+    }
+    if (isNaN(priceNum) || priceNum <= 0) {
+      addNotification('Price per call must be greater than 0', 'error'); return;
+    }
+    if (depositNum < priceNum) {
+      addNotification('Deposit must be >= price per call', 'error'); return;
+    }
     setEscrowLoading(true);
     try {
-      const txHash = await depositToChannel(signer, escrowAgentB, escrowPrice, escrowDeposit);
+      const txHash = await depositToChannel(signer, escrowAgentB.trim(), escrowPrice, escrowDeposit);
       addNotification(`Channel opened. Tx: ${txHash.slice(0, 16)}...`, 'success');
       setEscrowAgentB(""); setEscrowPrice(""); setEscrowDeposit("");
     } catch (e: any) {
-      addNotification(`Escrow error: ${e.message}`, 'error');
+      const msg = e.reason || e.data?.message || e.message || 'Unknown error';
+      addNotification(`Escrow error: ${msg}`, 'error');
     } finally { setEscrowLoading(false); }
   };
 

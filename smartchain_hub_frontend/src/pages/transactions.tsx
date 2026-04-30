@@ -58,7 +58,7 @@ export default function Transactions() {
     setStats({ savings: totalSavings, efficiency, avgConfMs });
   };
 
-  useEffect(() => { fetchTxList(); }, [user]);
+  useEffect(() => { fetchTxList(); }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleOptimize = async () => {
     if (!amount) return;

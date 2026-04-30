@@ -1,38 +1,64 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useWeb3 } from "@/context/Web3Context";
 import { useNotification } from "@/context/NotificationContext";
 import { hasAgentID, mintAgentID, getAgentIdentity } from "@/utils/agentId";
 
 export default function AgentIDCard() {
-  const { signer, isConnected, connectWallet } = useWeb3();
+  const { signer, isConnected, address, connectWallet } = useWeb3();
   const { addNotification } = useNotification();
 
   const [agent, setAgent]         = useState<any>(null);
-  const [initialLoad, setInitialLoad] = useState(true); // only true on first load
+  const [loading, setLoading]     = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
   const [minting, setMinting]     = useState(false);
-  const [refreshing, setRefreshing] = useState(false);  // separate from initialLoad
+  const [refreshing, setRefreshing] = useState(false);
 
-  // fetchAgent never sets initialLoad — only called internally
-  const fetchAgent = useCallback(async (showSpinner = false) => {
-    if (!signer) return;
-    if (showSpinner) setRefreshing(true);
+  // Refs to avoid stale closures and prevent duplicate fetches
+  const signerRef   = useRef(signer);
+  const fetchingRef = useRef(false);   // guard: only one fetch in-flight at a time
+  const addressRef  = useRef<string | null>(null); // track which address we fetched for
+  signerRef.current = signer;
+
+  // ready = wallet connected AND signer available — no blank gap between the two
+  const ready = isConnected && !!signer;
+
+  const fetchAgent = useCallback(async (isRefresh = false) => {
+    const s = signerRef.current;
+    if (!s || fetchingRef.current) return;
+    fetchingRef.current = true;
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
     try {
-      const exists = await hasAgentID(signer);
-      setAgent(exists ? await getAgentIdentity(signer) : null);
-    } catch (e: any) {
-      // Silently fail — don't flicker to empty state on error
+      const exists = await hasAgentID(s);
+      setAgent(exists ? await getAgentIdentity(s) : null);
+      setHasFetched(true);
+    } catch {
+      // keep existing data on error — no flicker
     } finally {
-      if (showSpinner) setRefreshing(false);
-      setInitialLoad(false);
+      setLoading(false);
+      if (isRefresh) setRefreshing(false);
+      fetchingRef.current = false;
     }
-  }, [signer]);
+  }, []);
 
-  // Initial load only
   useEffect(() => {
-    if (!signer) { setInitialLoad(false); return; }
-    setInitialLoad(true);
-    fetchAgent(false);
-  }, [signer]);
+    if (!signer) {
+      // True disconnect — full reset
+      setAgent(null);
+      setHasFetched(false);
+      setLoading(false);
+      fetchingRef.current = false;
+      addressRef.current  = null;
+      return;
+    }
+    // Signer available — only fetch if address changed (guards against signer object recreation)
+    signer.getAddress().then((addr) => {
+      const normalized = addr.toLowerCase();
+      if (addressRef.current === normalized) return;
+      addressRef.current = normalized;
+      fetchAgent(false);
+    }).catch(() => {});
+  }, [signer, fetchAgent]);
 
   const handleMint = async () => {
     if (!signer) return;
@@ -46,7 +72,8 @@ export default function AgentIDCard() {
         return;
       }
       await mintAgentID(signer);
-      await fetchAgent(false);
+      addressRef.current = null; // force re-fetch by clearing address guard
+      await fetchAgent(true);    // isRefresh=true — uses refreshing spinner, not loading
       addNotification("Agent ID minted successfully! ✓", "success");
     } catch (e: any) {
       const msg = e.reason || e.message || "";
@@ -59,7 +86,7 @@ export default function AgentIDCard() {
   };
 
   const handleRefresh = async () => {
-    await fetchAgent(true); // showSpinner=true uses refreshing state, NOT initialLoad
+    await fetchAgent(true);
     addNotification("Agent data refreshed ✓", "success");
   };
 
@@ -99,8 +126,8 @@ export default function AgentIDCard() {
       {/* Body */}
       <div className="relative px-6 py-5">
 
-        {/* NOT CONNECTED */}
-        {!isConnected && (
+        {/* NOT CONNECTED or signer not yet ready */}
+        {!ready && (
           <div className="py-6 text-center space-y-4">
             <div className="w-14 h-14 rounded-2xl bg-gray-800 border border-white/[0.06] flex items-center justify-center mx-auto">
               <svg className="w-7 h-7 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,16 +144,16 @@ export default function AgentIDCard() {
           </div>
         )}
 
-        {/* INITIAL LOADING — only on first fetch, never on refresh */}
-        {isConnected && initialLoad && (
+        {/* LOADING — spinner while fetching, never shown on refresh */}
+        {ready && loading && (
           <div className="flex items-center gap-3 py-6 justify-center">
             <div className="w-4 h-4 rounded-full border-2 border-blue-500/30 border-t-blue-500 animate-spin" />
             <p className="text-sm text-gray-500">Loading agent identity...</p>
           </div>
         )}
 
-        {/* AGENT EXISTS — stays visible even during refresh */}
-        {isConnected && !initialLoad && agent && (
+        {/* AGENT EXISTS — stays visible during refresh */}
+        {ready && hasFetched && agent && (
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-3">
               {[
@@ -198,7 +225,7 @@ export default function AgentIDCard() {
         )}
 
         {/* NO AGENT — MINT */}
-        {isConnected && !initialLoad && !agent && (
+        {ready && hasFetched && !agent && (
           <div className="py-6 text-center space-y-4">
             <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mx-auto">
               <svg className="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

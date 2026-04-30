@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { ethers } from "ethers";
 import { useWeb3 } from "@/context/Web3Context";
 import { useNotification } from "@/context/NotificationContext";
-import { hasAgentID, mintAgentID, getAgentIdentity } from "@/utils/agentId";
+import { hasAgentID, mintAgentID, getAgentIdentity, resetMint } from "@/utils/agentId";
 
 export default function AgentIDCard() {
   const { signer, isConnected, address, connectWallet } = useWeb3();
@@ -12,6 +12,7 @@ export default function AgentIDCard() {
   const [loading, setLoading]     = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
   const [minting, setMinting]     = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   // Refs to avoid stale closures and prevent duplicate fetches
@@ -91,6 +92,28 @@ export default function AgentIDCard() {
       }
     } finally {
       setMinting(false);
+    }
+  };
+
+  const handleReset = async () => {
+    if (!signer) return;
+    if (!window.confirm("Reset your Agent ID? This will delete it on-chain so you can re-mint.")) return;
+    setResetting(true);
+    try {
+      const addr = await signer.getAddress();
+      await resetMint(signer, addr);
+      addressRef.current = null;
+      setAgent(null);
+      setHasFetched(false);
+      await fetchAgent(false);
+      addNotification("Agent ID reset — you can now re-mint ✓", "success");
+    } catch (e: any) {
+      const msg = e.reason || e.message || "";
+      if (!msg.toLowerCase().includes("denied") && !msg.toLowerCase().includes("rejected")) {
+        addNotification(`Reset failed: ${msg}`, "error");
+      }
+    } finally {
+      setResetting(false);
     }
   };
 
@@ -219,17 +242,27 @@ export default function AgentIDCard() {
               Non-transferable · Lives on 0G Chain · Updates on every optimization
             </p>
 
-            {/* Refresh — uses refreshing state, agent data stays visible */}
-            <button onClick={handleRefresh} disabled={refreshing}
-              className="w-full flex items-center justify-center gap-2 py-2 border border-white/[0.06] rounded-xl text-xs text-gray-500 hover:text-gray-300 hover:border-white/[0.12] transition-all disabled:opacity-50">
-              {refreshing ? (
-                <><div className="w-3 h-3 rounded-full border-2 border-gray-500/30 border-t-gray-400 animate-spin" />Refreshing...</>
-              ) : (
-                <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                </svg>Refresh Agent Data</>
-              )}
-            </button>
+            {/* Refresh + Reset row */}
+            <div className="flex gap-2">
+              <button onClick={handleRefresh} disabled={refreshing || resetting}
+                className="flex-1 flex items-center justify-center gap-2 py-2 border border-white/[0.06] rounded-xl text-xs text-gray-500 hover:text-gray-300 hover:border-white/[0.12] transition-all disabled:opacity-50">
+                {refreshing ? (
+                  <><div className="w-3 h-3 rounded-full border-2 border-gray-500/30 border-t-gray-400 animate-spin" />Refreshing...</>
+                ) : (
+                  <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                  </svg>Refresh</>
+                )}
+              </button>
+              <button onClick={handleReset} disabled={resetting || refreshing}
+                className="flex items-center justify-center gap-1.5 px-4 py-2 border border-red-500/20 rounded-xl text-xs text-red-400 hover:text-red-300 hover:border-red-500/40 transition-all disabled:opacity-50">
+                {resetting ? (
+                  <><div className="w-3 h-3 rounded-full border-2 border-red-500/30 border-t-red-400 animate-spin" />Resetting...</>
+                ) : (
+                  <>Reset &amp; Re-mint</>
+                )}
+              </button>
+            </div>
           </div>
         )}
 

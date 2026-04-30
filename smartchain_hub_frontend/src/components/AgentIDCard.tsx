@@ -32,12 +32,12 @@ export default function AgentIDCard() {
     try {
       const exists = await hasAgentID(s);
       setAgent(exists ? await getAgentIdentity(s) : null);
-      setHasFetched(true);
     } catch {
-      // keep existing data on error — no flicker
+      // keep existing agent data on error
     } finally {
       setLoading(false);
       if (isRefresh) setRefreshing(false);
+      setHasFetched(true); // always mark fetched so UI never stays blank
       fetchingRef.current = false;
     }
   }, []);
@@ -68,18 +68,24 @@ export default function AgentIDCard() {
       const ethersProvider = signer.provider as ethers.Provider;
       const addr = await signer.getAddress();
       const balance = await ethersProvider.getBalance(addr);
-      if (balance === BigInt(0)) {
+      // Need at least 0.001 A0GI to cover gas
+      if (balance < ethers.parseEther("0.001")) {
         addNotification("Insufficient A0GI — get tokens from hub.0g.ai/faucet", "error");
         return;
       }
       await mintAgentID(signer);
-      addressRef.current = null; // force re-fetch by clearing address guard
-      await fetchAgent(true);    // isRefresh=true — uses refreshing spinner, not loading
+      addressRef.current = null;
+      await fetchAgent(true);
       addNotification("Agent ID minted successfully! ✓", "success");
     } catch (e: any) {
-      const msg = e.reason || e.message || "";
-      if (!msg.toLowerCase().includes("denied") && !msg.toLowerCase().includes("rejected")) {
-        addNotification(`Mint failed: ${msg}`, "error");
+      const msg = (e.reason || e.data?.message || e.message || "").toLowerCase();
+      if (msg.includes("already minted")) {
+        // Agent exists on-chain but UI hasn't fetched it yet — just refresh
+        addressRef.current = null;
+        await fetchAgent(true);
+        addNotification("Agent ID already exists — loaded! ✓", "success");
+      } else if (!msg.includes("denied") && !msg.includes("rejected") && !msg.includes("user rejected")) {
+        addNotification(`Mint failed: ${e.reason || e.message}`, "error");
       }
     } finally {
       setMinting(false);

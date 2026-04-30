@@ -1,5 +1,8 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { supabase } from "@/utils/supabase";
 
 const stats = [
   { label: "Transactions Optimized", value: "124K+", icon: "⚡" },
@@ -91,6 +94,15 @@ const steps = [
 ];
 
 export default function Home() {
+  const router = useRouter();
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) router.replace('/dashboard');
+    });
+  }, [router]);
+
   return (
     <>
       <Head>
@@ -123,7 +135,7 @@ export default function Home() {
                 SmartChain Hub gives every user a sovereign AI agent with soulbound identity, persistent memory, and TEE-verified intelligence — all powered by the full 0G modular stack.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link href="/signup"
+                <Link href="/dashboard"
                   className="px-7 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/25 text-sm">
                   Launch App →
                 </Link>
@@ -296,7 +308,7 @@ export default function Home() {
             <h3 className="text-3xl font-black text-white mb-4">Ready to launch your sovereign agent?</h3>
             <p className="text-gray-400 mb-8">Connect your wallet, mint your Agent ID, and start optimizing transactions on 0G.</p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/signup"
+              <Link href="/dashboard"
                 className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/25">
                 Get Started Free →
               </Link>

@@ -7,6 +7,11 @@ import { useNotification } from "@/context/NotificationContext";
 import { ethers } from "ethers";
 
 const CLAIM_ABI = ["function claimEarnings() external", "function pendingEarnings(address) external view returns (uint256)"];
+const OG_NETWORK = ethers.Network.from({ chainId: 16602, name: 'og-galileo' });
+const OG_RPC = 'https://evmrpc-testnet.0g.ai';
+const READ_PROVIDER = typeof window !== 'undefined'
+  ? new ethers.JsonRpcProvider(OG_RPC, OG_NETWORK, { staticNetwork: OG_NETWORK })
+  : null;
 
 const DonutChart = ({ pct }: { pct: number }) => {
   const r = 70, cx = 100, cy = 100, circ = 2 * Math.PI * r;
@@ -60,12 +65,12 @@ export default function Revenue() {
 
   // Fetch on-chain pending earnings
   useEffect(() => {
-    if (!signer || !address) return;
+    if (!address) return;
     const contractAddr = process.env.NEXT_PUBLIC_PAYMENTS_CONTRACT;
-    if (!contractAddr) return;
-    const c = new ethers.Contract(contractAddr, CLAIM_ABI, signer);
+    if (!contractAddr || !READ_PROVIDER) return;
+    const c = new ethers.Contract(contractAddr, CLAIM_ABI, READ_PROVIDER);
     c.pendingEarnings(address).then((v: bigint) => setOnChainEarnings(ethers.formatEther(v))).catch(() => {});
-  }, [signer, address]);
+  }, [address]);
 
   const fetchRevenue = async () => {
     if (!user) return;

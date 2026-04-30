@@ -52,12 +52,15 @@ export default function Payments() {
   const [earnings, setEarnings] = useState("0");
 
   // Agent Escrow
-  const [escrowAgentB, setEscrowAgentB] = useState("");
-  const [escrowPrice, setEscrowPrice] = useState("");
-  const [escrowDeposit, setEscrowDeposit] = useState("");
-  const [escrowAgentA, setEscrowAgentA] = useState("");
-  const [escrowChannel, setEscrowChannel] = useState<any>(null);
-  const [escrowLoading, setEscrowLoading] = useState(false);
+  const [escrowAgentB, setEscrowAgentB]           = useState(""); // for Open Channel
+  const [escrowPrice, setEscrowPrice]             = useState("");
+  const [escrowDeposit, setEscrowDeposit]         = useState("");
+  const [escrowAgentA, setEscrowAgentA]           = useState(""); // for Claim Per Call
+  const [escrowWithdrawB, setEscrowWithdrawB]     = useState(""); // for Withdraw — separate from Open
+  const [escrowChannel, setEscrowChannel]         = useState<any>(null);
+  const [escrowLoading, setEscrowLoading]         = useState(false);
+  const [escrowCheckA, setEscrowCheckA]           = useState(""); // for Check Channel
+  const [escrowCheckB, setEscrowCheckB]           = useState(""); // for Check Channel
 
   const PAYMENTS_ADDR = (process.env.NEXT_PUBLIC_PAYMENTS_CONTRACT || '').trim();
 
@@ -203,22 +206,23 @@ export default function Payments() {
   };
 
   const handleEscrowWithdraw = async () => {
-    if (!escrowAgentB || !signer) return;
+    if (!escrowWithdrawB || !signer) return;
     setEscrowLoading(true);
     try {
-      const txHash = await withdrawFromChannel(signer, escrowAgentB);
+      const txHash = await withdrawFromChannel(signer, escrowWithdrawB);
       addNotification(`Withdrawn. Tx: ${txHash.slice(0, 16)}...`, 'success');
+      setEscrowWithdrawB("");
     } catch (e: any) {
-      addNotification(`Withdraw error: ${e.message}`, 'error');
+      addNotification(`Withdraw error: ${e.reason || e.message}`, 'error');
     } finally { setEscrowLoading(false); }
   };
 
   const handleEscrowCheck = async () => {
-    if (!escrowAgentA || !escrowAgentB) return;
+    if (!escrowCheckA || !escrowCheckB) return;
     setEscrowLoading(true);
     try {
       if (!RPC_PROVIDER) throw new Error('Provider not available');
-      const ch = await getChannelState(RPC_PROVIDER, escrowAgentA, escrowAgentB);
+      const ch = await getChannelState(RPC_PROVIDER, escrowCheckA, escrowCheckB);
       setEscrowChannel(ch);
     } catch (e: any) {
       addNotification(`Check error: ${e.message}`, 'error');
@@ -442,24 +446,35 @@ export default function Payments() {
               {/* Settle Call (Agent B) */}
               <div className="space-y-3 mb-6 pt-5 border-t border-gray-800">
                 <h3 className="text-sm font-semibold text-gray-300">Claim Payment (Agent B)</h3>
+                <p className="text-xs text-gray-500">You must be Agent B to claim. Enter Agent A's address.</p>
                 <input type="text" value={escrowAgentA} onChange={e => setEscrowAgentA(e.target.value)} placeholder="Agent A address (0x...)"
                   className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
-                <div className="grid grid-cols-2 gap-3">
-                  <button onClick={handleEscrowSettle} disabled={escrowLoading || !escrowAgentA}
-                    className="py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-colors disabled:opacity-50">
-                    {escrowLoading ? 'Processing...' : 'Claim Per Call'}
-                  </button>
-                  <button onClick={handleEscrowWithdraw} disabled={escrowLoading || !escrowAgentB}
-                    className="py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-colors disabled:opacity-50">
-                    {escrowLoading ? 'Processing...' : 'Withdraw Balance'}
-                  </button>
-                </div>
+                <button onClick={handleEscrowSettle} disabled={escrowLoading || !escrowAgentA}
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-colors disabled:opacity-50">
+                  {escrowLoading ? 'Processing...' : 'Claim Per Call'}
+                </button>
+              </div>
+
+              {/* Withdraw (Agent A) */}
+              <div className="space-y-3 mb-6 pt-5 border-t border-gray-800">
+                <h3 className="text-sm font-semibold text-gray-300">Withdraw Balance (Agent A)</h3>
+                <p className="text-xs text-gray-500">You must be Agent A. Enter Agent B's address to withdraw remaining balance.</p>
+                <input type="text" value={escrowWithdrawB} onChange={e => setEscrowWithdrawB(e.target.value)} placeholder="Agent B address (0x...)"
+                  className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
+                <button onClick={handleEscrowWithdraw} disabled={escrowLoading || !escrowWithdrawB}
+                  className="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-colors disabled:opacity-50">
+                  {escrowLoading ? 'Processing...' : 'Withdraw Balance'}
+                </button>
               </div>
 
               {/* Check Channel */}
               <div className="space-y-3 pt-5 border-t border-gray-800">
                 <h3 className="text-sm font-semibold text-gray-300">Check Channel State</h3>
-                <button onClick={handleEscrowCheck} disabled={escrowLoading || !escrowAgentA || !escrowAgentB}
+                <input type="text" value={escrowCheckA} onChange={e => setEscrowCheckA(e.target.value)} placeholder="Agent A address (0x...)"
+                  className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
+                <input type="text" value={escrowCheckB} onChange={e => setEscrowCheckB(e.target.value)} placeholder="Agent B address (0x...)"
+                  className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
+                <button onClick={handleEscrowCheck} disabled={escrowLoading || !escrowCheckA || !escrowCheckB}
                   className="w-full py-2.5 border border-gray-700 text-gray-400 text-sm font-medium rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-50">
                   {escrowLoading ? 'Loading...' : 'Check Channel'}
                 </button>

@@ -5,6 +5,11 @@
  * Returns: { rootHash, txHash, storageScanUrl }
  */
 import type { NextApiRequest, NextApiResponse } from "next";
+import crypto from "crypto";
+
+function fallbackHash(data: object): string {
+  return "0x" + crypto.createHash("sha256").update(JSON.stringify(data)).digest("hex");
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end();
@@ -14,11 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const privateKey = process.env.STORAGE_PRIVATE_KEY;
   if (!privateKey) {
-    // Fallback: return a deterministic mock hash
-    const content = JSON.stringify(data);
-    const hash = Array.from(content).reduce((h, c) => (Math.imul(31, h) + c.charCodeAt(0)) | 0, 0);
-    const rootHash = `0x${Math.abs(hash).toString(16).padStart(64, "0")}`;
-    return res.status(200).json({ rootHash, txHash: "", storageScanUrl: "" });
+    return res.status(200).json({ rootHash: fallbackHash(data), txHash: "", storageScanUrl: "" });
   }
 
   try {
@@ -49,12 +50,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   } catch (e: any) {
     console.warn("0G Storage upload failed:", e.message);
-    const content = JSON.stringify(data);
-    const hash = Array.from(content).reduce((h, c) => (Math.imul(31, h) + c.charCodeAt(0)) | 0, 0);
-    return res.status(200).json({
-      rootHash: `0x${Math.abs(hash).toString(16).padStart(64, "0")}`,
-      txHash: "",
-      storageScanUrl: "",
-    });
+    return res.status(200).json({ rootHash: fallbackHash(data), txHash: "", storageScanUrl: "" });
   }
 }

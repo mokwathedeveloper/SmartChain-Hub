@@ -79,9 +79,13 @@ export default function Payments() {
     try {
       const c = getReadContract();
       const [amt, rew] = await c.getStake(displayAddress);
-      setStaked({ amount: ethers.formatEther(amt), reward: ethers.formatEther(rew) });
+      // Format with enough precision to show small amounts
+      const amtFormatted = parseFloat(ethers.formatEther(amt)).toFixed(6).replace(/\.?0+$/, '') || '0';
+      const rewFormatted = parseFloat(ethers.formatEther(rew)).toFixed(6).replace(/\.?0+$/, '') || '0';
+      setStaked({ amount: amtFormatted, reward: rewFormatted });
       const earn = await c.pendingEarnings(displayAddress);
-      setEarnings(ethers.formatEther(earn));
+      const earnFormatted = parseFloat(ethers.formatEther(earn)).toFixed(6).replace(/\.?0+$/, '') || '0';
+      setEarnings(earnFormatted);
     } catch {
       // contract not yet deployed or RPC unavailable — show zeros
     }
@@ -372,7 +376,7 @@ export default function Payments() {
               <div>
                 <h3 className="text-base font-bold text-white mb-2">Unstake</h3>
                 <p className="text-sm text-gray-500 mb-4">Withdraw your staked A0GI + accumulated rewards</p>
-                <button onClick={handleUnstake} disabled={loading || staked.amount === "0"}
+                <button onClick={handleUnstake} disabled={loading || parseFloat(staked.amount) === 0}
                   className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-50">
                   {loading ? 'Processing...' : `Unstake ${staked.amount} A0GI`}
                 </button>
@@ -381,7 +385,7 @@ export default function Payments() {
               <div className="pt-4 border-t border-gray-800">
                 <h3 className="text-base font-bold text-white mb-2">Claim Revenue Share</h3>
                 <p className="text-sm text-gray-500 mb-4">Claim your share of platform fees</p>
-                <button onClick={handleClaimEarnings} disabled={loading || earnings === "0"}
+                <button onClick={handleClaimEarnings} disabled={loading || parseFloat(earnings) === 0}
                   className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-50">
                   {loading ? 'Claiming...' : `Claim ${earnings} A0GI`}
                 </button>

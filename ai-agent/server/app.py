@@ -81,7 +81,6 @@ def call_0g_compute(prompt: str) -> dict:
         headers = {
             "Content-Type": "application/json",
             "X-Provider-Address": provider_addr,
-            "X-Private-Key": OG_PRIVATE_KEY,   # broker signs request on-chain
             "X-Verification-Mode": "teeml",
         }
         resp = requests.post(
@@ -131,8 +130,13 @@ def optimize_transaction():
         return jsonify({"error": "Amount is required"}), 400
     try:
         amount = float(amount)
-    except ValueError:
+        if amount <= 0 or amount > 1_000_000_000:
+            return jsonify({"error": "Amount must be between 0 and 1,000,000,000"}), 400
+    except (ValueError, TypeError):
         return jsonify({"error": "Invalid amount format"}), 400
+
+    if priority not in ('efficiency', 'speed', 'security'):
+        priority = 'efficiency'
 
     # Try 0G Compute first
     og_result = call_0g_compute(
@@ -201,27 +205,55 @@ def fine_tune_model():
 
     # If direct transaction data provided, use it
     if transactions:
-        from scripts.fine_tuner import transactions_to_features, fine_tune as _fine_tune
-        import numpy as np, hashlib
+        from scripts.fine_tuner import transactions_to_features, FINE_TUNE_EPOCHS, FINE_TUNE_LR
+        import hashlib, tensorflow as tf
+        from models.savings_model import SavingsModel
+
         X, y = transactions_to_features(transactions)
         n_samples = len(X)
         if n_samples < 10:
             return jsonify({"ok": False, "reason": "insufficient_samples", "samples": n_samples, "min": 10}), 422
         if dry_run:
             return jsonify({"ok": True, "dry_run": True, "samples": n_samples})
-        # Fine-tune with direct data
-        import tensorflow as tf
-        model_obj = get_optimizer().model if hasattr(get_optimizer(), 'model') else None
-        from models.savings_model import SavingsModel
+
         sm = SavingsModel()
-        sm.model.compile(optimizer=tf.keras.optimizers.Adam(0.0001), loss='mse', metrics=['mae'])
-        history = sm.model.fit(X, y, epochs=50, batch_size=min(32, n_samples),
-                               validation_split=0.1 if n_samples >= 20 else 0.0, verbose=0)
+        sm.model.compile(
+            optimizer=tf.keras.optimizers.Adam(FINE_TUNE_LR),
+            loss='mse', metrics=['mae']
+        )
+        history = sm.model.fit(
+            X, y,
+            epochs=FINE_TUNE_EPOCHS,
+            batch_size=min(32, n_samples),
+            validation_split=0.1 if n_samples >= 20 else 0.0,
+            verbose=0
+        )
         sm.model.save(sm.model_path)
         weights_bytes = b"".join(w.tobytes() for w in sm.model.get_weights())
         model_hash = "0x" + hashlib.sha256(weights_bytes).hexdigest()
-        return jsonify({"ok": True, "samples": n_samples, "epochs": 50,
-                        "final_loss": float(history.history["loss"][-1]), "model_hash": model_hash})
+        return jsonify({
+            "ok": True, "samples": n_samples, "epochs": FINE_TUNE_EPOCHS,
+            "final_loss": float(history.history["loss"][-1]), "model_hash": model_hash
+        })
+        sm = SavingsModel()
+        sm.model.compile(
+            optimizer=tf.keras.optimizers.Adam(FINE_TUNE_LR),
+            loss='mse', metrics=['mae']
+        )
+        history = sm.model.fit(
+            X, y,
+            epochs=FINE_TUNE_EPOCHS,
+            batch_size=min(32, n_samples),
+            validation_split=0.1 if n_samples >= 20 else 0.0,
+            verbose=0
+        )
+        sm.model.save(sm.model_path)
+        weights_bytes = b"".join(w.tobytes() for w in sm.model.get_weights())
+        model_hash = "0x" + hashlib.sha256(weights_bytes).hexdigest()
+        return jsonify({
+            "ok": True, "samples": n_samples, "epochs": FINE_TUNE_EPOCHS,
+            "final_loss": float(history.history["loss"][-1]), "model_hash": model_hash
+        })
 
     result = fine_tune(root_hashes, dry_run=dry_run)
     status = 200 if result.get("ok") else 422

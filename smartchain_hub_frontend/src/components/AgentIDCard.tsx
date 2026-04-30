@@ -32,8 +32,10 @@ export default function AgentIDCard() {
     try {
       const exists = await hasAgentID(s);
       setAgent(exists ? await getAgentIdentity(s) : null);
-    } catch {
-      // keep existing agent data on error
+    } catch (err) {
+      // On error during refresh keep existing data; on first load leave agent null
+      // hasFetched still set true in finally so UI shows mint button as fallback
+      console.error('[AgentIDCard] fetchAgent error:', err);
     } finally {
       setLoading(false);
       if (isRefresh) setRefreshing(false);

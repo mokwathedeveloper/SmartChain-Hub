@@ -20,26 +20,35 @@ export const MODEL_HASH = ethers.keccak256(
   ethers.toUtf8Bytes("SmartChain-TF-SavingsModel-v2.16-6feature")
 );
 
+const OG_NETWORK = ethers.Network.from({ chainId: 16602, name: 'og-galileo' });
+const OG_RPC     = 'https://evmrpc-testnet.0g.ai';
+
+/** Read-only provider — static network skips detection, avoids timeout on 0G Galileo */
+function getReadProvider() {
+  return new ethers.JsonRpcProvider(OG_RPC, OG_NETWORK, { staticNetwork: OG_NETWORK });
+}
+
 function getContract(signer: ethers.Signer) {
   const addr = process.env.NEXT_PUBLIC_AGENT_ID_CONTRACT;
   if (!addr) throw new Error("NEXT_PUBLIC_AGENT_ID_CONTRACT not set");
-  // Use checksummed address to prevent ethers from attempting ENS resolution
-  // 0G Galileo Testnet does not support ENS
   return new ethers.Contract(ethers.getAddress(addr), AGENT_ID_ABI, signer);
+}
+
+function getReadContract() {
+  const addr = process.env.NEXT_PUBLIC_AGENT_ID_CONTRACT;
+  if (!addr) throw new Error("NEXT_PUBLIC_AGENT_ID_CONTRACT not set");
+  return new ethers.Contract(ethers.getAddress(addr), AGENT_ID_ABI, getReadProvider());
 }
 
 /** Check if user already has an Agent ID minted. */
 export async function hasAgentID(signer: ethers.Signer): Promise<boolean> {
-  const addr = await signer.getAddress();
-  // Pass checksummed address directly — 0G chain does not support ENS
-  const contract = getContract(signer);
-  return contract.hasMinted(ethers.getAddress(addr));
+  const addr = ethers.getAddress(await signer.getAddress());
+  return getReadContract().hasMinted(addr);
 }
 
 /** Mint a soulbound Agent ID for the user. One per wallet. */
 export async function mintAgentID(signer: ethers.Signer): Promise<string> {
-  const contract = getContract(signer);
-  const tx = await contract.mintAgentID(MODEL_HASH);
+  const tx = await getContract(signer).mintAgentID(MODEL_HASH);
   const receipt = await tx.wait();
   return receipt.hash;
 }
@@ -50,22 +59,19 @@ export async function updateAgentMemory(
   memoryRootHex: string,
   savingsUsd: number
 ): Promise<string> {
-  const contract = getContract(signer);
-  // Convert USD savings to wei-equivalent (1 USD = 1e15 for display purposes)
   const savingsWei = BigInt(Math.round(savingsUsd * 1e15));
   const memoryRoot = memoryRootHex.startsWith("0x")
     ? memoryRootHex.padEnd(66, "0").slice(0, 66)
     : `0x${memoryRootHex.padEnd(64, "0").slice(0, 64)}`;
-  const tx = await contract.updateMemory(memoryRoot, savingsWei);
+  const tx = await getContract(signer).updateMemory(memoryRoot, savingsWei);
   const receipt = await tx.wait();
   return receipt.hash;
 }
 
 /** Fetch the agent's full on-chain identity. */
 export async function getAgentIdentity(signer: ethers.Signer) {
-  // Use checksummed address directly — 0G chain does not support ENS
   const addr = ethers.getAddress(await signer.getAddress());
-  const agent = await getContract(signer).getAgent(addr);
+  const agent = await getReadContract().getAgent(addr);
   return {
     exists:       agent.exists,
     memoryRoot:   agent.memoryRoot,

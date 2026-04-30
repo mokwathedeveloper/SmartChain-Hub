@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    entry_point, to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
+    entry_point, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
 };
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -46,7 +46,7 @@ pub fn execute(
             // 1. Verify that Fee + Savings matches the expected market delta.
             // 2. Perform threshold check using the proof_factor.
             
-            let total_delta = fee + savings;
+            let _total_delta = fee + savings;
             let efficiency_ratio = (savings as f64) / (amount as f64);
 
             // Logic: Reject if efficiency is abnormally high (possible exploit) 
@@ -67,6 +67,6 @@ pub fn execute(
 #[entry_point]
 pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetVersion {} => to_binary("v0.1.0-rust-layer"),
+        QueryMsg::GetVersion {} => to_json_binary("v0.1.0-rust-layer"),
     }
 }

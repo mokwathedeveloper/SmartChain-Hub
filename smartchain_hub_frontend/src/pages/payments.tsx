@@ -418,7 +418,14 @@ export default function Payments() {
           <div className="space-y-5">
             <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
               <h2 className="text-base font-bold text-white mb-1">Agent-to-Agent Micropayments</h2>
-              <p className="text-xs text-gray-500 mb-5">Open a payment channel with another agent. Agent B claims A0GI per API call rendered.</p>
+              <p className="text-xs text-gray-500 mb-2">Open a payment channel with another agent. Agent B claims A0GI per API call rendered.</p>
+              {/* Active channel hint */}
+              <div className="mb-5 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-xs text-blue-300">
+                <p className="font-semibold mb-1">Active channel on-chain:</p>
+                <p>Agent A (you): <span className="font-mono">{address || '—'}</span></p>
+                <p>Agent B: <span className="font-mono">0x756c8FaCaF44B673D0b0BAA76C11D9ED81065ef2</span></p>
+                <p>Balance: 0.01 A0GI · Active: true</p>
+              </div>
 
               {/* Open / Top-up Channel */}
               <div className="space-y-3 mb-6">
@@ -446,33 +453,37 @@ export default function Payments() {
               {/* Settle Call (Agent B) */}
               <div className="space-y-3 mb-6 pt-5 border-t border-gray-800">
                 <h3 className="text-sm font-semibold text-gray-300">Claim Payment (Agent B)</h3>
-                <p className="text-xs text-gray-500">You must be Agent B to claim. Enter Agent A's address.</p>
-                <input type="text" value={escrowAgentA} onChange={e => setEscrowAgentA(e.target.value)} placeholder="Agent A address (0x...)"
+                <p className="text-xs text-gray-500">Only works if your wallet IS Agent B. Enter the Agent A address who opened the channel.</p>
+                <input type="text" value={escrowAgentA} onChange={e => setEscrowAgentA(e.target.value)}
+                  placeholder="Agent A address — who deposited funds (0x...)"
                   className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
                 <button onClick={handleEscrowSettle} disabled={escrowLoading || !escrowAgentA}
                   className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-colors disabled:opacity-50">
-                  {escrowLoading ? 'Processing...' : 'Claim Per Call'}
+                  {escrowLoading ? 'Processing...' : 'Claim Per Call (as Agent B)'}
                 </button>
               </div>
 
               {/* Withdraw (Agent A) */}
               <div className="space-y-3 mb-6 pt-5 border-t border-gray-800">
                 <h3 className="text-sm font-semibold text-gray-300">Withdraw Balance (Agent A)</h3>
-                <p className="text-xs text-gray-500">You must be Agent A. Enter Agent B's address to withdraw remaining balance.</p>
-                <input type="text" value={escrowWithdrawB} onChange={e => setEscrowWithdrawB(e.target.value)} placeholder="Agent B address (0x...)"
+                <p className="text-xs text-gray-500">Only works if your wallet IS Agent A. Enter the Agent B address you opened the channel with.</p>
+                <input type="text" value={escrowWithdrawB} onChange={e => setEscrowWithdrawB(e.target.value)}
+                  placeholder="Agent B address — who you paid per call (0x...)"
                   className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
                 <button onClick={handleEscrowWithdraw} disabled={escrowLoading || !escrowWithdrawB}
                   className="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-colors disabled:opacity-50">
-                  {escrowLoading ? 'Processing...' : 'Withdraw Balance'}
+                  {escrowLoading ? 'Processing...' : 'Withdraw Remaining Balance (as Agent A)'}
                 </button>
               </div>
 
               {/* Check Channel */}
               <div className="space-y-3 pt-5 border-t border-gray-800">
                 <h3 className="text-sm font-semibold text-gray-300">Check Channel State</h3>
-                <input type="text" value={escrowCheckA} onChange={e => setEscrowCheckA(e.target.value)} placeholder="Agent A address (0x...)"
+                <input type="text" value={escrowCheckA} onChange={e => setEscrowCheckA(e.target.value)}
+                  placeholder="Agent A address — who deposited (0x...)"
                   className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
-                <input type="text" value={escrowCheckB} onChange={e => setEscrowCheckB(e.target.value)} placeholder="Agent B address (0x...)"
+                <input type="text" value={escrowCheckB} onChange={e => setEscrowCheckB(e.target.value)}
+                  placeholder="Agent B address — who claims per call (0x...)"
                   className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
                 <button onClick={handleEscrowCheck} disabled={escrowLoading || !escrowCheckA || !escrowCheckB}
                   className="w-full py-2.5 border border-gray-700 text-gray-400 text-sm font-medium rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-50">

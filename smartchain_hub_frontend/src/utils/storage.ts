@@ -20,13 +20,11 @@ async function uploadToZeroGStorage(data: object): Promise<StorageUploadResult> 
     return res.json();
   } catch (err) {
     console.warn("0G Storage unavailable, using fallback:", err);
-    const content = JSON.stringify(data);
-    const hash = Array.from(content).reduce((h, c) => (Math.imul(31, h) + c.charCodeAt(0)) | 0, 0);
-    return {
-      rootHash: `0x${Math.abs(hash).toString(16).padStart(64, "0")}`,
-      txHash: "",
-      storageScanUrl: "",
-    };
+    // Browser-safe fallback hash using SubtleCrypto
+    const encoded = new TextEncoder().encode(JSON.stringify(data));
+    const hashBuf = await crypto.subtle.digest('SHA-256', encoded);
+    const hashHex = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    return { rootHash: `0x${hashHex}`, txHash: "", storageScanUrl: "" };
   }
 }
 

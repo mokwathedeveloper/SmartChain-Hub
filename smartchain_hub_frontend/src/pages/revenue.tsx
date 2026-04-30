@@ -54,7 +54,7 @@ const DonutChart = ({ pct }: { pct: number }) => {
 };
 
 export default function Revenue() {
-  const { user } = useAuth();
+  const { user } = useAuth(false); // false = don't redirect if no session
   const { signer, isConnected, address } = useWeb3();
   const { addNotification } = useNotification();
   const [shares, setShares] = useState<any[]>([]);
@@ -62,15 +62,31 @@ export default function Revenue() {
   const [loading, setLoading] = useState(true);
   const [claiming, setClaiming] = useState(false);
   const [onChainEarnings, setOnChainEarnings] = useState("0");
+  const [onChainStake, setOnChainStake] = useState("0");
+  const [onChainReward, setOnChainReward] = useState("0");
 
-  // Fetch on-chain pending earnings
+  // Fetch on-chain pending earnings, stake and reward
   useEffect(() => {
     if (!address) return;
     const contractAddr = process.env.NEXT_PUBLIC_PAYMENTS_CONTRACT;
     if (!contractAddr || !READ_PROVIDER) return;
-    const c = new ethers.Contract(contractAddr, CLAIM_ABI, READ_PROVIDER);
+    const STAKE_ABI = [
+      'function claimEarnings() external',
+      'function pendingEarnings(address) external view returns (uint256)',
+      'function getStake(address user) external view returns (uint256 amount, uint256 reward)',
+    ];
+    const c = new ethers.Contract(contractAddr, STAKE_ABI, READ_PROVIDER);
     c.pendingEarnings(address).then((v: bigint) => setOnChainEarnings(ethers.formatEther(v))).catch(() => {});
+    c.getStake(address).then(([amt, rew]: [bigint, bigint]) => {
+      setOnChainStake(ethers.formatEther(amt));
+      setOnChainReward(ethers.formatEther(rew));
+    }).catch(() => {});
   }, [address]);
+
+  useEffect(() => {
+    if (!user) { setLoading(false); return; }
+    fetchRevenue();
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchRevenue = async () => {
     if (!user) return;
@@ -81,33 +97,29 @@ export default function Revenue() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchRevenue(); }, [user]);
-
   const totalPool = shares.reduce((s, r) => s + Number(r.total_platform_revenue || 0), 0);
   const yourShare = shares.reduce((s, r) => s + Number(r.user_share || 0), 0);
   const unclaimedAmt = unclaimed.reduce((s, r) => s + Number(r.user_share || 0), 0);
   const sharePct = totalPool > 0 ? (yourShare / totalPool) * 100 : 22.8;
 
   const handleClaim = async () => {
-    if (!user) return;
     setClaiming(true);
     try {
-      // On-chain claim if wallet connected
       if (isConnected && signer && process.env.NEXT_PUBLIC_PAYMENTS_CONTRACT) {
         const c = new ethers.Contract(process.env.NEXT_PUBLIC_PAYMENTS_CONTRACT, CLAIM_ABI, signer);
         const tx = await c.claimEarnings();
         await tx.wait();
         setOnChainEarnings("0");
+        addNotification('Earnings claimed successfully ✓', 'success');
       }
-      // Mark Supabase records claimed
-      if (unclaimedAmt > 0) {
+      if (user && unclaimedAmt > 0) {
         await supabase.from('revenue_shares').update({ claimed: true }).eq('user_id', user.id).eq('claimed', false);
         const { data: profile } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
         await supabase.from('profiles').update({ balance: (profile?.balance || 0) + unclaimedAmt }).eq('id', user.id);
         fetchRevenue();
       }
     } catch (e: any) {
-      addNotification(`Claim failed: ${e.message}`, 'error');
+      addNotification(`Claim failed: ${e.reason || e.message}`, 'error');
     } finally { setClaiming(false); }
   };
 
@@ -117,6 +129,28 @@ export default function Revenue() {
     <>
       <Head><title>Revenue Sharing | SmartChain Hub</title></Head>
       <div className="space-y-6">
+        {/* On-chain stats — always visible when wallet connected */}
+        {address && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-emerald-500/[0.06] border border-emerald-500/20 rounded-2xl p-6">
+              <p className="text-xs text-gray-500 mb-1">Claimable Earnings (On-chain)</p>
+              <span className="text-3xl font-bold text-emerald-400">{parseFloat(onChainEarnings).toFixed(6)} A0GI</span>
+              <p className="text-xs text-gray-600 mt-1">Claim via Payments → Withdraw</p>
+            </div>
+            <div className="bg-blue-500/[0.06] border border-blue-500/20 rounded-2xl p-6">
+              <p className="text-xs text-gray-500 mb-1">Your Stake (On-chain)</p>
+              <span className="text-3xl font-bold text-blue-400">{parseFloat(onChainStake).toFixed(6)} A0GI</span>
+              <p className="text-xs text-gray-600 mt-1">5% APY · Earning rewards</p>
+            </div>
+            <div className="bg-purple-500/[0.06] border border-purple-500/20 rounded-2xl p-6">
+              <p className="text-xs text-gray-500 mb-1">Staking Reward (On-chain)</p>
+              <span className="text-3xl font-bold text-purple-400">{parseFloat(onChainReward).toFixed(9)} A0GI</span>
+              <p className="text-xs text-gray-600 mt-1">Accruing continuously</p>
+            </div>
+          </div>
+        )}
+
+        {/* Supabase revenue records */}
         <div className="flex gap-6 border-b border-gray-700">
           <button className="pb-3 text-sm font-semibold text-blue-600 border-b-2 border-blue-600">Total Pool</button>
           <span className="pb-3 text-sm text-gray-500">${totalPool.toLocaleString()}</span>
@@ -143,13 +177,16 @@ export default function Revenue() {
         <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <DonutChart pct={sharePct} />
-            {unclaimedAmt > 0 && (
+            {(unclaimedAmt > 0 || parseFloat(onChainEarnings) > 0) && (
               <div className="text-center">
                 <p className="text-sm text-gray-500 mb-2">Available to claim</p>
-                <p className="text-3xl font-bold text-white mb-4">${unclaimedAmt.toFixed(2)}</p>
-                <button onClick={handleClaim} disabled={claiming || (unclaimedAmt <= 0 && onChainEarnings === "0")}
+                <p className="text-3xl font-bold text-white mb-1">
+                  {parseFloat(onChainEarnings) > 0 ? `${parseFloat(onChainEarnings).toFixed(6)} A0GI` : `$${unclaimedAmt.toFixed(2)}`}
+                </p>
+                {parseFloat(onChainEarnings) > 0 && <p className="text-xs text-gray-500 mb-4">on-chain claimable</p>}
+                <button onClick={handleClaim} disabled={claiming || (!isConnected && unclaimedAmt <= 0)}
                   className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-50">
-                  {claiming ? 'Claiming...' : `Claim Now${onChainEarnings !== "0" ? ` (${onChainEarnings} A0GI on-chain)` : ''}`}
+                  {claiming ? 'Claiming...' : `Claim Now`}
                 </button>
               </div>
             )}

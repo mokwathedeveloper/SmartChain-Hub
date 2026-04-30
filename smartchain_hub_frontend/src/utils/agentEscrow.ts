@@ -16,9 +16,8 @@ const ESCROW_ABI = [
 ];
 
 function getEscrowAddress(): string {
-  const addr = process.env.NEXT_PUBLIC_AGENT_ESCROW_CONTRACT;
-  if (!addr) throw new Error("NEXT_PUBLIC_AGENT_ESCROW_CONTRACT not configured");
-  return addr;
+  const addr = process.env.NEXT_PUBLIC_AGENT_ESCROW_CONTRACT || '0x0A3951414c4097AF78953a97e49ad38293e9eA17';
+  return ethers.getAddress(addr); // checksummed
 }
 
 function getContract(signerOrProvider: ethers.Signer | ethers.Provider) {

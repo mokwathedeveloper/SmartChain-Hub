@@ -128,7 +128,7 @@ main();
 | Frontend | https://smartchainhubfrontend.vercel.app | ✅ Live |
 | AI Agent | https://smartchain-ai-agent.onrender.com | ✅ Healthy |
 | Payments Contract | `0x540a...7eB` on 0G Galileo | ✅ Deployed |
-| AgentID Contract | `0x0Dd3...c911` on 0G Galileo | ✅ Deployed |
+| AgentID Contract | `0x69C619374c6B901b99941Df7238fceb80d7DCd08` on 0G Galileo | ✅ Deployed (canonical) |
 
 ---
 

@@ -1,91 +1,253 @@
+<div align="center">
 
-# SmartChain Hub: User Journey and Detailed Wireframe
+<img src="../logo/logo.png" alt="SmartChain Hub" width="100" />
 
-## User Journey Breakdown
+# ⛓ SmartChain Hub — User Journey & Wireframes
+### *End-to-end user flows across all 16 pages*
 
-### 1. User Logs In
-- **Action**: The user logs into **SmartChain Hub** using their credentials (via **Supabase authentication**).
-- **Expected Outcome**: The user is successfully logged in and directed to the **Dashboard Landing Page**.
-- **Key Components**: 
-  - **Login Form**: Email and password fields, with options for **forgot password** and **sign-up**.
+[![Live](https://img.shields.io/badge/Live-smartchainhubfrontend.vercel.app-6366f1?style=for-the-badge)](https://smartchainhubfrontend.vercel.app)
+[![0G Galileo](https://img.shields.io/badge/Network-0G_Galileo_Testnet-0ea5e9?style=for-the-badge)](https://scan-testnet.0g.ai)
+[![Track 3](https://img.shields.io/badge/Track_3-Agentic_Economy-10b981?style=for-the-badge)](https://0g.ai)
 
-### 2. Dashboard Landing Page
-- **Action**: After logging in, the user is greeted with a **personalized hero section**.
-- **Expected Outcome**: The user sees their **current balance**, **recent transactions**, and **AI-driven transaction optimization** suggestions.
-- **Key Components**:
-  - **Hero Section**: Displays user’s name, current balance, and recent transaction statistics.
-  - **AI Transaction Optimization**: A form that lets users input **transaction details** (amount and transaction type).
-  - **Blockchain Transactions**: Users can see **pending** and **confirmed transactions** in real-time.
-  - **Revenue Sharing**: Display the user's share of **revenue** from optimized transactions, with an option to **claim earnings**.
-
-### 3. Transaction Optimization
-- **Action**: The user inputs **transaction data** and the system returns **optimized results** for the best transaction route and cost.
-- **Expected Outcome**: The user receives the **optimized transaction details** and can choose to **confirm** or **modify** the transaction.
-- **Key Components**:
-  - **Transaction Input Form**: Inputs for **amount**, **transaction type**, and **destination**.
-  - **Optimized Transaction Recommendations**: Based on AI-driven analysis, the user sees the **optimized transaction route**.
-
-### 4. Blockchain Interaction
-- **Action**: Once the user confirms the transaction, the **blockchain interaction** happens automatically in the backend via **smart contracts**.
-- **Expected Outcome**: The transaction is confirmed on the **blockchain**, and the user receives real-time updates on the **transaction status**.
-- **Key Components**:
-  - **Transaction Status**: Displays the **current status** (pending, confirmed) of the blockchain transaction.
-  - **Smart Contract Interaction**: Blockchain **smart contracts** handle the transaction execution and verification.
-
-### 5. Revenue Sharing
-- **Action**: The user checks their **revenue share** from previous transactions and claims any earnings.
-- **Expected Outcome**: The user sees how much **revenue** they have earned from transaction optimizations and clicks **claim** to receive their earnings.
-- **Key Components**:
-  - **Revenue Summary**: Displays the user's **share of revenue**.
-  - **Claim Revenue Button**: A button to allow users to claim their share of earnings.
-
-### 6. Profile and Settings
-- **Action**: The user can navigate to their **profile settings** to manage their account and preferences.
-- **Expected Outcome**: The user can edit their **profile** information and log out.
-- **Key Components**:
-  - **Profile Form**: Editable fields for **user name**, **email**, **preferences**, etc.
-  - **Logout Option**: Option for the user to log out of their account.
-
-## Wireframes for SmartChain Hub
-
-### 1. Login Page Wireframe
-- **Components**: 
-  - **Login Form**: Input fields for **Email** and **Password**.
-  - **Forgot Password** link and **Sign-Up** link.
-![Login Page Wireframe](sandbox:/mnt/data/a_wireframe_design_of_a_dashboard_landing_page_is.png)
-
-### 2. Dashboard Landing Page Wireframe
-- **Components**:
-  - **Hero Section**: Personalized greeting, current balance, and recent transactions.
-  - **AI Transaction Optimization**: Form for entering transaction data.
-  - **Blockchain Transactions**: Display pending and confirmed transactions.
-  - **Revenue Sharing**: Displays the user’s revenue share.
-![Dashboard Landing Page Wireframe](sandbox:/mnt/data/a_wireframe_design_of_a_dashboard_landing_page_is.png)
-
-### 3. Transaction Optimization Wireframe
-- **Components**:
-  - **Transaction Input Form**: Users input the **amount** and **transaction type**.
-  - **Optimized Results**: AI-driven optimized transaction suggestions.
-![Transaction Optimization Wireframe](sandbox:/mnt/data/a_wireframe_design_of_a_dashboard_landing_page_is.png)
-
-### 4. Blockchain Transaction Status Wireframe
-- **Components**:
-  - **Transaction Status**: Shows the status of the user’s blockchain transaction (e.g., **pending**, **confirmed**).
-  - **Transaction Details**: Detailed view of the transaction, including **transaction hash** and confirmation status.
-
-### 5. Revenue Sharing Wireframe
-- **Components**:
-  - **Revenue Summary**: Display of the user’s revenue share from optimized transactions.
-  - **Claim Revenue Button**: Button to claim available earnings.
-
-### 6. Profile Settings Wireframe
-- **Components**:
-  - **Profile Form**: Allows users to edit their name, email, and preferences.
-  - **Logout Option**: Button to log out.
+</div>
 
 ---
 
-### Next Steps:
-1. **Frontend Development**: Start by implementing the **Dashboard Page**, **Transaction Optimization**, and **Blockchain Integration** using the **wireframes** as a reference.
-2. **Backend Integration**: Ensure that the **Supabase backend** is set up to handle **user authentication**, **transaction data**, and **real-time updates**.
-3. **Blockchain Smart Contract**: Implement and deploy the **smart contracts** for **transaction validation** and **revenue sharing**.
+## Complete User Journey
+
+```
+New User
+    │
+    ▼
+[1] Landing Page (/)
+    Hero section · Features · CTA
+    → "Get Started" → /signup
+    → "Connect Wallet" → MetaMask SDK
+    │
+    ▼
+[2] Sign Up / Login (/signup · /login)
+    Supabase email + password auth
+    OR wallet-only (no Supabase session required for Agent ID)
+    │
+    ▼
+[3] Dashboard (/dashboard)
+    ├── AgentIDCard
+    │     No Agent ID? → Mint Agent ID button
+    │     Has Agent ID? → Shows reputation · memoryRoot · modelHash
+    │     TEE badge (green) or Local AI badge (blue)
+    │
+    ├── Fine-tune AI Model panel
+    │     Fetches storage_roots from Supabase
+    │     Sends to /api/fine-tune → Flask AI Agent
+    │     Returns: samples · loss · model_hash
+    │
+    ├── Stats cards: Transactions (30d) · Revenue · Agent Reputation
+    ├── Transaction Volume bar chart (30 days)
+    ├── Recent Activity table
+    └── Route Performance table
+    │
+    ▼
+[4] Transactions (/transactions)
+    ├── Optimize tab
+    │     Enter $amount · select priority (efficiency/speed/security)
+    │     → POST /optimize → AI Agent
+    │     Result: fee · savings · route · confidence · risk · congestion
+    │     TEE badge (if 0G Compute available)
+    │     → Confirm & Save:
+    │         POST /api/zk-proof → ZK commitment (purple badge)
+    │         POST /api/storage-upload → 0G Storage Log (rootHash)
+    │         POST /api/agent-memory → 0G Storage KV
+    │         supabase.insert('transactions')
+    │         AgentID.updateMemory() → reputation++ on-chain
+    │
+    ├── Analyze tab
+    │     Route breakdown bar chart
+    │     Summary table: route · count · fees · savings · efficiency %
+    │     Savings over time mini chart
+    │
+    └── Simulate tab
+          Enter amount · select route
+          Run Simulation → estimated fee · time · savings · risk
+          (no real transaction executed)
+    │
+    ▼
+[5] Payments (/payments)
+    ├── Send tab
+    │     Recipient address · amount · memo
+    │     sendFunds() → 0.5% fee → stakers
+    │
+    ├── Stake tab
+    │     Stake A0GI → 5% APY time-weighted
+    │     Unstake → principal + accrued reward
+    │
+    ├── Withdraw tab
+    │     Claimable earnings from revenue distribution
+    │     claimEarnings() → pull-based
+    │
+    └── Agent Escrow tab
+          Open channel: Agent B address · price/call · deposit amount
+          Check channel state: balance · calls · active
+          Claim per call (as Agent B)
+          Withdraw remaining (as Agent A)
+    │
+    ▼
+[6] Revenue (/revenue)
+    Revenue shares from Supabase revenue_shares table
+    Requires Supabase auth session
+    On-chain earnings claimable via Payments → Withdraw tab
+    │
+    ▼
+[7] Profile (/profile)
+    Agent identity display
+    Memory root (0G KV)
+    Model hash (TF weights)
+    Total optimizations · total savings
+    │
+    ▼
+[8] History (/history)
+    Full transaction history from Supabase
+    Columns: tx hash · date · amount · fee · savings · route · status
+    │
+    ▼
+[9] On-ramp (/onramp)
+    Buy A0GI with:
+    ├── Credit/Debit Card (Stripe Checkout)
+    │     POST /api/onramp/stripe → Stripe session
+    │     Webhook: /api/onramp/stripe-webhook
+    │
+    └── M-Pesa (Flutterwave STK Push)
+          POST /api/onramp/mpesa → Flutterwave
+          Webhook: /api/onramp/mpesa-webhook
+          Kenya mobile money (+254XXXXXXXXX)
+```
+
+---
+
+## Page-by-Page Wireframe Reference
+
+### Landing Page (`/`)
+
+```
+┌─────────────────────────────────────────────────────┐
+│  HEADER: Logo · Nav · Connect Wallet                │
+├─────────────────────────────────────────────────────┤
+│  HERO                                               │
+│  "The First Sovereign AI Agent Economy on 0G"       │
+│  [Get Started]  [View Demo]                         │
+├─────────────────────────────────────────────────────┤
+│  FEATURES (3 columns)                               │
+│  🪪 Soulbound ID  🧠 Persistent Memory  🔬 TEE AI  │
+├─────────────────────────────────────────────────────┤
+│  STATS: Agents · Transactions · Revenue             │
+├─────────────────────────────────────────────────────┤
+│  FOOTER                                             │
+└─────────────────────────────────────────────────────┘
+```
+
+### Dashboard (`/dashboard`)
+
+```
+┌─────────────────────────────────────────────────────┐
+│  SIDEBAR  │  AGENT ID CARD                          │
+│           │  ┌─────────────────────────────────┐   │
+│  Dashboard│  │ 0G Agent ID · Soulbound          │   │
+│  Txns     │  │ Reputation: 3 · Since: Jan 2026  │   │
+│  Payments │  │ Memory Root: 0x1a2b...           │   │
+│  Revenue  │  │ Model Hash:  0x3c4d...           │   │
+│  Profile  │  │ ✓ AI Inference Active — TF 2.16  │   │
+│  History  │  │ [Refresh]  [Reset & Re-mint]     │   │
+│  Console  │  └─────────────────────────────────┘   │
+│  On-ramp  │                                         │
+│           │  FINE-TUNE PANEL                        │
+│           │  [Fine-tune Model]                      │
+│           │                                         │
+│           │  STATS: Txns · Revenue · Reputation     │
+│           │                                         │
+│           │  BAR CHART: 30-day volume               │
+│           │                                         │
+│           │  RECENT ACTIVITY TABLE                  │
+└─────────────────────────────────────────────────────┘
+```
+
+### Transactions (`/transactions`)
+
+```
+┌─────────────────────────────────────────────────────┐
+│  TABS: [Optimize] [Analyze] [Simulate]              │
+├─────────────────────────────────────────────────────┤
+│  STATS: Savings · Efficiency · Avg Confirmation     │
+├─────────────────────────────────────────────────────┤
+│  OPTIMIZE TAB                                       │
+│  Amount: [$____]                                    │
+│  Priority: [Efficiency] [Speed] [Security]          │
+│  [Optimize Transaction]                             │
+│                                                     │
+│  RESULT (after optimize):                           │
+│  Fee: $3.00  Savings: $18.85  Time: 8s              │
+│  Route: 0G Chain Flash Route                        │
+│  ┌─────────────────────────────────────────────┐   │
+│  │ ✓ AI Inference Active — TF 2.16  [0G AI]   │   │
+│  └─────────────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────────────┐   │
+│  │ ✓ ZK Proof Generated  Commitment: 0x1a2b.. │   │
+│  └─────────────────────────────────────────────┘   │
+│  [Reset]  [Confirm & Save]                          │
+└─────────────────────────────────────────────────────┘
+```
+
+### Payments (`/payments`)
+
+```
+┌─────────────────────────────────────────────────────┐
+│  TABS: [Send] [Stake] [Withdraw] [Agent Escrow]     │
+├─────────────────────────────────────────────────────┤
+│  AGENT ESCROW TAB                                   │
+│  Agent B Address: [0x____________________]          │
+│  Price per call:  [0.001] A0GI                      │
+│  Deposit amount:  [0.01]  A0GI                      │
+│  [Open / Top-up Channel]                            │
+│                                                     │
+│  Channel State:                                     │
+│  Balance: 0.01 A0GI · Price/call: 0.001 · Active   │
+│                                                     │
+│  [Claim Per Call (as Agent B)]                      │
+│  [Withdraw Remaining (as Agent A)]                  │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+## Screenshots
+
+| Dashboard | Transaction Optimizer | Agent ID Card |
+|---|---|---|
+| ![Dashboard](../mockups/dashboard1.png) | ![Transactions](../mockups/transaction.png) | ![Profile](../mockups/profile.png) |
+
+| Revenue Dashboard | Login | All Pages |
+|---|---|---|
+| ![Revenue](../mockups/revenuedashboard.png) | ![Login](../mockups/login.png) | ![All Pages](../mockups/allpagesmockups.png) |
+
+---
+
+## Key UX Decisions
+
+| Decision | Rationale |
+|---|---|
+| Wallet-only mode (no Supabase required) | AgentIDCard works with wallet alone — no forced login |
+| `hydrateAgentMemory()` on every mount | Cross-device sync happens automatically — user never loses state |
+| Dual-write localStorage + 0G KV | Instant UI responsiveness + durable persistence |
+| TEE badge vs Local AI badge | Transparent about inference source — builds trust |
+| ZK badge on confirm | Visual proof that optimization is cryptographically verified |
+| SHA-256 fallback for ZK | Groth16 requires compiled circuit — fallback keeps flow unblocked |
+| `version` field in AgentMemory | Prevents stale cache overwrites on cross-device sync |
+| `fetchingRef` guard in AgentIDCard | Prevents duplicate in-flight fetches on signer recreation |
+
+---
+
+<div align="center">
+
+**SmartChain Hub** · User Journey & Wireframes · 0G APAC Hackathon 2026
+
+`#BuildOn0G` · `#AgenticEconomy`
+
+</div>

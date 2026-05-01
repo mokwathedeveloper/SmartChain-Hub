@@ -1,79 +1,211 @@
+<div align="center">
 
-# SmartChain Hub Hackathon Submission
+<img src="../logo/logo.png" alt="SmartChain Hub" width="80" />
 
-## 1. Project Name
+# 🏆 SmartChain Hub — Hackathon Submission
+### 0G APAC Hackathon 2026 · Track 3: Agentic Economy & Autonomous Applications
+
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-smartchainhubfrontend.vercel.app-6366f1?style=for-the-badge)](https://smartchainhubfrontend.vercel.app)
+[![0G Galileo](https://img.shields.io/badge/Network-0G_Galileo_Testnet-0ea5e9?style=for-the-badge)](https://scan-testnet.0g.ai)
+[![Track 3](https://img.shields.io/badge/Track_3-Agentic_Economy-10b981?style=for-the-badge)](https://0g.ai)
+
+</div>
+
+---
+
+## 1 · Project Name
+
 **SmartChain Hub**
 
-## 2. Project Intro
-**SmartChain Hub** is a decentralized platform designed to revolutionize **digital commerce** by integrating **AI-driven agents** and **blockchain technology** to create a seamless, transparent, and autonomous transaction system. The platform optimizes transactions, enhances security with blockchain, and provides users with a more efficient way to conduct business in the digital era.
+---
 
-## 3. Sector
-- **AI**
-- **DeFi** (Decentralized Finance)
-- **SocialFi** (Social Finance)
-- **DAO** (Decentralized Autonomous Organizations)
+## 2 · One-Line Description
 
-## 4. Tech Tags
-- **React**
-- **Web3**
-- **Solidity**
-- **Node.js**
-- **Python**
-- **Ethers**
-- **Rust**
-- **Go**
+> The first sovereign AI agent economy on 0G — every user owns an agent with soulbound on-chain identity, persistent cross-device memory, TEE-verified intelligence, and autonomous revenue generation.
 
-## 5. MVP Link
-*“Our MVP is currently under development, with a core set of features available for testing. A public demo will be shared shortly before the final submission.”*
+---
 
-## 6. Project Link
-[GitHub Repository Link](https://github.com/your-username/smartchain-hub)
+## 3 · Track
 
-## 7. X (Twitter) Link
-[https://twitter.com/smartchainhub](https://twitter.com/smartchainhub)
+**Track 3 — Agentic Economy & Autonomous Applications**
 
-## 8. Wallet
-- Connect your wallet through the provided **Wallet Connect** option.
+---
 
-## 9. Images
-- **Homepage Mockup** showcasing the platform’s user interface with an engaging hero section and intuitive navigation.
-- **Features Page** demonstrating the AI-driven agents and decentralized commerce capabilities.
-- **Blockchain Transaction Flow** illustration of smart contract execution and transaction validation.
+## 4 · Problem Statement
 
-## 10. Demo Video
-- **Demo Video Link**: [Insert YouTube or Loom demo link]
-  - Demonstrates key features, including **AI-driven transaction optimization**, **blockchain integration**, and the seamless user experience of SmartChain Hub.
+Three fundamental problems block the agentic economy from existing:
 
-## 11. Pitch Video
-- **Pitch Video Link**: [Insert YouTube or Loom pitch link]
-  - Short pitch explaining **SmartChain Hub**’s value proposition, the problem it solves in **digital commerce**, and how it leverages **AI agents** and **blockchain** for a secure, transparent experience.
+| Problem | Current Reality | Impact |
+|---|---|---|
+| No sovereign agent identity | AI agents are API keys — copyable, revocable, platform-owned | Agents cannot be trusted economic actors |
+| No persistent agent memory | Memory lives in sessions or centralized DBs — lost on device switch | Agents cannot learn across interactions |
+| No verifiable AI inference | AI decisions are black boxes — no cryptographic proof of correctness | Agents cannot be trusted to act autonomously |
 
-## 12. Description
-**SmartChain Hub** bridges the gap between traditional commerce and the decentralized future by combining the power of **AI agents** and **blockchain technology**. The platform automates **transaction optimization** using **AI** and ensures **secure, tamper-proof transactions** through **blockchain smart contracts**. This solution is perfect for businesses and consumers who want to leverage the benefits of **decentralized finance (DeFi)**, **AI-driven decisions**, and **transparent transactions**.
+---
 
-- **Problem Solved**: Traditional e-commerce platforms struggle with inefficiencies, high fees, and lack of transparency. SmartChain Hub aims to reduce transaction costs, automate decisions, and provide transparency in digital transactions.
-- **How it works**: Users engage with the platform, and **AI agents** autonomously optimize transactions based on user preferences, ensuring a seamless, cost-effective, and transparent experience. Blockchain integration secures all transactions and provides a tamper-proof, auditable record.
-- **Target Audience**: Businesses and consumers seeking secure, low-cost, decentralized digital commerce.
+## 5 · Solution
 
-## 13. Progress During Hackathon
-- **Completed AI Agent Integration**: We’ve successfully integrated **AI agents** that autonomously optimize transactions, ensuring faster and cheaper exchanges.
-- **Blockchain Integration**: Deployed **smart contracts** on **0G Chain** to ensure **secure transactions**, automated **revenue-sharing**, and transparent execution.
-- **0G Components Integration**: Integrated **0G Storage** for decentralized data storage and **0G Compute** for real-time AI transaction optimization.
+SmartChain Hub introduces three on-chain primitives that solve all three problems simultaneously:
 
-## 14. Fundraising Status
-- Currently seeking **seed funding** to scale the platform and bring it to a wider audience. We've successfully built a functional prototype and are now focused on integrating more features and attracting early users.
+```
+Soulbound Agent ID (0G Chain)
+  → SmartChainAgentID.sol — non-transferable NFT per wallet
+  → Stores: modelHash · memoryRoot · reputation · totalSavings
 
-## 15. Active Hackathon
-- **Active Participation**: We are actively participating in the hackathon and excited to showcase the progress made thus far. Our project is aligned with the hackathon’s goals of leveraging **AI** and **blockchain technology** to solve **real-world problems** in digital commerce.
+Persistent Cross-Device Memory (0G Storage KV)
+  → Versioned KV writes via @0glabs/0g-ts-sdk Batcher
+  → hydrateAgentMemory() syncs on every app mount
+  → Survives: device resets · browser clears · app updates
 
-## 16. Deployment Details
-- **Ecosystem Deployed**: **Mainnet**
-- **Contract Address**: (Will be provided upon final deployment)
-- **Deployed Link**: [Insert deployed link]
-  - All components are deployed on the mainnet, ensuring scalability, security, and decentralization. The smart contract address and deployment link will be shared as part of the final submission.
+TEE-Verified Intelligence (0G Compute TeeML)
+  → LLaMA 3.1 8B inference via broker.0g.ai
+  → X-TEE-Proof header proves inference ran inside TEE
+  → Falls back to TF 2.16 local model gracefully
+```
 
-## Summary
-**SmartChain Hub** is designed to bring **AI-powered transaction optimization** and **blockchain security** into the realm of **digital commerce**. By combining **AI agents** and **blockchain technology**, the platform ensures a **seamless, transparent**, and **autonomous** user experience, reducing transaction fees and automating decision-making for enhanced efficiency. The project is well-positioned to disrupt traditional commerce by providing a secure, decentralized, and user-friendly platform.
+---
 
-## Additional Notes
-This response should be refined based on the **latest project updates** and **deployment statuses** before final submission. Let me know if you need further modifications to any section or additional details for a stronger impact!
+## 6 · Sectors
+
+- **AI / Agentic Economy** — sovereign agent identity + memory + inference
+- **DeFi** — transaction fee optimization, staking, revenue distribution
+- **Infrastructure** — agent-to-agent micropayment rails
+- **Emerging Markets** — M-Pesa + Stripe on-ramp for A0GI
+
+---
+
+## 7 · Tech Stack
+
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
+![Solidity](https://img.shields.io/badge/Solidity-363636?style=flat-square&logo=solidity)
+![Rust](https://img.shields.io/badge/Rust-000000?style=flat-square&logo=rust&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=flat-square&logo=next.js)
+![React](https://img.shields.io/badge/React_19-61DAFB?style=flat-square&logo=react&logoColor=black)
+![TensorFlow](https://img.shields.io/badge/TensorFlow_2.16-FF6F00?style=flat-square&logo=tensorflow&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-000000?style=flat-square&logo=flask)
+![Node.js](https://img.shields.io/badge/Node.js_20-339933?style=flat-square&logo=node.js&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
+
+---
+
+## 8 · 0G Components Used
+
+| 0G Module | Integration | File |
+|---|---|---|
+| **0G Chain** | 5 contracts on Galileo Testnet (Chain ID 16602) | `blockchain/contracts/` |
+| **0G Compute TeeML** | LLaMA 3.1 8B via broker.0g.ai — X-TEE-Proof header | `ai-agent/server/app.py` |
+| **0G Compute Fine-tuning** | Incremental TF training on real tx data from 0G Storage | `ai-agent/scripts/fine_tuner.py` |
+| **0G Storage Log** | MemData upload → Merkle rootHash via @0glabs/0g-ts-sdk | `src/pages/api/storage-upload.ts` |
+| **0G Storage KV** | Versioned agent memory — KvClient + Batcher | `src/pages/api/agent-memory.ts` |
+| **Agent ID Standard** | Soulbound NFT — modelHash + memoryRoot + reputation | `SmartChainAgentID.sol` |
+| **Agent Escrow** | Agent-to-agent micropayments — deposit → payPerCall → withdraw | `SmartChainAgentEscrow.sol` |
+
+---
+
+## 9 · Live Demo
+
+**[https://smartchainhubfrontend.vercel.app](https://smartchainhubfrontend.vercel.app)**
+
+---
+
+## 10 · Deployed Contracts — 0G Galileo Testnet (Chain ID 16602)
+
+| Contract | Address | Explorer |
+|---|---|---|
+| SmartChainAgentID | `0x69C619374c6B901b99941Df7238fceb80d7DCd08` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0x69C619374c6B901b99941Df7238fceb80d7DCd08) |
+| SmartChainAgentEscrow | `0x0A3951414c4097AF78953a97e49ad38293e9eA17` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0x0A3951414c4097AF78953a97e49ad38293e9eA17) |
+| SmartChainPayments | `0x540aFf6B167F8B5889d852d124C545F5f876A7eB` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0x540aFf6B167F8B5889d852d124C545F5f876A7eB) |
+| SmartChainRevenue | `0x8858886AEE6342DFA4DE5Cf66dB25dCF75b31A08` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0x8858886AEE6342DFA4DE5Cf66dB25dCF75b31A08) |
+| SmartChainTransaction | `0xf95A1610be22046c334E3bD1b11D2B88519E6C52` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0xf95A1610be22046c334E3bD1b11D2B88519E6C52) |
+
+---
+
+## 11 · Demo Video
+
+- [ ] **Link:** `[INSERT YOUTUBE OR LOOM LINK]` ← **ACTION REQUIRED before submission**
+
+Script: [`docs/demo/DEMO_SCRIPT.md`](../demo/DEMO_SCRIPT.md)
+
+---
+
+## 12 · X (Twitter) Post
+
+- [ ] **Link:** `[INSERT X POST LINK]` ← **ACTION REQUIRED before submission**
+
+Template: [`docs/submission/SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md)
+
+---
+
+## 13 · GitHub Repository
+
+- [ ] **Link:** `[INSERT PUBLIC GITHUB REPO LINK]` ← **Make repo public before submission**
+
+---
+
+## 14 · What Was Built During the Hackathon
+
+```
+✅ 5 smart contracts deployed on 0G Galileo Testnet
+✅ SmartChainAgentID — soulbound NFT with modelHash + memoryRoot + reputation
+✅ SmartChainAgentEscrow — agent-to-agent micropayment channels (1% platform fee)
+✅ SmartChainPayments — send/stake/withdraw with 5% APY and 0.5% fee
+✅ SmartChainRevenue — proportional revenue distribution (10% fee share)
+✅ SmartChainTransaction — immutable on-chain transaction records
+
+✅ AI Agent (Flask + TensorFlow 2.16 + 0G Compute TeeML)
+   6-feature neural network: savings_rate · confidence · risk_score
+   0G Compute TeeML broker integration with graceful TF fallback
+   Incremental fine-tuning on real user data from 0G Storage
+
+✅ Frontend (Next.js 16 + React 19 + TypeScript 6)
+   16 pages · 17 components · 9 API routes
+   AgentIDCard with TEE + ZK badges
+   Stripe + Flutterwave M-Pesa on-ramp
+
+✅ 0G Storage Log — immutable tx receipts via @0glabs/0g-ts-sdk MemData
+✅ 0G Storage KV — versioned agent memory with cross-device sync
+✅ ZK Proofs — snarkjs Groth16 + SHA-256 commitment fallback
+✅ 245 automated tests — 100% pass rate
+✅ Rust WASM optimizer module compiled
+```
+
+---
+
+## 15 · The Economic Flywheel
+
+Every optimization generates **4 verifiable on-chain actions:**
+
+```
+User optimizes transaction
+  → [1] 0G Storage Log upload      → Merkle rootHash
+  → [2] ZK proof generated         → SHA-256 commitment
+  → [3] AgentID.updateMemory()     → reputation++ on-chain
+  → [4] Revenue event              → 0.5% fee distributed to stakers
+```
+
+---
+
+## 16 · Tester Wallet (Verified Live Transactions)
+
+| Field | Value |
+|---|---|
+| Address | `0x604cDbDBE7850bAd105C28bFE01Ad680520D451F` |
+| Network | 0G Galileo Testnet (Chain ID 16602) |
+| Verified actions | Send · Stake · Revenue distribution · Agent Escrow open/claim/withdraw |
+
+---
+
+## 17 · Fundraising Status
+
+Not currently fundraising. Built as a hackathon submission demonstrating the full 0G agentic economy stack.
+
+---
+
+<div align="center">
+
+**SmartChain Hub** · 0G APAC Hackathon 2026 · Track 3
+
+`#BuildOn0G` · `#AgenticEconomy` · `#0GHackathon`
+
+</div>

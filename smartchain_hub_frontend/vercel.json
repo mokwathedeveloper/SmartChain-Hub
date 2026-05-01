@@ -4,6 +4,12 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "regions": ["sin1"],
+  "crons": [
+    {
+      "path": "/api/keepalive",
+      "schedule": "*/14 * * * *"
+    }
+  ],
   "functions": {
     "src/pages/api/storage-upload.ts": {
       "maxDuration": 30

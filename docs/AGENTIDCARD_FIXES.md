@@ -233,11 +233,13 @@ vercel --prod
 
 ## Contract Addresses (Final)
 
-| Contract | Address | Network |
-|---|---|---|
-| SmartChainAgentID (new) | `0x0Dd3Ac67C684630273d5369a5DBaC174EB44c911` | 0G Galileo |
-| SmartChainAgentID (old) | `0x69C619374c6B901b99941Df7238fceb80d7DCd08` | 0G Galileo |
-| SmartChainTransaction | `0xf95A1610be22046c334E3bD1b11D2B88519E6C52` | 0G Galileo |
-| SmartChainRevenue | `0x8858886AEE6342DFA4DE5Cf66dB25dCF75b31A08` | 0G Galileo |
-| SmartChainPayments | `0x540aFf6B167F8B5889d852d124C545F5f876A7eB` | 0G Galileo |
-| SmartChainAgentEscrow | `0x0A3951414c4097AF78953a97e49ad38293e9eA17` | 0G Galileo |
+| Contract | Address | Network | Notes |
+|---|---|---|---|
+| SmartChainAgentID **(active)** | `0x69C619374c6B901b99941Df7238fceb80d7DCd08` | 0G Galileo | Used in README · SUBMISSION_CHECKLIST · all docs |
+| SmartChainAgentID (local .env.local) | `0x0Dd3Ac67C684630273d5369a5DBaC174EB44c911` | 0G Galileo | Redeployed with `resetMint()` — used in `.env.local` + `agentId.ts` fallback |
+| SmartChainTransaction | `0xf95A1610be22046c334E3bD1b11D2B88519E6C52` | 0G Galileo | |
+| SmartChainRevenue | `0x8858886AEE6342DFA4DE5Cf66dB25dCF75b31A08` | 0G Galileo | |
+| SmartChainPayments | `0x540aFf6B167F8B5889d852d124C545F5f876A7eB` | 0G Galileo | |
+| SmartChainAgentEscrow | `0x0A3951414c4097AF78953a97e49ad38293e9eA17` | 0G Galileo | |
+
+> **Note:** Two AgentID contract addresses exist because the contract was redeployed to add `resetMint()`. The `.env.local` uses `0x0Dd3...` (newer, has resetMint). The README and submission docs use `0x69C6...` (original). Both are deployed and functional on 0G Galileo Testnet. For the hackathon submission, use `0x69C619374c6B901b99941Df7238fceb80d7DCd08` as the canonical address.

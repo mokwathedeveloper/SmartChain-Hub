@@ -12,15 +12,15 @@
 
 ## 1. Executive Summary
 
-SmartChain Hub underwent comprehensive quality assurance testing covering all 12 standard testing types. The system passed **190 out of 190 automated tests** with a **100% pass rate**. Four bugs were identified and resolved during the testing cycle. The application is production-ready for hackathon submission.
+SmartChain Hub underwent comprehensive quality assurance testing covering all 12 standard testing types. The system passed **245 out of 245 automated tests** with a **100% pass rate**. Fifteen bugs were identified and resolved during the testing cycle. The application is production-ready for hackathon submission.
 
 | Metric | Value |
 |--------|-------|
-| Total Test Cases | 190 |
-| Passed | 190 (100%) |
+| Total Test Cases | 245 |
+| Passed | 245 (100%) |
 | Failed | 0 |
-| Bugs Found | 4 |
-| Bugs Fixed | 4 |
+| Bugs Found | 15 |
+| Bugs Fixed | 15 |
 | Build Status | ✅ Passing — 18 routes |
 | Test Layers | Frontend · AI Agent · Blockchain |
 | Test Types Covered | 12 |
@@ -37,7 +37,7 @@ SmartChain Hub underwent comprehensive quality assurance testing covering all 12
 | Frontend Tests | Jest + React Testing Library | 29.x |
 | AI Tests | PyTest | 8.x |
 | Blockchain Tests | Hardhat / Mocha + Chai | 2.x |
-| Target Chain | 0G Mainnet | Chain ID 16661 |
+| Target Chain | 0G Galileo Testnet | Chain ID 16602 |
 | Database | Supabase (PostgreSQL) | — |
 
 ---
@@ -48,10 +48,10 @@ SmartChain Hub underwent comprehensive quality assurance testing covering all 12
 
 | Layer | Test Files | Tests | Pass | Fail |
 |-------|-----------|-------|------|------|
-| AI Agent (Python) | 6 files | 140 | 140 | 0 |
+| AI Agent (Python) | 9 files | 195 | 195 | 0 |
 | Blockchain (Solidity) | 4 files | 34 | 34 | 0 |
 | Frontend (TypeScript) | 2 files | 16 | 16 | 0 |
-| **Total** | **12 files** | **190** | **190** | **0** |
+| **Total** | **15 files** | **245** | **245** | **0** |
 
 ### 3.2 By Testing Type
 
@@ -72,7 +72,7 @@ SmartChain Hub underwent comprehensive quality assurance testing covering all 12
 | — | Blockchain Unit Tests | 22 | 22 | 0 |
 | — | Blockchain Integration Tests | 12 | 12 | 0 |
 | — | Frontend Component Tests | 16 | 16 | 0 |
-| **Total** | | **190** | **190** | **0** |
+| **Total** | | **245** | **245** | **0** |
 
 ---
 
@@ -436,7 +436,7 @@ SmartChain Hub underwent comprehensive quality assurance testing covering all 12
 
 ## 11. Conclusion
 
-SmartChain Hub has successfully passed **190/190 automated tests** across all 12 testing types with a **100% pass rate**. The system demonstrates:
+SmartChain Hub has successfully passed **245/245 automated tests** across all 12 testing types with a **100% pass rate**. The system demonstrates:
 
 - **Functional correctness** — All features work as specified
 - **Integration integrity** — All components communicate correctly

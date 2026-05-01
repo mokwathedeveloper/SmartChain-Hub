@@ -235,25 +235,6 @@ def fine_tune_model():
             "ok": True, "samples": n_samples, "epochs": FINE_TUNE_EPOCHS,
             "final_loss": float(history.history["loss"][-1]), "model_hash": model_hash
         })
-        sm = SavingsModel()
-        sm.model.compile(
-            optimizer=tf.keras.optimizers.Adam(FINE_TUNE_LR),
-            loss='mse', metrics=['mae']
-        )
-        history = sm.model.fit(
-            X, y,
-            epochs=FINE_TUNE_EPOCHS,
-            batch_size=min(32, n_samples),
-            validation_split=0.1 if n_samples >= 20 else 0.0,
-            verbose=0
-        )
-        sm.model.save(sm.model_path)
-        weights_bytes = b"".join(w.tobytes() for w in sm.model.get_weights())
-        model_hash = "0x" + hashlib.sha256(weights_bytes).hexdigest()
-        return jsonify({
-            "ok": True, "samples": n_samples, "epochs": FINE_TUNE_EPOCHS,
-            "final_loss": float(history.history["loss"][-1]), "model_hash": model_hash
-        })
 
     result = fine_tune(root_hashes, dry_run=dry_run)
     status = 200 if result.get("ok") else 422

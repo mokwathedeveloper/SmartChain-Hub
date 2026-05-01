@@ -29,7 +29,7 @@ function getReadProvider() {
   return new ethers.JsonRpcProvider(OG_RPC, OG_NETWORK, { staticNetwork: OG_NETWORK });
 }
 
-const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_AGENT_ID_CONTRACT || '0x0Dd3Ac67C684630273d5369a5DBaC174EB44c911';
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_AGENT_ID_CONTRACT || '0x69C619374c6B901b99941Df7238fceb80d7DCd08';
 
 function getContract(signer: ethers.Signer) {
   return new ethers.Contract(ethers.getAddress(CONTRACT_ADDRESS), AGENT_ID_ABI, signer);

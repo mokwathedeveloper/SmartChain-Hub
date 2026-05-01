@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { Indexer, MemData } = await import("@0glabs/0g-ts-sdk");
     const { ethers } = await import("ethers");
 
-    const OG_STORAGE_RPC = "https://evmrpc.0g.ai";
+    const OG_STORAGE_RPC = "https://evmrpc-testnet.0g.ai";
     const OG_INDEXER_RPC = "https://indexer-storage-testnet-standard.0g.ai";
 
     const provider = new ethers.JsonRpcProvider(OG_STORAGE_RPC);

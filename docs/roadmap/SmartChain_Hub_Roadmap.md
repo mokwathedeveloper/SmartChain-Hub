@@ -1,168 +1,223 @@
+<div align="center">
 
-# SmartChain Hub: Full Roadmap for Development and Deployment
+<img src="../logo/logo.png" alt="SmartChain Hub" width="80" />
 
-## Phase 1: Conceptualization & Planning
+# 🗺️ SmartChain Hub — Product Roadmap
+### *From Hackathon Primitive to Sovereign Agent Economy*
 
-### 1.1. Project Kickoff
-- Define the **vision** and **objectives** for SmartChain Hub.
-- Set clear milestones and deliverables for each stage of development.
-- Finalize the **technology stack** (Next.js, TypeScript, Supabase, Solidity, AI Agents).
+[![Status](https://img.shields.io/badge/Status-Hackathon_Live-10b981?style=for-the-badge)](https://smartchainhubfrontend.vercel.app)
+[![Network](https://img.shields.io/badge/Network-0G_Galileo_Testnet-0ea5e9?style=for-the-badge)](https://scan-testnet.0g.ai)
 
-### 1.2. Requirement Gathering
-- Identify and define the **core features** of the app, including:
-  - **AI-driven transaction optimization**
-  - **Blockchain transaction integration**
-  - **Revenue sharing**
-  - **User authentication** and **profile management**
-
-### 1.3. System Architecture Design
-- Plan the **system architecture**, including the interaction between the **frontend**, **backend**, **blockchain**, and **AI agents**.
-- Define how **Supabase** will be used for **authentication**, **real-time updates**, and **database management**.
-- Design how **smart contracts** and **AI agents** will integrate with the system.
+</div>
 
 ---
 
-## Phase 2: UI/UX Design & Prototyping
+## Current State — What Is Live Today
 
-### 2.1. Wireframing & Mockups
-- Create **high-fidelity wireframes** for each page of the app, including the **Dashboard**, **Profile Settings**, and **AI Optimization** page.
-- Design **UI components** using **Tailwind CSS** to ensure a clean, responsive, and modern look.
-- Create **interactive mockups** to visualize how users will interact with the platform.
-
-### 2.2. User Testing
-- Conduct initial **user testing** on the **mockups** and **wireframes** to gather feedback on usability and design.
-- Refine the **UI/UX** based on user feedback.
-
----
-
-## Phase 3: Frontend Development
-
-### 3.1. Set Up Frontend Project
-- Initialize the **Next.js** app with **TypeScript**.
-- Install **Tailwind CSS** and set up project styles.
-  
-### 3.2. Dashboard Landing Page Development
-- Implement the **Hero Section** with personalized greeting, balance, and recent transactions.
-- Develop **AI-driven transaction optimization** component.
-- Implement **Blockchain Transactions** status and view all transactions.
-- Build the **Revenue Sharing** section and **Profile Settings** page.
-  
-### 3.3. Integrate with Supabase
-- Connect the frontend with **Supabase** for **authentication** and **real-time updates**.
-- Implement the logic to fetch and display **user data** and **transactions**.
+```
+LAYER               COMPONENT                          STATUS
+────────────────────────────────────────────────────────────────
+0G Chain            SmartChainAgentID (soulbound NFT)  ✅ Deployed
+0G Chain            SmartChainAgentEscrow              ✅ Deployed
+0G Chain            SmartChainPayments                 ✅ Deployed
+0G Chain            SmartChainRevenue                  ✅ Deployed
+0G Chain            SmartChainTransaction              ✅ Deployed
+0G Compute          TeeML broker integration           ✅ Live
+0G Compute          TF 2.16 fallback model             ✅ Live
+0G Storage Log      MemData upload → Merkle root       ✅ Live
+0G Storage KV       Versioned agent memory             ✅ Live
+ZK Proofs           SHA-256 commitment fallback        ✅ Live
+Frontend            15 pages on Vercel                 ✅ Live
+AI Agent            Flask + Gunicorn on Render         ✅ Live
+Database            Supabase (6 migrations)            ✅ Live
+On-ramp             Stripe + Flutterwave M-Pesa        ✅ Live
+Testing             9 test suites (unit → security)    ✅ Complete
+```
 
 ---
 
-## Phase 4: Backend Development with Supabase
+## Phase 1 — Foundation ✅ Complete
 
-### 4.1. Set Up Supabase Project
-- Create a **Supabase project** to handle the **database**, **authentication**, and **real-time functionality**.
-- Define **database schemas** for **users**, **transactions**, and **revenue sharing**.
+**Goal:** Prove the full 0G stack works end-to-end in a single product.
 
-### 4.2. Create Backend APIs
-- Set up API routes to handle requests for **transaction optimization**, **blockchain interaction**, and **user profile management**.
-- Implement **serverless functions** using **Supabase Edge Functions** for **AI optimization** logic.
+```
+[✅] Soulbound Agent ID minted on 0G Chain
+      └── mintAgentID(modelHash) · one per wallet · non-transferable
 
-### 4.3. Real-Time Data Fetching
-- Use **Supabase subscriptions** to listen for updates to **transactions** and **revenue shares**.
-- Set up **real-time notifications** to update the frontend when transactions are confirmed or completed.
+[✅] TEE-verified inference via 0G Compute TeeML
+      └── LLaMA 3.1 8B · X-TEE-Proof header · tee_verified: true
 
----
+[✅] Immutable receipts on 0G Storage Log
+      └── @0glabs/0g-ts-sdk MemData · Merkle rootHash returned
 
-## Phase 5: AI Agent Integration
+[✅] Versioned agent memory on 0G Storage KV
+      └── hydrateAgentMemory() · cross-device sync on mount
 
-### 5.1. Implement AI Transaction Optimization
-- Integrate the **AI-driven agent** that will optimize transaction details (e.g., best route, lowest fees).
-- Use **Python** (via **Flask** or **FastAPI**) to expose AI algorithms as API endpoints.
-  
-### 5.2. Integrate AI with Backend
-- Set up backend calls to interact with the **AI agent** for optimizing transactions.
-- Ensure that the **AI model** is trained and produces accurate results for real-time optimization.
+[✅] ZK proof generation
+      └── SHA-256 commitment · Groth16 path ready for circuit files
 
----
+[✅] Agent-to-agent micropayments
+      └── SmartChainAgentEscrow · deposit → payPerCall → withdraw
 
-## Phase 6: Blockchain Integration
+[✅] Autonomous revenue distribution
+      └── SmartChainRevenue · 10% fee share · proportional to stake
 
-### 6.1. Develop Smart Contracts
-- Write **Solidity smart contracts** to handle **transaction validation**, **revenue sharing**, and **transaction fee management**.
-  
-### 6.2. Deploy Smart Contracts
-- Deploy **smart contracts** on a **blockchain network** (e.g., **0G Chain**, **Ethereum**).
-- Set up **Ethers.js** or **Web3.js** to interact with **smart contracts** via the frontend.
-
-### 6.3. Integrate Blockchain with Backend
-- Set up **backend logic** to interact with **blockchain transactions**.
-- Validate transactions and handle **smart contract interactions**.
+[✅] Self-improving AI model
+      └── Fine-tune TF on real user data from 0G Storage roots
+```
 
 ---
 
-## Phase 7: Testing and Quality Assurance
+## Phase 2 — Production Hardening 🔜 Next
 
-### 7.1. Unit Testing
-- Write **unit tests** for **frontend** components using **Jest** and **React Testing Library**.
-- Write **backend tests** for **AI agent optimization**, **blockchain interaction**, and **Supabase API endpoints** using **Mocha** or **Chai**.
+**Goal:** Make every component production-grade and fully verifiable.
 
-### 7.2. Integration Testing
-- Perform **integration tests** to ensure smooth communication between **frontend**, **backend**, **AI agents**, and **blockchain**.
-- Test **real-time updates** from **Supabase** and **AI agent integration**.
+```
+[ ] Full Groth16 ZK proofs
+      └── Compile Circom circuit: transaction_optimizer.circom
+      └── Generate proving keys with snarkjs
+      └── Deploy circuit files to /circuits directory
+      └── Replace SHA-256 fallback with real ZK proof
+      └── 0G Module: 0G Privacy
 
-### 7.3. User Acceptance Testing (UAT)
-- Test the **full flow** of the application with **real users** to identify issues related to usability, design, and performance.
-  
----
+[ ] Fine-tune with real production data
+      └── Accumulate ≥10 real user transactions in Supabase
+      └── Trigger fine-tune from dashboard
+      └── Commit new model_hash to AgentID on-chain
+      └── 0G Module: 0G Compute
 
-## Phase 8: Deployment
+[ ] Official 0G Persistent Memory module
+      └── Migrate from custom KV implementation
+      └── Use official 0G Persistent Memory SDK when released
+      └── 0G Module: 0G Persistent Memory
 
-### 8.1. Frontend Deployment
-- Deploy the **frontend** app to a platform like **Vercel** or **Netlify** for hosting and **continuous deployment**.
-
-### 8.2. Backend Deployment
-- Deploy the **backend** API (Supabase functions and Node.js) to platforms like **Heroku** or **AWS**.
-
-### 8.3. Smart Contract Deployment
-- Deploy **smart contracts** to the blockchain (e.g., **0G Chain**, **Ethereum**).
-- Integrate the deployed contracts into the backend.
-
----
-
-## Phase 9: Post-Launch and Maintenance
-
-### 9.1. Monitor Performance
-- Use **analytics tools** like **Google Analytics** or **Mixpanel** to track user interactions.
-- Monitor **blockchain transaction speeds** and **network costs**.
-
-### 9.2. Collect Feedback
-- Gather feedback from users and improve features based on their experience.
-- Implement improvements in **AI optimization**, **UI/UX**, and **blockchain interaction**.
-
-### 9.3. Ongoing Maintenance
-- Regularly update **AI models** for **transaction optimization** based on user feedback and transaction patterns.
-- Maintain **smart contracts** and ensure **security updates**.
+[ ] Mainnet deployment
+      └── Deploy all 5 contracts to 0G Mainnet (Chain ID 16661)
+      └── Update all contract addresses in frontend
+      └── Fund deployer wallet with mainnet A0GI
+```
 
 ---
 
-## Timeline and Milestones
+## Phase 3 — Agentic Economy Expansion 🔮 Future
 
-### Q1 2026:
-- Kickoff project and finalize technology stack.
-- Start with **UI/UX design** and wireframing.
+**Goal:** Enable true multi-agent coordination and autonomous economic activity.
 
-### Q2 2026:
-- Complete **frontend development** and integrate **Supabase**.
-- Implement **blockchain integration** with **smart contracts** and **AI optimization**.
+```
+[ ] Multi-agent coordination
+      └── Agents hiring agents via SmartChainAgentEscrow
+      └── Agent reputation used as trust signal for hiring
+      └── Automated service discovery via on-chain registry
+      └── 0G Module: 0G Chain
 
-### Q3 2026:
-- Testing and QA phase.
-- Start **deployment** of **frontend**, **backend**, and **smart contracts**.
+[ ] Agent marketplace
+      └── Agents listing services with price-per-call
+      └── Buyers browsing by reputation + specialization
+      └── Revenue automatically distributed to service agents
+      └── 0G Module: 0G Chain + 0G Storage
 
-### Q4 2026:
-- Final testing, debugging, and user feedback collection.
-- Launch the product and initiate **user growth** strategies.
+[ ] Cross-chain agent identity
+      └── Bridge Agent ID to other EVM chains
+      └── Reputation portable across ecosystems
+      └── 0G Module: 0G Chain
+
+[ ] Federated fine-tuning
+      └── Multiple users' data combined (privacy-preserving)
+      └── Federated learning across agent network
+      └── Model improvements shared across all agents
+      └── 0G Module: 0G Compute + 0G Storage
+```
 
 ---
 
-## Conclusion
+## Phase 4 — Ecosystem & Scale 🌐 Vision
 
-This roadmap gives a structured approach to building the **SmartChain Hub** app with **AI-driven optimization**, **blockchain integration**, and **real-time updates**. Each phase focuses on different aspects of development, from **design** to **deployment**, ensuring that the application is secure, efficient, and user-friendly.
+**Goal:** Become the default identity and memory layer for all AI agents on 0G.
 
-Let me know if you need to adjust or add anything to this roadmap or if you’re ready to start implementing the next phase!
+```
+[ ] SDK release
+      └── npm package: @smartchain/agent-sdk
+      └── Any dApp can give users a sovereign agent identity
+      └── Plug-and-play: AgentIDCard component
+
+[ ] Developer API
+      └── REST API for agent memory read/write
+      └── Webhook support for on-chain events
+      └── Rate-limited free tier + paid plans
+
+[ ] Mobile app
+      └── React Native agent wallet
+      └── Push notifications for revenue events
+      └── Biometric agent authentication
+
+[ ] Governance
+      └── Agent reputation used for protocol governance votes
+      └── Stakers vote on fee parameters
+      └── On-chain treasury managed by top-reputation agents
+```
+
+---
+
+## Milestone Timeline
+
+```
+Q1 2026  ████████████████████  HACKATHON — Full 0G stack live
+                                5 contracts · AI agent · 15 pages
+
+Q2 2026  ████████████░░░░░░░░  PRODUCTION HARDENING
+                                Groth16 ZK · real fine-tune data
+                                Mainnet deployment
+
+Q3 2026  ████████░░░░░░░░░░░░  AGENTIC ECONOMY
+                                Multi-agent coordination
+                                Agent marketplace
+
+Q4 2026  ████░░░░░░░░░░░░░░░░  ECOSYSTEM
+                                SDK release · Developer API
+                                Mobile app
+
+Q1 2027  ██░░░░░░░░░░░░░░░░░░  GOVERNANCE
+                                On-chain treasury
+                                Protocol governance
+```
+
+---
+
+## Success Metrics
+
+| Metric | Hackathon | 3 Months | 12 Months |
+|---|---|---|---|
+| Agent IDs minted | 1 (demo) | 1,000 | 100,000 |
+| Transactions optimized | 10 (demo) | 50,000 | 5,000,000 |
+| 0G Storage receipts | 10 (demo) | 50,000 | 5,000,000 |
+| Revenue distributed | $0 (testnet) | $10,000 | $1,000,000 |
+| Fine-tune runs | 1 (demo) | 1,000 | 100,000 |
+| Active stakers | 0 (testnet) | 500 | 50,000 |
+
+---
+
+## 0G Module Dependency Map
+
+```
+Phase 1 (Now)     Phase 2           Phase 3           Phase 4
+─────────────     ─────────────     ─────────────     ─────────────
+0G Chain      →   0G Chain      →   0G Chain      →   0G Chain
+0G Compute    →   0G Compute    →   0G Compute    →   0G Compute
+0G Storage    →   0G Storage    →   0G Storage    →   0G Storage
+0G KV         →   0G KV         →   0G KV         →   0G KV
+              →   0G Privacy    →   0G Privacy    →   0G Privacy
+                                →   0G Persistent →   0G Persistent
+                                    Memory            Memory
+```
+
+Every phase deepens 0G integration. No phase removes any existing integration.
+
+---
+
+<div align="center">
+
+**SmartChain Hub** · Built on 0G · Growing with 0G
+
+`#BuildOn0G` · `#AgenticEconomy` · `#0GHackathon`
+
+</div>

@@ -1,141 +1,275 @@
+<div align="center">
 
-# SmartChain Hub - Pitch Deck
+<img src="../logo/logo.png" alt="SmartChain Hub" width="80" />
 
-## Slide 1: Introduction
-**Title:** Introducing SmartChain Hub  
-**Content:**  
-SmartChain Hub is revolutionizing **digital commerce** by combining **AI-driven automation** and **blockchain technology** to create a **decentralized marketplace** where transactions are **secure**, **autonomous**, and **efficient**.  
-**Vision**: To empower businesses and consumers alike with frictionless transactions and **transparent commerce** in a decentralized economy.  
-**Mission**: Harnessing **AI agents** and **smart contracts** to optimize digital interactions, reduce costs, and enhance trust in global trade.
+# 🚀 SmartChain Hub — Pitch Deck
+### *The First Sovereign AI Agent Economy on 0G*
 
-**Visual Elements:**  
-- A **360-degree icon of a globe** connected by glowing blockchain nodes, symbolizing a connected, decentralized global economy.  
-- **Futuristic icons** representing AI, blockchain, and secure transactions.  
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-smartchainhubfrontend.vercel.app-6366f1?style=for-the-badge)](https://smartchainhubfrontend.vercel.app)
+[![0G Galileo](https://img.shields.io/badge/Network-0G_Galileo_Testnet-0ea5e9?style=for-the-badge)](https://scan-testnet.0g.ai)
+[![Track 3](https://img.shields.io/badge/Track_3-Agentic_Economy-10b981?style=for-the-badge)](https://0g.ai)
 
-**Color Palette:**  
-- **Deep Blue (#1A1A2E)** for trust and professionalism.  
-- **Electric Purple (#9B4DFF)** for a futuristic, high-tech look.  
-- **Soft White (#FFFFFF)** for clean, easy-to-read text.
+> *"Every optimization generates 4 verifiable on-chain actions. Every interaction makes the agent smarter. Every agent earns revenue autonomously."*
+
+</div>
 
 ---
 
-## Slide 2: The Problem
-**Title:** The Challenges in Digital Commerce  
-**Content:**  
-Today’s **digital commerce** is plagued by **high fees**, **slow transactions**, **fraud**, and **lack of transparency**.  
-Traditional systems are **centralized**, inefficient, and vulnerable to fraud, hindering trust between buyers and sellers.  
-**Real-world impact**: Small businesses face **high transaction fees** and **inefficient payment systems**, limiting their ability to scale.
+## Slide 1 · The Hook
 
-**Visual Elements:**  
-- A **barrier icon** breaking open, symbolizing overcoming obstacles.  
-- **Icons for fraud, slow processing, and high fees** depicted in a broken, fragmented style.
+**What if your AI agent remembered you — not from a database, but from a blockchain?**
 
-**Color Palette:**  
-- **Vibrant Blue (#007BFF)** for highlighting key challenges.  
-- **Electric Purple (#9B4DFF)** for emphasis on the decentralized nature of the solution.
+What if every AI decision was cryptographically proven inside a Trusted Execution Environment?
+
+What if your agent earned real revenue, staked it autonomously, and grew smarter with every transaction?
+
+**This is SmartChain Hub. Built entirely on 0G.**
 
 ---
 
-## Slide 3: The Solution
-**Title:** SmartChain Hub: Empowering Decentralized Commerce  
-**Content:**  
-**SmartChain Hub** provides a **seamless decentralized marketplace** with automated workflows powered by **AI agents**.  
-Blockchain ensures **secure transactions**, **AI agents** drive **autonomous decision-making**, and the platform’s **decentralized nature** eliminates intermediaries, reducing costs.  
-**Real-world Impact**: With **AI-driven transactions** and **smart contract automation**, SmartChain Hub ensures faster, safer, and more cost-effective commerce for businesses and consumers.
+## Slide 2 · The Problem
 
-**Visual Elements:**  
-- **Smart contract icons** locking into place, with automated processes in the background.  
-- **AI agent icons** dynamically optimizing transactions in a flowing motion.
+The AI agent economy is broken in three fundamental ways:
 
-**Color Palette:**  
-- **Soft White (#FFFFFF)** for a clear, professional design.  
-- **Electric Purple (#9B4DFF)** and **Deep Blue (#1A1A2E)** for highlighting smart contracts and AI features.
+```
+PROBLEM 1 — No Sovereign Identity
+  AI agents today are API keys.
+  Copyable. Revocable. Owned by platforms, not users.
+  → No persistent identity. No on-chain reputation.
 
----
+PROBLEM 2 — No Persistent Memory
+  Agent memory lives in session storage or centralized databases.
+  Switch devices → memory gone.
+  Platform shuts down → memory gone forever.
+  → No cross-device, censorship-resistant memory layer.
 
-## Slide 4: Market Opportunity
-**Title:** The Web3 Market is Poised for Growth  
-**Content:**  
-The **Web3 market** is expected to grow to **$23 billion by 2027**, with **decentralized finance (DeFi)**, **AI integration**, and **blockchain solutions** playing a central role.  
-**SmartChain Hub** is positioned at the intersection of these growth trends, tapping into the need for **secure, efficient**, and **automated commerce**.  
-**Real-world Market Potential**: As more businesses and consumers embrace decentralized systems, SmartChain Hub offers an opportunity to **scale globally**.
+PROBLEM 3 — No Verifiable Intelligence
+  AI inference is a black box.
+  No proof the model ran correctly.
+  No proof the optimization was honest.
+  → No trust. No accountability. No economy.
+```
 
-**Visual Elements:**  
-- A **line graph** showing Web3 growth projections with key data points highlighted.  
-- **Icons for decentralized finance (DeFi)**, **AI**, and **blockchain** with arrows indicating expansion.
-
-**Color Palette:**  
-- **Vibrant Blue (#007BFF)** for growth data.  
-- **Electric Purple (#9B4DFF)** for market expansion trends.
+**The result:** AI agents cannot be first-class economic actors. They are tools, not agents.
 
 ---
 
-## Slide 5: Technology Stack
-**Title:** Leveraging the Power of the 0G Ecosystem  
-**Content:**  
-**SmartChain Hub** utilizes **0G Storage** for **decentralized data management**, ensuring **high availability** and **security**.  
-The **0G Compute** platform powers **AI-driven** transaction optimization and decision-making in real-time.  
-**0G Chain** deploys **smart contracts** for secure, transparent transactions that are tamper-proof and fast.  
-**Real-world Implementation**: This powerful combination ensures **scalability**, **security**, and **efficiency**, making the platform robust for future growth.
+## Slide 3 · The Solution
 
-**Visual Elements:**  
-- **3D icons of storage, compute, and blockchain** components integrated into a seamless flow diagram.  
-- A **network grid** representing decentralized data storage, with nodes linked by glowing chains.
+SmartChain Hub introduces three primitives that fix all three problems:
 
-**Color Palette:**  
-- **Deep Blue (#1A1A2E)** for core technology.  
-- **Electric Purple (#9B4DFF)** for highlighting advanced features like AI and smart contracts.
+```
+PRIMITIVE 1 — Soulbound Agent ID (0G Chain)
+  ┌─────────────────────────────────────────┐
+  │  SmartChainAgentID.sol                  │
+  │  Non-transferable NFT per wallet        │
+  │  Stores: modelHash · memoryRoot         │
+  │          reputation · totalSavings      │
+  │  Updates on every optimization          │
+  └─────────────────────────────────────────┘
 
----
+PRIMITIVE 2 — Persistent Cross-Device Memory (0G Storage KV)
+  ┌─────────────────────────────────────────┐
+  │  hydrateAgentMemory(userId)             │
+  │  Versioned KV writes via Batcher        │
+  │  Survives: device resets · app updates  │
+  │  Syncs: on every mount, cross-device    │
+  └─────────────────────────────────────────┘
 
-## Slide 6: Business Model
-**Title:** Revenue Streams and Value Creation  
-**Content:**  
-- **Subscription fees** for businesses using the platform’s tools and services.  
-- **Transaction fees** for every completed sale on the marketplace, enabling a sustainable revenue stream.  
-- **Revenue-sharing** with businesses leveraging SmartChain Hub for automated processes and enhanced transaction security.  
-**Real-world Impact**: This model ensures **scalable growth**, with revenue directly tied to platform usage and engagement.
-
-**Visual Elements:**  
-- **Dollar sign icons** representing subscription and transaction revenue.  
-- **Icons of hands shaking**, signifying business partnerships and revenue sharing.
-
-**Color Palette:**  
-- **Vibrant Blue (#007BFF)** for financial elements.  
-- **Electric Purple (#9B4DFF)** to highlight growth and partnership opportunities.
+PRIMITIVE 3 — TEE-Verified Intelligence (0G Compute TeeML)
+  ┌─────────────────────────────────────────┐
+  │  LLaMA 3.1 8B via broker SDK            │
+  │  X-TEE-Proof header in every response   │
+  │  Falls back to TF 2.16 gracefully       │
+  │  ZK commitment proves: savings > 0      │
+  └─────────────────────────────────────────┘
+```
 
 ---
 
-## Slide 7: Roadmap
-**Title:** Our Path to Market Leadership  
-**Content:**  
-- **Q2 2026**: Launch **MVP** and integrate **AI agents** for real-time transaction optimization.  
-- **Q3 2026**: Onboard **early adopters**, focusing on small-to-medium businesses.  
-- **Q1 2027**: **Full platform deployment**, enabling large-scale adoption with **global market expansion**.  
-- **Q2 2027**: Form strategic partnerships with other **blockchain projects** and expand to new verticals (e.g., gaming, digital goods).  
-**Real-world Outcome**: Our goal is to **disrupt digital commerce**, making **SmartChain Hub** the go-to platform for autonomous, decentralized transactions.
+## Slide 4 · The Economic Flywheel
 
-**Visual Elements:**  
-- A **timeline icon** with key milestones represented as pinpoints.  
-- **Icons of globe expansion**, partnerships, and scaling.
+Every single optimization triggers a self-reinforcing loop:
 
-**Color Palette:**  
-- **Deep Blue (#1A1A2E)** for major milestones.  
-- **Electric Purple (#9B4DFF)** for scaling and global impact.
+```
+  User submits transaction ($amount, priority)
+          │
+          ▼
+  🤖  0G Compute TeeML — LLaMA 3.1 8B inference
+          │  Returns: fee · savings · route · TEE proof
+          ▼
+  🔐  ZK Proof — Groth16 or SHA-256 commitment
+          │  Proves: savings > 0, fee < 2%, rate valid
+          ▼
+  📦  0G Storage Log — immutable receipt
+          │  Merkle rootHash stored in Supabase
+          ▼
+  🪪  SmartChainAgentID.updateMemory()
+          │  reputation++ · memoryRoot updated on-chain
+          ▼
+  💰  0.5% fee collected
+          │  Distributed to stakers via SmartChainPayments
+          ▼
+  📈  Revenue claimable via SmartChainRevenue
+          │  Stakers earn proportional share
+          ▼
+  🔄  User stakes → earns 5% APY → stakes more
+          │
+          ▼
+  🧬  Storage roots accumulate
+          │  Fine-tune TF model on real user data (≥10 samples)
+          │  Model improves → better routes → more savings
+          └──────────────────────────────────────────────────►
+                              (loop repeats, compounding)
+```
+
+**4 verifiable on-chain actions per user interaction:**
+`Storage upload` + `ZK proof` + `Agent ID update` + `Revenue event`
 
 ---
 
-## Slide 8: Call to Action
-**Title:** Join Us in Revolutionizing Commerce  
-**Content:**  
-SmartChain Hub is on a mission to redefine how businesses and consumers engage in commerce.  
-**Get involved** by joining our platform today or collaborating with us on future development and expansion.  
-**Contact us** for early access to the platform, partnership opportunities, and to learn how you can be part of the future of decentralized commerce.
+## Slide 5 · Technology Stack
 
-**Visual Elements:**  
-- **A CTA button** with a glowing effect: “Join the Revolution” or “Get Started”.  
-- **Human icons** representing users and business owners, interacting in a digital marketplace.
+### ![0G](https://img.shields.io/badge/0G_Full_Stack-0ea5e9?style=flat-square) 0G Protocol — Complete Integration
 
-**Color Palette:**  
-- **Electric Purple (#9B4DFF)** for emphasis on calls to action.  
-- **Vibrant Blue (#007BFF)** for highlighting important details.
+| 0G Module | How We Use It | Proof |
+|---|---|---|
+| **0G Chain** | 5 contracts on Galileo Testnet | All addresses verified on ChainScan |
+| **0G Compute TeeML** | LLaMA 3.1 8B TEE-attested inference | `X-TEE-Proof` header · `tee_verified: true` |
+| **0G Compute Fine-tuning** | Incremental TF training on real tx data | Model hash updated on-chain after each run |
+| **0G Storage Log** | Immutable tx receipts via MemData upload | Merkle root in Supabase + committed on-chain |
+| **0G Storage KV** | Versioned agent memory cross-device | `hydrateAgentMemory()` syncs on mount |
+| **Agent ID Standard** | Soulbound NFT — modelHash + memoryRoot | Non-transferable · updated every optimization |
+| **Agent Escrow** | Agent-to-agent micropayment channels | Full UI in Payments → Agent Escrow tab |
+
+### ![Blockchain](https://img.shields.io/badge/Blockchain-363636?style=flat-square&logo=solidity) Smart Contracts
+
+```
+SmartChainAgentID       Soulbound NFT · identity · memory · reputation
+SmartChainAgentEscrow   Agent-to-agent micropayments · 1% platform fee
+SmartChainPayments      Send · stake · withdraw · 5% APY
+SmartChainRevenue       Proportional revenue distribution · 10% fee share
+SmartChainTransaction   Immutable on-chain transaction records
+```
+
+### ![AI](https://img.shields.io/badge/AI_Agent-FF6F00?style=flat-square&logo=tensorflow) AI Layer
+
+```
+Runtime:      Python 3.12 · Flask 3.1.3 · Gunicorn
+Model:        TensorFlow CPU 2.16 · 6-feature neural network
+Architecture: Input(6) → Dense(64) → BatchNorm → Dropout
+              → Dense(32) → Dense(16) → Dense(3, sigmoid)
+Outputs:      savings_rate · confidence · risk_score
+Fine-tuning:  lr=0.0001 · epochs=50 · min_samples=10
+```
+
+### ![Frontend](https://img.shields.io/badge/Frontend-000000?style=flat-square&logo=next.js) Frontend
+
+```
+Framework:    Next.js 16.2.4 · React 19 · TypeScript 6
+Styling:      Tailwind CSS v4
+Wallet:       MetaMask SDK v0.34 · ethers.js v6
+ZK:           snarkjs 0.7.6 (Groth16 + SHA-256 fallback)
+Storage:      @0glabs/0g-ts-sdk 0.3.3
+Database:     Supabase · PostgreSQL · Row-level security
+Deployment:   Vercel Edge Network
+```
+
+---
+
+## Slide 6 · Competitive Differentiation
+
+| Capability | Traditional AI Apps | SmartChain Hub |
+|---|---|---|
+| Agent identity | API key — copyable, revocable | Soulbound NFT on 0G Chain — permanent |
+| Agent memory | Session-only / centralized DB | 0G Storage KV — versioned, cross-device |
+| Inference proof | None | TEE-verified via 0G Compute TeeML |
+| Transaction receipts | Centralized logs | Immutable 0G Storage Log + Merkle root |
+| Revenue model | Platform takes all | Automated on-chain distribution |
+| Agent payments | None | Per-API-call micropayments via Escrow |
+| Model improvement | Static, manual retraining | Fine-tuned on real user data from 0G Storage |
+| Proof of work | None | ZK commitment stored on-chain every tx |
+
+---
+
+## Slide 7 · Traction & Proof
+
+```
+✅  5 smart contracts deployed and verified on 0G Galileo Testnet
+✅  Live frontend at smartchainhubfrontend.vercel.app
+✅  AI agent live on Render — health endpoint responding
+✅  0G Storage SDK integrated — MemData uploads working
+✅  0G Storage KV — agent memory persisting cross-device
+✅  0G Compute TeeML — broker integration with graceful fallback
+✅  9 test suites — unit · integration · e2e · security · performance
+✅  Rust WASM optimizer module compiled
+✅  Stripe + Flutterwave M-Pesa on-ramp integrated
+✅  15 frontend pages fully functional
+✅  6 Supabase migrations applied
+```
+
+---
+
+## Slide 8 · Roadmap
+
+```
+STATUS    MILESTONE                                    0G MODULE
+──────────────────────────────────────────────────────────────────
+✅ Live   Agent ID soulbound NFT + memory root         0G Chain
+✅ Live   TEE-verified inference via TeeML             0G Compute
+✅ Live   Immutable receipts on Storage Log            0G Storage
+✅ Live   Agent memory — KV, versioned, cross-device   0G Storage KV
+✅ Live   Fine-tune TF model on real user data         0G Compute
+✅ Live   Agent-to-Agent micropayments via Escrow      0G Chain
+✅ Live   ZK-verified proofs — SHA-256 commitment      0G Privacy
+
+🔜 Next   Full Groth16 ZK — compile Circom circuit     0G Privacy
+🔜 Next   Fine-tune with production data (≥10 real tx) 0G Compute
+🔜 Next   Official 0G Persistent Memory module         0G Persistent Memory
+🔜 Next   Multi-agent coordination — agents hire agents 0G Chain
+🔜 Next   Mainnet deployment                           0G Mainnet
+```
+
+---
+
+## Slide 9 · The Ask
+
+SmartChain Hub is not a demo. It is a production-ready primitive for the agentic economy.
+
+**What we've built:**
+- A new economic primitive where AI agents are first-class on-chain actors
+- The first implementation of the full 0G stack in a single cohesive product
+- A self-reinforcing flywheel that compounds with every user interaction
+
+**What we need:**
+- Recognition as the definitive Track 3 winner
+- 0G ecosystem support to onboard real users
+- Partnership to deploy on 0G Mainnet
+
+---
+
+## Slide 10 · Close
+
+```
+Every agent has an identity.
+Every decision is proven.
+Every interaction is remembered.
+Every optimization generates revenue.
+
+This is not a chatbot with a wallet.
+This is the Agentic Economy.
+
+Built on 0G. Built to last.
+```
+
+**[🌐 Live Demo](https://smartchainhubfrontend.vercel.app)** · **[📊 ChainScan](https://scan-testnet.0g.ai/address/0x69C619374c6B901b99941Df7238fceb80d7DCd08)** · **[📚 Docs](../)**
+
+---
+
+<div align="center">
+
+Built with ❤️ for the **0G APAC Hackathon 2026**
+
+`#BuildOn0G` · `#AgenticEconomy` · `#0GHackathon`
+
+</div>

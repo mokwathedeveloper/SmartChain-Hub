@@ -1,53 +1,88 @@
 import React from 'react';
 
-const AIDecisionTree = ({ isOptimizing, result, priority }: { isOptimizing: boolean, result: any, priority: string }) => {
+const AIDecisionTree = ({
+  isOptimizing,
+  result,
+  priority,
+}: {
+  isOptimizing: boolean;
+  result: any;
+  priority: string;
+}) => {
   return (
-    <div className="bg-gray-900 rounded-[2.5rem] p-10 border border-gray-800 shadow-xl shadow-gray-200/50">
-      <div className="flex items-center justify-between mb-10">
-        <h3 className="text-xl font-black text-deep-blue tracking-tight">AI Decision Pathway</h3>
-        <span className="text-[10px] font-black bg-purple-100 text-purple-600 px-3 py-1 rounded-full uppercase tracking-widest">
+    <div className="card p-6 sm:p-8">
+      <div className="flex items-center justify-between mb-8">
+        <h3 className="text-base font-bold text-white">AI Decision Pathway</h3>
+        <span className={isOptimizing ? 'badge-pending' : 'badge-confirmed'}>
           {isOptimizing ? 'Thinking...' : 'Path Verified'}
         </span>
       </div>
 
-      <div className="flex flex-col items-center space-y-8 relative">
-        {/* Connection Line */}
-        <div className="absolute top-0 bottom-0 w-0.5 bg-gray-800 left-1/2 -translate-x-1/2 z-0"></div>
+      <div className="flex flex-col items-center space-y-6 relative">
+        {/* Vertical connector line */}
+        <div className="absolute top-0 bottom-0 w-px bg-gray-800 left-1/2 -translate-x-1/2 z-0" />
 
-        {/* Node 1: Input */}
-        <div className={`relative z-10 w-full max-w-[200px] p-4 rounded-2xl border-2 text-center transition-all ${isOptimizing ? 'border-electric-purple animate-pulse' : 'border-gray-800 bg-gray-900'}`}>
-          <p className="text-[10px] font-black text-gray-400 uppercase mb-1">Input Data</p>
-          <p className="text-xs font-bold text-deep-blue">Transaction Matrix</p>
+        {/* Node 1 — Input */}
+        <div className={`relative z-10 w-full max-w-[200px] p-4 rounded-2xl border text-center transition-all ${
+          isOptimizing
+            ? 'border-blue-500/50 bg-blue-500/[0.06] animate-pulse'
+            : 'border-gray-700 bg-gray-800/50'
+        }`}>
+          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Input Data</p>
+          <p className="text-sm font-bold text-white">Transaction Matrix</p>
         </div>
 
-        {/* Node 2: Priority Engine */}
-        <div className={`relative z-10 w-full max-w-[240px] p-5 rounded-2xl border-2 shadow-sm transition-all ${isOptimizing ? 'border-gray-800 opacity-50' : 'border-electric-purple bg-gray-900'}`}>
-          <div className="flex items-center justify-center space-x-2 mb-2">
-            <span className="text-lg">🎯</span>
-            <p className="text-xs font-black text-deep-blue uppercase tracking-wide">Priority: {priority}</p>
+        {/* Node 2 — Priority Engine */}
+        <div className={`relative z-10 w-full max-w-[240px] p-5 rounded-2xl border transition-all ${
+          isOptimizing
+            ? 'border-gray-700 bg-gray-800/30 opacity-50'
+            : 'border-blue-500/30 bg-blue-500/[0.06]'
+        }`}>
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <span className="text-base">🎯</span>
+            <p className="text-xs font-bold text-blue-300 uppercase tracking-wide">
+              Priority: {priority}
+            </p>
           </div>
-          <p className="text-[10px] text-gray-500 font-medium leading-relaxed">Adjusting weights for gas efficiency and route finality.</p>
+          <p className="text-xs text-gray-500 text-center leading-relaxed">
+            Adjusting weights for gas efficiency and route finality.
+          </p>
         </div>
 
-        {/* Node 3: TensorFlow Prediction */}
-        <div className={`relative z-10 w-full max-w-[280px] p-6 rounded-[2rem] border-2 shadow-lg transition-all ${isOptimizing ? 'border-gray-800 opacity-50' : 'border-green-500 bg-green-50/50'}`}>
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white text-xs font-black italic">TF</div>
-            <p className="text-xs font-black text-green-700 uppercase">Heuristic Prediction</p>
-          </div>
-          <div className="space-y-2">
-            <div className="h-1.5 w-full bg-green-200 rounded-full overflow-hidden">
-              <div className={`h-full bg-green-500 transition-all duration-1000 ${isOptimizing ? 'w-0' : 'w-[94%]'}`}></div>
+        {/* Node 3 — TensorFlow Prediction */}
+        <div className={`relative z-10 w-full max-w-[280px] p-5 rounded-2xl border transition-all ${
+          isOptimizing
+            ? 'border-gray-700 bg-gray-800/30 opacity-50'
+            : 'border-green-500/30 bg-green-500/[0.06]'
+        }`}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white text-xs font-black shrink-0">
+              TF
             </div>
-            <p className="text-[9px] text-green-600 font-bold">Confidence: {result?.confidence || '0'}%</p>
+            <p className="text-xs font-bold text-green-300 uppercase tracking-wide">
+              Heuristic Prediction
+            </p>
+          </div>
+          <div className="space-y-1.5">
+            <div className="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-green-500 rounded-full transition-all duration-1000"
+                style={{ width: isOptimizing ? '0%' : '94%' }}
+              />
+            </div>
+            <p className="text-xs text-gray-500">
+              Confidence: {result?.confidence ?? '0'}%
+            </p>
           </div>
         </div>
 
-        {/* Node 4: Final Output */}
+        {/* Node 4 — Final Output */}
         {!isOptimizing && result && (
-          <div className="relative z-10 w-full max-w-[240px] p-4 rounded-2xl bg-deep-blue text-white shadow-2xl animate-fade-in-up">
-            <p className="text-[10px] font-black opacity-60 uppercase mb-1">Selected Route</p>
-            <p className="text-sm font-bold truncate">{result.route}</p>
+          <div className="relative z-10 w-full max-w-[240px] p-4 rounded-2xl bg-blue-600 shadow-lg shadow-blue-600/20 animate-slide-up">
+            <p className="text-xs text-blue-200 font-semibold uppercase tracking-wider mb-1">
+              Selected Route
+            </p>
+            <p className="text-sm font-bold text-white truncate">{result.route}</p>
           </div>
         )}
       </div>

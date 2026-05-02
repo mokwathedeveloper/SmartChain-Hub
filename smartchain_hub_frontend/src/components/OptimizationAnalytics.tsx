@@ -8,15 +8,13 @@ const OptimizationAnalytics = () => {
     totalSavings: 0,
     avgSavingsRate: 0,
     totalVolume: 0,
-    topRoute: 'N/A'
+    topRoute: 'N/A',
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      fetchAnalytics();
-    }
-  }, [user]);
+    if (user) fetchAnalytics();
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchAnalytics = async () => {
     try {
@@ -24,114 +22,128 @@ const OptimizationAnalytics = () => {
         .from('transactions')
         .select('amount, savings, route')
         .eq('user_id', user?.id);
-
       if (error) throw error;
-
       if (data && data.length > 0) {
-        const totalSavings = data.reduce((acc, curr) => acc + (Number(curr.savings) || 0), 0);
-        const totalVolume = data.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
-        const avgSavingsRate = (totalSavings / totalVolume) * 100;
-        
-        // Find top route
+        const totalSavings = data.reduce((a, c) => a + (Number(c.savings) || 0), 0);
+        const totalVolume  = data.reduce((a, c) => a + (Number(c.amount)  || 0), 0);
+        const avgSavingsRate = totalVolume > 0 ? (totalSavings / totalVolume) * 100 : 0;
         const routes = data.map(d => d.route);
-        const mostCommonRoute = routes.sort((a,b) =>
-          routes.filter(v => v===a).length - routes.filter(v => v===b).length
-        ).pop();
-
-        setStats({
-          totalSavings,
-          avgSavingsRate,
-          totalVolume,
-          topRoute: mostCommonRoute || 'N/A'
-        });
+        const topRoute = routes.sort((a, b) =>
+          routes.filter(v => v === a).length - routes.filter(v => v === b).length
+        ).pop() || 'N/A';
+        setStats({ totalSavings, avgSavingsRate, totalVolume, topRoute });
       }
-    } catch (error) {
-      console.error("Error fetching analytics:", error);
+    } catch (err) {
+      console.error('Error fetching analytics:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) return <div className="animate-pulse h-64 bg-gray-800 rounded-2xl"></div>;
+  if (loading) return <div className="animate-pulse h-64 bg-gray-800 rounded-2xl" />;
+
+  const statCards = [
+    {
+      label: 'Total Volume',
+      value: `$${stats.totalVolume.toLocaleString()}`,
+      sub: 'Lifetime activity',
+      accent: 'card-blue',
+      textAccent: 'text-blue-400',
+      icon: (
+        <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8"
+            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Gas Fees Saved',
+      value: `$${stats.totalSavings.toFixed(2)}`,
+      sub: `+${stats.avgSavingsRate.toFixed(1)}% avg efficiency`,
+      accent: 'card-green',
+      textAccent: 'text-green-400',
+      icon: (
+        <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8"
+            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Active AI Agent',
+      value: 'Efficiency',
+      sub: 'Running on 0G Compute',
+      accent: 'card-indigo',
+      textAccent: 'text-indigo-400',
+      icon: (
+        <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8"
+            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Optimal Route',
+      value: stats.topRoute,
+      sub: 'Most frequent success',
+      accent: 'card-purple',
+      textAccent: 'text-purple-400',
+      icon: (
+        <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8"
+            d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      ),
+    },
+  ];
 
   return (
-    <div className="bg-gray-900 rounded-2xl shadow-sm border border-gray-800 p-8">
-      <h3 className="text-xl font-bold text-white mb-8 flex items-center">
-        <svg className="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    <div className="card p-6 sm:p-8">
+      <h3 className="text-base font-bold text-white mb-6 flex items-center gap-2">
+        <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8"
+            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
         AI Performance Analytics
       </h3>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="p-6 bg-blue-50 rounded-2xl border border-blue-100 transform transition hover:scale-105">
-          <p className="text-xs text-blue-600 font-bold uppercase mb-2">Total Volume</p>
-          <p className="text-2xl font-black text-blue-900">${stats.totalVolume.toLocaleString()}</p>
-          <div className="mt-2 flex items-center text-xs text-blue-500">
-            <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
-            </svg>
-            Lifetime activity
-          </div>
-        </div>
 
-        <div className="p-6 bg-green-50 rounded-2xl border border-green-100 transform transition hover:scale-105">
-          <p className="text-xs text-green-600 font-bold uppercase mb-2">Gas Fees Saved</p>
-          <p className="text-2xl font-black text-green-900">${stats.totalSavings.toFixed(2)}</p>
-          <div className="mt-2 flex items-center text-xs text-green-500">
-            <span className="font-bold">+{stats.avgSavingsRate.toFixed(1)}%</span> 
-            <span className="ml-1">avg efficiency</span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {statCards.map(card => (
+          <div key={card.label} className={`${card.accent} p-5 rounded-2xl hover:scale-[1.02] transition-transform`}>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">{card.label}</p>
+              {card.icon}
+            </div>
+            <p className={`text-2xl font-black ${card.textAccent} truncate`}>{card.value}</p>
+            <p className="text-xs text-gray-600 mt-1.5">{card.sub}</p>
           </div>
-        </div>
-
-        <div className="p-6 bg-indigo-500/10 rounded-2xl border border-indigo-100 transform transition hover:scale-105">
-          <p className="text-xs text-indigo-300 font-bold uppercase mb-2">Active AI Agent</p>
-          <p className="text-2xl font-black text-white">Efficiency</p>
-          <div className="mt-2 text-xs text-indigo-500 flex items-center">
-            <span className="w-2 h-2 bg-indigo-500 rounded-full mr-2 animate-pulse"></span>
-            Running on 0G
-          </div>
-        </div>
-
-        <div className="p-6 bg-purple-50 rounded-2xl border border-purple-100 transform transition hover:scale-105">
-          <p className="text-xs text-purple-600 font-bold uppercase mb-2">Optimal Route</p>
-          <p className="text-lg font-black text-purple-900 truncate">{stats.topRoute}</p>
-          <p className="mt-2 text-xs text-purple-400">Most frequent success</p>
-        </div>
+        ))}
       </div>
 
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
-          <h4 className="font-bold text-gray-200 mb-4">Savings Projection</h4>
-          <div className="relative pt-1">
-            <div className="flex mb-2 items-center justify-between">
-              <div>
-                <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
-                  Current Target
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-xs font-semibold inline-block text-blue-600">
-                  75%
-                </span>
-              </div>
-            </div>
-            <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-100">
-              <div style={{ width: "75%" }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"></div>
-            </div>
-            <p className="text-xs text-gray-400 text-center">On track to save $1,200 this year based on your activity.</p>
+      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Savings projection */}
+        <div className="card p-5">
+          <h4 className="text-sm font-bold text-white mb-4">Savings Projection</h4>
+          <div className="flex items-center justify-between mb-2">
+            <span className="badge-chain">Current Target</span>
+            <span className="text-xs font-semibold text-blue-400">75%</span>
           </div>
+          <div className="h-2 bg-gray-800 rounded-full overflow-hidden mb-3">
+            <div className="h-full bg-blue-500 rounded-full" style={{ width: '75%' }} />
+          </div>
+          <p className="text-xs text-gray-500 text-center">
+            On track to save $1,200 this year based on your activity.
+          </p>
         </div>
 
-        <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800 flex items-center justify-between">
+        {/* Decentralization score */}
+        <div className="card p-5 flex items-center justify-between">
           <div>
-            <h4 className="font-bold text-gray-200 mb-1">Decentralization Score</h4>
+            <h4 className="text-sm font-bold text-white mb-1">Decentralization Score</h4>
             <p className="text-xs text-gray-500">How distributed are your transactions?</p>
           </div>
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border-4 border-green-500 text-green-600 font-black">
-              9.2
-            </div>
+          <div className="w-16 h-16 rounded-full border-4 border-green-500 flex items-center justify-center shrink-0">
+            <span className="text-green-400 font-black text-sm">9.2</span>
           </div>
         </div>
       </div>

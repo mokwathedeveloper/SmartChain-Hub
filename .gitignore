@@ -108,3 +108,7 @@ circuits/*.wasm
 circuits/*.zkey
 circuits/*.r1cs
 circuits/verification_key.json
+
+# ── Demo & Slides (local only) ────────────────────────────────────
+docs/demo/
+

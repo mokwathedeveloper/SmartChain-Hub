@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { errMsg } from "@/utils/errors";
 import { useState, useEffect } from "react";
 import { useWeb3 } from "@/context/Web3Context";
 import { useNotification } from "@/context/NotificationContext";
@@ -103,8 +104,8 @@ export default function Payments() {
       await tx.wait();
       addNotification(`Sent ${sendAmt} A0GI to ${sendTo}`, 'success');
       setSendTo(""); setSendAmt(""); setSendMemo("");
-    } catch (e: any) {
-      addNotification(`Send failed: ${e.reason || e.message}`, 'error');
+    } catch (e: unknown) {
+      addNotification(`Send failed: ${errMsg(e)}`, 'error');
     } finally { setLoading(false); }
   };
 
@@ -131,8 +132,8 @@ export default function Payments() {
       await tx.wait();
       addNotification(`Staked ${stakeAmt} A0GI successfully`, 'success');
       setStakeAmt(""); fetchStakeData();
-    } catch (e: any) {
-      addNotification(`Stake failed: ${e.reason || e.message}`, 'error');
+    } catch (e: unknown) {
+      addNotification(`Stake failed: ${errMsg(e)}`, 'error');
     } finally { setLoading(false); }
   };
 
@@ -145,8 +146,8 @@ export default function Payments() {
       await tx.wait();
       addNotification(`Unstaked ${staked.amount} A0GI + ${staked.reward} reward`, 'success');
       fetchStakeData();
-    } catch (e: any) {
-      addNotification(`Unstake failed: ${e.reason || e.message}`, 'error');
+    } catch (e: unknown) {
+      addNotification(`Unstake failed: ${errMsg(e)}`, 'error');
     } finally { setLoading(false); }
   };
 
@@ -159,8 +160,8 @@ export default function Payments() {
       await tx.wait();
       addNotification(`Claimed ${earnings} A0GI`, 'success');
       fetchStakeData();
-    } catch (e: any) {
-      addNotification(`Claim failed: ${e.reason || e.message}`, 'error');
+    } catch (e: unknown) {
+      addNotification(`Claim failed: ${errMsg(e)}`, 'error');
     } finally { setLoading(false); }
   };
 
@@ -185,8 +186,8 @@ export default function Payments() {
       const txHash = await depositToChannel(signer, escrowAgentB.trim(), escrowPrice, escrowDeposit);
       addNotification(`Channel opened. Tx: ${txHash.slice(0, 16)}...`, 'success');
       setEscrowAgentB(""); setEscrowPrice(""); setEscrowDeposit("");
-    } catch (e: any) {
-      const msg = e.reason || e.data?.message || e.message || 'Unknown error';
+    } catch (e: unknown) {
+      const msg = errMsg(e) || 'Unknown error';
       addNotification(`Escrow error: ${msg}`, 'error');
     } finally { setEscrowLoading(false); }
   };
@@ -197,8 +198,8 @@ export default function Payments() {
     try {
       const txHash = await settleCall(signer, escrowAgentA);
       addNotification(`Call settled. Tx: ${txHash.slice(0, 16)}...`, 'success');
-    } catch (e: any) {
-      addNotification(`Settle error: ${e.message}`, 'error');
+    } catch (e: unknown) {
+      addNotification(`Settle error: ${errMsg(e)}`, 'error');
     } finally { setEscrowLoading(false); }
   };
 
@@ -209,8 +210,8 @@ export default function Payments() {
       const txHash = await withdrawFromChannel(signer, escrowWithdrawB);
       addNotification(`Withdrawn. Tx: ${txHash.slice(0, 16)}...`, 'success');
       setEscrowWithdrawB("");
-    } catch (e: any) {
-      addNotification(`Withdraw error: ${e.reason || e.message}`, 'error');
+    } catch (e: unknown) {
+      addNotification(`Withdraw error: ${errMsg(e)}`, 'error');
     } finally { setEscrowLoading(false); }
   };
 
@@ -221,8 +222,8 @@ export default function Payments() {
       if (!RPC_PROVIDER) throw new Error('Provider not available');
       const ch = await getChannelState(RPC_PROVIDER, escrowCheckA, escrowCheckB);
       setEscrowChannel(ch);
-    } catch (e: any) {
-      addNotification(`Check error: ${e.message}`, 'error');
+    } catch (e: unknown) {
+      addNotification(`Check error: ${errMsg(e)}`, 'error');
     } finally { setEscrowLoading(false); }
   };
 

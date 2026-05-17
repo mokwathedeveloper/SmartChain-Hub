@@ -12,12 +12,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const aiAgentUrl = (process.env.NEXT_PUBLIC_AI_AGENT_URL || "https://smartchain-ai-agent.onrender.com").trim();
   const { root_hashes = [], dry_run = false } = req.body || {};
 
+  const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
+  const serviceKey  = (process.env.SUPABASE_SERVICE_KEY || "").trim();
+
+  if (!serviceKey) {
+    return res.status(503).json({
+      ok:     false,
+      reason: "Fine-tune unavailable — SUPABASE_SERVICE_KEY not configured",
+    });
+  }
+
   try {
-    // Use service role key to bypass RLS for server-side reads
-    const supabase = createClient(
-      (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim(),
-      (process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim()
-    );
+    // Service role key required — bypasses RLS for cross-user reads.
+    // Never fall back to the anon key here.
+    const supabase = createClient(supabaseUrl, serviceKey);
 
     const { data: txs } = await supabase
       .from("transactions")

@@ -22,12 +22,13 @@ const DonutChart = ({ pct }: { pct: number }) => {
     { p: 0.10, color: '#EAB308' },
   ];
   const total = segments.reduce((s, x) => s + x.p, 0);
-  segments.push({ p: Math.max(0, 1 - total), color: '#E5E7EB' });
+  segments.push({ p: Math.max(0, 1 - total), color: '#374151' });
   let offset = 0;
   return (
-    <div className="flex items-center gap-8">
-      <div className="relative">
-        <svg width="200" height="200" viewBox="0 0 200 200">
+    <div className="flex flex-col sm:flex-row items-center gap-5 sm:gap-8 w-full">
+      {/* SVG fills its container — max 180px on mobile, 200px on desktop */}
+      <div className="relative w-40 h-40 sm:w-48 sm:h-48 shrink-0">
+        <svg viewBox="0 0 200 200" className="w-full h-full">
           {segments.map((seg, i) => {
             const da = seg.p * circ;
             const el = <circle key={i} cx={cx} cy={cy} r={r} fill="none" stroke={seg.color} strokeWidth="28"
@@ -45,7 +46,7 @@ const DonutChart = ({ pct }: { pct: number }) => {
       <div className="space-y-3">
         {[['Your Share','bg-blue-500'],['Partners','bg-purple-500'],['Staking Rewards','bg-green-500'],['Network Fees','bg-yellow-400']].map(([l,c]) => (
           <div key={l} className="flex items-center gap-2">
-            <span className={`w-3 h-3 rounded-full ${c}`}/><span className="text-sm text-gray-500">{l}</span>
+            <span className={`w-3 h-3 rounded-full shrink-0 ${c}`}/><span className="text-sm text-gray-500">{l}</span>
           </div>
         ))}
       </div>

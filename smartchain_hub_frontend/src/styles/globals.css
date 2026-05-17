@@ -11,26 +11,128 @@
   --font-sans: 'Plus Jakarta Sans', sans-serif;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Cross-browser base — html
+   ═══════════════════════════════════════════════════════════ */
+html {
+  /* Prevent iOS Safari from resizing text in landscape */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Native dark UI elements (scrollbars, form controls) */
+  color-scheme: dark;
+  /* Smooth anchor scrolling in all browsers */
+  scroll-behavior: smooth;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Cross-browser base — body
+   ═══════════════════════════════════════════════════════════ */
 body {
   background: var(--background);
   color: var(--foreground);
+  /* Prevent horizontal overflow on all browsers */
   overflow-x: hidden;
-  /* iOS Safari momentum scrolling */
+  /* iOS momentum scrolling */
   -webkit-overflow-scrolling: touch;
+  /* Crisp subpixel text rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* Prevent iOS tap highlight flash */
+/* ═══════════════════════════════════════════════════════════
+   Global resets (all browsers / all devices)
+   ═══════════════════════════════════════════════════════════ */
 * {
+  /* Remove grey tap flash on iOS and Android */
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ── Button reset ─────────────────────────────────────────── */
+button {
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  /* Faster tap response on touch screens (no 300 ms delay) */
+  touch-action: manipulation;
+}
+
+/* ── Input / select / textarea reset ─────────────────────── */
+input,
+select,
+textarea {
+  /* Remove iOS inner shadow on text inputs */
+  -webkit-appearance: none;
+  appearance: none;
+  background-clip: padding-box;
+}
+
+/* Remove number spinners (Chrome, Safari, Edge) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Remove number spinners (Firefox) */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* ── iOS input-zoom prevention ────────────────────────────── */
+/* iOS Safari zooms the viewport when an input has font-size < 16px.
+   This media query targets touch-primary devices (phones & tablets). */
+@media (hover: none) and (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ── dvh progressive enhancement ────────────────────────── */
+/* Tailwind's min-h-dvh only emits 100dvh (no vh fallback).
+   Older Safari/Chrome fall back to 100vh gracefully. */
+.min-h-dvh {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.h-dvh {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* ── Text selection colour ───────────────────────────────── */
+::selection {
+  background-color: rgba(59, 130, 246, 0.35);
+  color: #ffffff;
+}
+::-moz-selection {
+  background-color: rgba(59, 130, 246, 0.35);
+  color: #ffffff;
+}
+
+/* ── Keyboard-navigation focus ring ─────────────────────── */
+:focus-visible {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Utility classes
+   ═══════════════════════════════════════════════════════════ */
 @layer utilities {
+  /* ── Glassmorphism card ──────────────────────────────────── */
   .glass-dark {
     background: rgba(17, 24, 39, 0.8);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
+
   .animate-slide-up {
     animation: slideUp 0.3s ease-out forwards;
   }
@@ -49,17 +151,21 @@ body {
   .badge-failed    { @apply bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-medium px-2.5 py-1 rounded-full; }
 
   /* ── Card variants ────────────────────────────────────────── */
-  .card           { @apply bg-gray-900 border border-gray-800 rounded-2xl; }
-  .card-hover     { @apply bg-gray-900 border border-gray-800 rounded-2xl hover:border-gray-700 transition-colors; }
-  .card-blue      { @apply bg-blue-500/[0.06] border border-blue-500/20 rounded-2xl; }
-  .card-green     { @apply bg-green-500/[0.06] border border-green-500/20 rounded-2xl; }
-  .card-purple    { @apply bg-purple-500/[0.06] border border-purple-500/20 rounded-2xl; }
-  .card-yellow    { @apply bg-yellow-500/[0.06] border border-yellow-500/20 rounded-2xl; }
-  .card-cyan      { @apply bg-cyan-500/[0.06] border border-cyan-500/20 rounded-2xl; }
-  .card-indigo    { @apply bg-indigo-500/[0.06] border border-indigo-500/20 rounded-2xl; }
+  .card        { @apply bg-gray-900 border border-gray-800 rounded-2xl; }
+  .card-hover  { @apply bg-gray-900 border border-gray-800 rounded-2xl hover:border-gray-700 transition-colors; }
+  .card-blue   { @apply bg-blue-500/[0.06] border border-blue-500/20 rounded-2xl; }
+  .card-green  { @apply bg-green-500/[0.06] border border-green-500/20 rounded-2xl; }
+  .card-purple { @apply bg-purple-500/[0.06] border border-purple-500/20 rounded-2xl; }
+  .card-yellow { @apply bg-yellow-500/[0.06] border border-yellow-500/20 rounded-2xl; }
+  .card-cyan   { @apply bg-cyan-500/[0.06] border border-cyan-500/20 rounded-2xl; }
+  .card-indigo { @apply bg-indigo-500/[0.06] border border-indigo-500/20 rounded-2xl; }
 
-  /* ── Input standard ───────────────────────────────────────── */
-  .input { @apply w-full px-4 py-3 bg-gray-950 border border-gray-700 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-sm transition-all; }
+  /* ── Standard input ───────────────────────────────────────── */
+  .input {
+    @apply w-full px-4 py-3 bg-gray-950 border border-gray-700 rounded-xl text-white
+           placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50
+           focus:border-blue-500 text-sm transition-all;
+  }
 
   /* ── Button variants ──────────────────────────────────────── */
   .btn-primary   { @apply px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed; }
@@ -71,17 +177,27 @@ body {
   .live-dot { @apply w-2 h-2 bg-green-400 rounded-full animate-pulse; }
 
   /* ── Hide scrollbar while keeping scroll ─────────────────── */
-  .scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
-  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide {
+    scrollbar-width: none;       /* Firefox */
+    -ms-overflow-style: none;    /* IE / Edge legacy */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;               /* Chrome, Safari, Opera */
+  }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Animations
+   ═══════════════════════════════════════════════════════════ */
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Dark scrollbar */
-::-webkit-scrollbar { width: 6px; }
+/* ═══════════════════════════════════════════════════════════
+   Custom dark scrollbar (WebKit)
+   ═══════════════════════════════════════════════════════════ */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #111827; }
 ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #3B82F6; }

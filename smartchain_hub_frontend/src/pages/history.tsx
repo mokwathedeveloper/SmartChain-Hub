@@ -70,15 +70,15 @@ export default function HistoryPage() {
         </div>
 
         {/* Search + filter */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="relative">
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative w-full sm:w-64">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
             <input type="text" placeholder="Search by hash or route..." value={search} onChange={e => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2.5 bg-gray-950 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 w-64"/>
+              className="w-full pl-9 pr-4 py-2.5 bg-gray-950 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500"/>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {['all', 'confirmed', 'pending', 'failed'].map(f => (
               <button key={f} onClick={() => setFilter(f)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-colors ${

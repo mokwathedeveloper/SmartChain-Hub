@@ -11,7 +11,7 @@
 export async function deliverA0GI(
   walletAddress: string,
   a0giAmount: string,
-  txRef: string
+  _txRef: string   // kept for caller symmetry; not encodable on-chain
 ): Promise<{ txHash: string; explorerUrl: string }> {
   const { ethers } = await import("ethers");
 
@@ -58,10 +58,10 @@ export async function logPayment(params: {
 }) {
   try {
     const { createClient } = await import("@supabase/supabase-js");
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    // Use service role key so the insert bypasses RLS and always succeeds.
+    // Fall back to anon key only when the service key is absent (local dev).
+    const key = process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, key);
 
     await supabase.from("onramp_payments").insert([{
       wallet_address: params.walletAddress,

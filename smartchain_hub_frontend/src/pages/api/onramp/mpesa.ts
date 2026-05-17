@@ -11,6 +11,7 @@
  */
 import type { NextApiRequest, NextApiResponse } from "next";
 import { logPayment } from "@/utils/onrampDelivery";
+import { rateLimit, getClientIp } from "@/utils/rateLimit";
 
 // Currency map by phone prefix
 const CURRENCY_MAP: Record<string, { currency: string; country: string }> = {
@@ -39,6 +40,11 @@ const USD_RATES: Record<string, number> = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end();
+
+  const ip = getClientIp(req);
+  if (!rateLimit(`mpesa:${ip}`, 5, 60_000)) {
+    return res.status(429).json({ error: "Too many requests — please wait before trying again." });
+  }
 
   const { amount, phone, walletAddress } = req.body;
 

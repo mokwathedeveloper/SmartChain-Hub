@@ -19,7 +19,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const privateKey = process.env.STORAGE_PRIVATE_KEY;
   if (!privateKey) {
-    return res.status(200).json({ rootHash: fallbackHash(data), txHash: "", storageScanUrl: "" });
+    return res.status(200).json({
+      rootHash:       fallbackHash(data),
+      txHash:         "",
+      storageScanUrl: "",
+      fallback:       true,
+      reason:         "STORAGE_PRIVATE_KEY not configured — local hash only",
+    });
   }
 
   try {
@@ -50,6 +56,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   } catch (e: any) {
     console.warn("0G Storage upload failed:", e.message);
-    return res.status(200).json({ rootHash: fallbackHash(data), txHash: "", storageScanUrl: "" });
+    return res.status(200).json({
+      rootHash:       fallbackHash(data),
+      txHash:         "",
+      storageScanUrl: "",
+      fallback:       true,
+      reason:         e.message,
+    });
   }
 }

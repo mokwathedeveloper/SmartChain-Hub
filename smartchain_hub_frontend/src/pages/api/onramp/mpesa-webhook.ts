@@ -10,20 +10,23 @@
  * Add FLUTTERWAVE_WEBHOOK_HASH to .env.local (from Flutterwave dashboard)
  */
 import type { NextApiRequest, NextApiResponse } from "next";
-import crypto from "crypto";
 import { deliverA0GI, logPayment } from "@/utils/onrampDelivery";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end();
 
-  // Verify Flutterwave webhook signature
+  // Verify Flutterwave webhook signature.
+  // FLUTTERWAVE_WEBHOOK_HASH is required — if it is not configured we refuse
+  // all incoming webhooks rather than letting them through unverified.
   const webhookHash = process.env.FLUTTERWAVE_WEBHOOK_HASH;
-  if (webhookHash) {
-    const signature = req.headers["verif-hash"] as string;
-    if (!signature || signature !== webhookHash) {
-      console.error("Flutterwave webhook signature mismatch");
-      return res.status(401).json({ error: "Invalid webhook signature" });
-    }
+  if (!webhookHash) {
+    console.error("FLUTTERWAVE_WEBHOOK_HASH not set — rejecting webhook");
+    return res.status(503).json({ error: "Webhook verification not configured" });
+  }
+  const signature = req.headers["verif-hash"] as string;
+  if (!signature || signature !== webhookHash) {
+    console.error("Flutterwave webhook signature mismatch");
+    return res.status(401).json({ error: "Invalid webhook signature" });
   }
 
   const event = req.body;

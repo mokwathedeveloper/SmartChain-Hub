@@ -24,13 +24,13 @@ function buildCommitment(amount: number, fee: number, savings: number, userId: s
 
 /** Validate public inputs before proof generation. */
 function validateInputs(amount: number, fee: number, savings: number): string | null {
-  if (amount <= 0)           return "amount must be > 0";
-  if (fee < 0)               return "fee must be >= 0";
-  if (savings < 0)           return "savings must be >= 0";
-  // Relaxed fee check — allow up to 5% fee (covers all 3 optimizer routes)
-  if (fee >= amount * 0.05)  return "fee exceeds 5% of amount";
-  // Relaxed savings check — allow up to 10% savings
-  if (savings / amount > 0.10) return "savings rate exceeds 10% — suspicious";
+  if (!Number.isFinite(amount) || amount <= 0) return "amount must be a positive number";
+  if (!Number.isFinite(fee)    || fee < 0)     return "fee must be >= 0";
+  if (!Number.isFinite(savings)|| savings < 0) return "savings must be >= 0";
+  // Cap at 20% fee — covers all optimizer routes with generous margin
+  if (fee > amount * 0.20)        return "fee exceeds 20% of amount";
+  // Cap at 30% savings — prevents nonsensical inputs while allowing large-amount edge cases
+  if (savings > amount * 0.30)    return "savings rate exceeds 30% — suspicious";
   return null;
 }
 

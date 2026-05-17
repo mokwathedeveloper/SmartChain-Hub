@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { errMsg } from "@/utils/errors";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
@@ -119,8 +120,8 @@ export default function Revenue() {
         await supabase.from('profiles').update({ balance: (profile?.balance || 0) + unclaimedAmt }).eq('id', user.id);
         fetchRevenue();
       }
-    } catch (e: any) {
-      addNotification(`Claim failed: ${e.reason || e.message}`, 'error');
+    } catch (e: unknown) {
+      addNotification(`Claim failed: ${errMsg(e)}`, 'error');
     } finally { setClaiming(false); }
   };
 

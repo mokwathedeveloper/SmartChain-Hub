@@ -56,10 +56,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Payment method types based on selection
     // Bank transfer uses card payment with bank redirect note
     // us_bank_account requires Financial Connections activation
-    const paymentMethodTypes: string[] = ["card"];
-
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: paymentMethodTypes as any,
+      payment_method_types: ["card"],
       line_items: [{
         price_data: {
           currency: "usd",

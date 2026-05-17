@@ -95,15 +95,14 @@ export default function AgentIDCard() {
       addressRef.current = null;
       await fetchAgent(true);
       addNotification("Agent ID minted successfully! ✓", "success");
-    } catch (e: any) {
-      const msg = (e.reason || e.data?.message || e.message || "").toLowerCase();
+    } catch (error: unknown) {
+      const msg = errMsg(error).toLowerCase();
       if (msg.includes("already minted")) {
-        // Agent exists on-chain but UI hasn't fetched it yet — just refresh
         addressRef.current = null;
         await fetchAgent(true);
         addNotification("Agent ID already exists — loaded! ✓", "success");
       } else if (!msg.includes("denied") && !msg.includes("rejected") && !msg.includes("user rejected")) {
-        addNotification(`Mint failed: ${e.reason || e.message}`, "error");
+        addNotification(`Mint failed: ${errMsg(error)}`, "error");
       }
     } finally {
       setMinting(false);
@@ -122,8 +121,8 @@ export default function AgentIDCard() {
       setHasFetched(false);
       await fetchAgent(false);
       addNotification("Agent ID reset — you can now re-mint ✓", "success");
-    } catch (e: any) {
-      const msg = e.reason || e.message || "";
+    } catch (error: unknown) {
+      const msg = errMsg(error);
       if (!msg.toLowerCase().includes("denied") && !msg.toLowerCase().includes("rejected")) {
         addNotification(`Reset failed: ${msg}`, "error");
       }

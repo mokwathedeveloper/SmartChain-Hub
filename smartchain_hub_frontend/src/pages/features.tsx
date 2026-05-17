@@ -98,14 +98,14 @@ export default function Features() {
       <Head><title>Features | SmartChain Hub</title></Head>
 
       {/* Hero */}
-      <section className="bg-gray-950 pt-20 pb-16 border-b border-gray-800">
-        <div className="container mx-auto px-6 max-w-6xl text-center">
+      <section className="bg-gray-950 pt-14 sm:pt-20 pb-10 sm:pb-16 border-b border-gray-800">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-xs font-semibold mb-6">
             <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"/>
             Full 0G Modular Stack
           </div>
-          <h1 className="text-5xl font-black text-white mb-5">
-            Every feature powered by<br/>
+          <h1 className="text-3xl sm:text-5xl font-black text-white mb-5">
+            Every feature powered by{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">a specific 0G primitive</span>
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-8">
@@ -125,8 +125,8 @@ export default function Features() {
 
       {/* Feature sections */}
       {features.map((section) => (
-        <section key={section.category} className="py-20 bg-gray-950 border-b border-gray-800">
-          <div className="container mx-auto px-6 max-w-6xl">
+        <section key={section.category} className="py-12 sm:py-20 bg-gray-950 border-b border-gray-800">
+          <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
             <div className="flex items-center gap-3 mb-10">
               <span className={`px-3 py-1 rounded-full text-xs font-bold border ${badgeColorMap[section.color]}`}>
                 {section.category}
@@ -152,8 +152,8 @@ export default function Features() {
       ))}
 
       {/* Comparison table */}
-      <section className="py-20 bg-gray-900">
-        <div className="container mx-auto px-6 max-w-4xl">
+      <section className="py-12 sm:py-20 bg-gray-900">
+        <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
           <h2 className="text-3xl font-black text-white text-center mb-3">How we compare</h2>
           <p className="text-gray-500 text-center mb-12">Most "AI + Web3" projects are just ChatGPT with a tip jar.</p>
           <div className="overflow-x-auto">
@@ -191,9 +191,9 @@ export default function Features() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-gray-950">
-        <div className="container mx-auto px-6 max-w-3xl text-center">
-          <h2 className="text-4xl font-black text-white mb-4">Ready to build on the full 0G stack?</h2>
+      <section className="py-12 sm:py-20 bg-gray-950">
+        <div className="container mx-auto px-4 sm:px-6 max-w-3xl text-center">
+          <h2 className="text-2xl sm:text-4xl font-black text-white mb-4">Ready to build on the full 0G stack?</h2>
           <p className="text-gray-500 mb-8">Connect your wallet and mint your sovereign Agent ID in under 2 minutes.</p>
           <Link href="/signup" className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-colors inline-block">
             Get Started Free →

@@ -1,22 +1,22 @@
 import Head from "next/head";
 import { errMsg } from "@/utils/errors";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import AgentIDCard from "@/components/AgentIDCard";
 import { hydrateAgentMemory } from "@/utils/agentMemory";
 import { triggerFineTune } from "@/utils/api";
+import type { FineTuneResult } from "@/utils/api";
 
-
+type TxActivity = { amount?: number; savings?: number; status?: string; created_at?: string; tx_hash?: string; route?: string };
 
 export default function Dashboard() {
   const { user } = useAuth(false); // false = don't redirect if no Supabase session — AgentIDCard works wallet-only
   const [stats, setStats] = useState({ totalTx: 0, revenue: 0, nodescore: 0, prevTx: 0, prevReputation: 0 });
-  const [activity, setActivity] = useState<any[]>([]);
+  const [activity, setActivity] = useState<TxActivity[]>([]);
   const [barData, setBarData] = useState<number[]>(Array(30).fill(0));
-  const [loading, setLoading] = useState(true);
   const [fineTuning, setFineTuning] = useState(false);
-  const [fineTuneResult, setFineTuneResult] = useState<any>(null);
+  const [fineTuneResult, setFineTuneResult] = useState<FineTuneResult | null>(null);
 
   // Hydrate agent memory from 0G KV on mount
   useEffect(() => {
@@ -35,17 +35,17 @@ export default function Dashboard() {
         const revRes    = await supabase.from('revenue_shares').select('user_share').eq('user_id', user.id);
         const prevTxRes = await supabase.from('transactions').select('id,status').eq('user_id', user.id).gte('created_at', sixtyDaysAgo).lt('created_at', thirtyDaysAgo);
 
-        const txs     = txRes.data     || [];
+        const txs     = (txRes.data     || []) as TxActivity[];
         const revs    = revRes.data    || [];
-        const prevTxs = prevTxRes.data || [];
+        const prevTxs = (prevTxRes.data || []) as { status?: string }[];
 
         const totalRevenue = revs.reduce((s, r) => s + Number(r.user_share), 0);
-        const nodescore    = txs.filter((t: any) => t.status === 'confirmed').length;
-        const prevReputation = prevTxs.filter((t: any) => t.status === 'confirmed').length;
+        const nodescore    = txs.filter(t => t.status === 'confirmed').length;
+        const prevReputation = prevTxs.filter(t => t.status === 'confirmed').length;
 
         const buckets = Array(30).fill(0);
-        txs.forEach((tx: any) => {
-          const daysAgo = Math.floor((Date.now() - new Date(tx.created_at).getTime()) / (24 * 60 * 60 * 1000));
+        txs.forEach(tx => {
+          const daysAgo = Math.floor((Date.now() - new Date(tx.created_at ?? 0).getTime()) / (24 * 60 * 60 * 1000));
           if (daysAgo >= 0 && daysAgo < 30) buckets[29 - daysAgo] += Number(tx.amount || 0);
         });
         const maxBucket = Math.max(...buckets, 1);
@@ -55,8 +55,6 @@ export default function Dashboard() {
         setActivity(txs.slice(0, 4));
       } catch {
         // Supabase unavailable — show empty state
-      } finally {
-        setLoading(false);
       }
     };
     fetch();
@@ -242,7 +240,7 @@ export default function Dashboard() {
             <tbody>
               {(() => {
                 const routeMap: Record<string, { count: number; savings: number }> = {};
-                activity.forEach((tx: any) => {
+                activity.forEach(tx => {
                   const r = tx.route || 'Unknown';
                   if (!routeMap[r]) routeMap[r] = { count: 0, savings: 0 };
                   routeMap[r].count++;

@@ -45,11 +45,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (treeErr) throw treeErr;
 
     const indexer = new Indexer(OG_INDEXER_RPC);
-    const [uploadResult, uploadErr] = await indexer.upload(file, OG_STORAGE_RPC, signer as any);
+    type ZeroGSigner = Parameters<typeof indexer.upload>[2];
+    const [uploadResult, uploadErr] = await indexer.upload(file, OG_STORAGE_RPC, signer as unknown as ZeroGSigner);
     if (uploadErr) throw uploadErr;
 
     const rootHash = tree!.rootHash()!;
-    const txHash = (uploadResult as any)?.txHash || "";
+    const txHash = (uploadResult as { txHash?: string } | undefined)?.txHash || "";
     return res.status(200).json({
       rootHash,
       txHash,

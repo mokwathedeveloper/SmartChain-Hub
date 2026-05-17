@@ -46,7 +46,7 @@ export default function Contact() {
           </div>
           <h1 className="text-3xl sm:text-5xl font-black text-white mb-4">Get in Touch</h1>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
-            Questions about SmartChain Hub, 0G integration, or the hackathon submission? We'd love to hear from you.
+            Questions about SmartChain Hub, 0G integration, or the hackathon submission? We&apos;d love to hear from you.
           </p>
         </div>
       </section>
@@ -105,7 +105,7 @@ export default function Contact() {
             {/* Form */}
             <div>
               <h2 className="text-2xl font-black text-white mb-2">Send a Message</h2>
-              <p className="text-gray-500 text-sm mb-8">We'll get back to you within 24 hours.</p>
+              <p className="text-gray-500 text-sm mb-8">We&apos;ll get back to you within 24 hours.</p>
 
               {status === "sent" ? (
                 <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-10 text-center">
@@ -115,7 +115,7 @@ export default function Contact() {
                     </svg>
                   </div>
                   <h3 className="text-lg font-bold text-white mb-2">Message Sent!</h3>
-                  <p className="text-gray-500 text-sm mb-6">We'll get back to you within 24 hours.</p>
+                  <p className="text-gray-500 text-sm mb-6">We&apos;ll get back to you within 24 hours.</p>
                   <button onClick={() => setStatus("idle")}
                     className="text-blue-400 text-sm font-medium hover:text-blue-300">
                     Send another →

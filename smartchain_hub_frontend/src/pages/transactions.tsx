@@ -206,10 +206,10 @@ export default function Transactions() {
       <div className="space-y-6">
 
         {/* Tabs */}
-        <div className="flex gap-6 border-b border-gray-700">
+        <div className="flex gap-4 sm:gap-6 border-b border-gray-700 overflow-x-auto scrollbar-hide -mx-1 px-1">
           {["Optimize", "Analyze", "Simulate"].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)}
-              className={`pb-3 text-sm font-semibold transition-colors ${activeTab === tab ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-200"}`}>
+              className={`pb-3 text-sm font-semibold transition-colors whitespace-nowrap shrink-0 ${activeTab === tab ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-200"}`}>
               {tab}
             </button>
           ))}

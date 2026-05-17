@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { errMsg } from '@/utils/errors';
 import { supabase } from '@/utils/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { useWeb3 } from '@/context/Web3Context';
@@ -112,8 +113,8 @@ const AIOptimizationWidget = ({ onStateChange }: WidgetProps) => {
       addNotification('Transaction finalized ✓', 'success');
       setOptimizedResult(null);
       setAmount('');
-    } catch (err: any) {
-      addNotification(`Error: ${err.message}`, 'error');
+    } catch (err: unknown) {
+      addNotification(`Error: ${errMsg(err)}`, 'error');
     } finally {
       setIsExecuting(false);
     }

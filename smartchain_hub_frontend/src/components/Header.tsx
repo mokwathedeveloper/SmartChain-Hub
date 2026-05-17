@@ -163,7 +163,10 @@ const Header = ({ onMenuClick }: HeaderProps) => {
 
   // Load avatar from profiles table whenever user changes
   useEffect(() => {
-    if (!user) { setAvatarUrl(null); return; }
+    if (!user) {
+      Promise.resolve().then(() => setAvatarUrl(null));
+      return;
+    }
     supabase.from('profiles').select('avatar_url').eq('id', user.id).single()
       .then(({ data }) => setAvatarUrl(data?.avatar_url || null));
   }, [user]);

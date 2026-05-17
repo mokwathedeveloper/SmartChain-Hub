@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 
-const AIDecisionFeed = () => {
-  const [logs, setLogs] = useState<{ id: number; message: string; type: 'info' | 'success' | 'process' }[]>([]);
+type LogEntry = { id: number; message: string; type: 'info' | 'success' | 'process' };
 
-  const initialLogs = [
-    { id: 1, message: "AI Agent Initialized on 0G Compute", type: 'info' as const },
-    { id: 2, message: "Scanning decentralized liquidity pools...", type: 'process' as const },
-    { id: 3, message: "Optimal route identified via 0G Flash Route", type: 'success' as const }
-  ];
+const INITIAL_LOGS: LogEntry[] = [
+  { id: 1, message: "AI Agent Initialized on 0G Compute", type: 'info' },
+  { id: 2, message: "Scanning decentralized liquidity pools...", type: 'process' },
+  { id: 3, message: "Optimal route identified via 0G Flash Route", type: 'success' },
+];
+
+const AIDecisionFeed = () => {
+  const [logs, setLogs] = useState<LogEntry[]>(INITIAL_LOGS);
 
   useEffect(() => {
-    setLogs(initialLogs);
-    
     // Simulate real-time background activity
     const interval = setInterval(() => {
       const messages = [

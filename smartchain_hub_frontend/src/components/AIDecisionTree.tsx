@@ -1,4 +1,4 @@
-import React from 'react';
+import type { OptimizeResult } from '@/utils/api';
 
 const AIDecisionTree = ({
   isOptimizing,
@@ -6,7 +6,7 @@ const AIDecisionTree = ({
   priority,
 }: {
   isOptimizing: boolean;
-  result: any;
+  result: OptimizeResult | null;
   priority: string;
 }) => {
   return (

@@ -12,14 +12,18 @@ export interface OptimizeResult {
   fee: number;
   savings: number;
   time_s?: number;
+  estimated_time_s?: number;
   fallback?: boolean;
   explanation?: string;
   confidence?: number;
   tee_verified?: boolean;
+  tee_mode?: string;
   tee_proof?: string;
   tee_signer?: string;
   provider_id?: string;
   ml_engine?: string;
+  risk?: string;
+  congestion?: string;
 }
 
 export interface HealthResult {

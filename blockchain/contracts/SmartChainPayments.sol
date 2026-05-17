@@ -42,7 +42,8 @@ contract SmartChainPayments is Ownable, ReentrancyGuard {
     // ── Events ───────────────────────────────────────────────────
     event FundsSent(address indexed from, address indexed to, uint256 amount, uint256 fee, string memo);
     event Staked(address indexed user, uint256 amount);
-    event Unstaked(address indexed user, uint256 amount, uint256 reward);
+    event Unstaked(address indexed user, uint256 principal, uint256 reward, uint256 paid);
+    event UnstakedPartial(address indexed user, uint256 principal, uint256 rewardExpected, uint256 paid);
     event RevenueDistributed(address indexed stakeholder, uint256 amount);
     event EarningsClaimed(address indexed stakeholder, uint256 amount);
 
@@ -95,17 +96,25 @@ contract SmartChainPayments is Ownable, ReentrancyGuard {
     function unstake() external nonReentrant {
         Stake storage s = stakes[msg.sender];
         require(s.amount > 0, "Nothing staked");
-        uint256 reward = _pendingReward(msg.sender) + s.rewardDebt;
+        uint256 reward    = _pendingReward(msg.sender) + s.rewardDebt;
         uint256 principal = s.amount;
         totalStaked -= principal;
         s.amount = 0; s.rewardDebt = 0; s.stakedAt = 0;
-        // Cap total to contract balance (reward may not be funded yet)
-        uint256 total = principal + reward;
+
+        uint256 owed    = principal + reward;
         uint256 balance = address(this).balance;
-        if (total > balance) total = balance;
-        (bool ok,) = payable(msg.sender).call{value: total}("");
+        uint256 paid    = owed > balance ? balance : owed;
+
+        (bool ok,) = payable(msg.sender).call{value: paid}("");
         require(ok, "Transfer failed");
-        emit Unstaked(msg.sender, principal, reward);
+
+        if (paid < owed) {
+            // Contract underfunded — reward was partially covered. Emit a
+            // distinct event so off-chain monitors can detect and top up.
+            emit UnstakedPartial(msg.sender, principal, reward, paid);
+        } else {
+            emit Unstaked(msg.sender, principal, reward, paid);
+        }
     }
 
     function _pendingReward(address user) internal view returns (uint256) {

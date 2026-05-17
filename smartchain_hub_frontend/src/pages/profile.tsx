@@ -77,7 +77,7 @@ export default function Profile() {
       });
     // Check Supabase MFA factors
     supabase.auth.mfa.listFactors().then(({ data }) => {
-      const verified = data?.totp?.find((f: any) => f.status === 'verified');
+      const verified = data?.totp?.find((f: { status: string; id: string }) => f.status === 'verified');
       if (verified) { setTwoFA(true); setTotpFactorId(verified.id); }
     });
   }, [user]);
@@ -148,7 +148,7 @@ export default function Profile() {
     const { error: verifyErr } = await supabase.auth.mfa.verify({ factorId: totpFactorId, challengeId: challengeData.id, code: totpCode });
     setTotpLoading(false);
     if (verifyErr) { setTotpError('Invalid code. Please try again.'); return; }
-    await supabase.from('profiles').update({ two_fa_enabled: true }).eq('id', user!.id);
+    if (user) await supabase.from('profiles').update({ two_fa_enabled: true }).eq('id', user.id);
     setTwoFA(true); setTotpStep('done');
     setTimeout(() => { setShow2FAModal(false); setTotpCode(""); }, 2000);
   };
@@ -163,7 +163,7 @@ export default function Profile() {
     const { error: vErr } = await supabase.auth.mfa.verify({ factorId: totpFactorId, challengeId: ch.id, code: disableCode });
     if (vErr) { setDisableError('Invalid code.'); setDisableLoading(false); return; }
     await supabase.auth.mfa.unenroll({ factorId: totpFactorId });
-    await supabase.from('profiles').update({ two_fa_enabled: false }).eq('id', user!.id);
+    if (user) await supabase.from('profiles').update({ two_fa_enabled: false }).eq('id', user.id);
     setTwoFA(false); setTotpFactorId(""); setDisableLoading(false);
     setShow2FADisable(false); setDisableCode("");
   };

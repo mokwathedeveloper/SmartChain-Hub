@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { useWeb3 } from '@/context/Web3Context';
@@ -6,9 +6,10 @@ import { useNotification } from '@/context/NotificationContext';
 import { ethers } from 'ethers';
 import { storageService } from '@/utils/storage';
 import { apiClient } from '@/utils/secureApi';
+import type { OptimizeResult } from '@/utils/api';
 
 interface WidgetProps {
-  onStateChange?: (loading: boolean, result: any) => void;
+  onStateChange?: (loading: boolean, result: OptimizeResult | null) => void;
 }
 
 const AIOptimizationWidget = ({ onStateChange }: WidgetProps) => {
@@ -18,7 +19,7 @@ const AIOptimizationWidget = ({ onStateChange }: WidgetProps) => {
   const [amount, setAmount] = useState('');
   const [priority, setPriority] = useState('efficiency');
   const [isOptimizing, setIsOptimizing] = useState(false);
-  const [optimizedResult, setOptimizedResult] = useState<null | any>(null);
+  const [optimizedResult, setOptimizedResult] = useState<OptimizeResult | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
 
   useEffect(() => {

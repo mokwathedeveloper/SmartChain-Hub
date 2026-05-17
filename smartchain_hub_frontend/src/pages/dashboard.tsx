@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { errMsg } from "@/utils/errors";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
@@ -69,8 +70,8 @@ export default function Dashboard() {
     try {
       const result = await triggerFineTune([], false);
       setFineTuneResult(result);
-    } catch (e: any) {
-      setFineTuneResult({ ok: false, reason: e.message });
+    } catch (e: unknown) {
+      setFineTuneResult({ ok: false, reason: errMsg(e) });
     } finally {
       setFineTuning(false);
     }

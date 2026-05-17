@@ -32,6 +32,7 @@ contract SmartChainAgentID is Ownable {
     event AgentMinted(address indexed owner, bytes32 modelHash, uint256 timestamp);
     event MemoryUpdated(address indexed owner, bytes32 newMemoryRoot, uint256 reputation);
     event ReputationIncremented(address indexed owner, uint256 newReputation, uint256 savingsAdded);
+    event AgentReset(address indexed wallet, address indexed resetBy, uint256 timestamp);
 
     constructor() Ownable(msg.sender) {}
 
@@ -88,6 +89,7 @@ contract SmartChainAgentID is Ownable {
         hasMinted[_wallet] = false;
         delete agents[_wallet];
         if (totalAgents > 0) totalAgents--;
+        emit AgentReset(_wallet, msg.sender, block.timestamp);
     }
 
     /**

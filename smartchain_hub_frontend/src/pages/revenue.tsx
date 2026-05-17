@@ -1,6 +1,8 @@
 import Head from "next/head";
 import { errMsg } from "@/utils/errors";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+
+type RevenueShare = { user_share?: number; total_platform_revenue?: number; claimed?: boolean };
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { useWeb3 } from "@/context/Web3Context";
@@ -59,8 +61,8 @@ export default function Revenue() {
   const { user } = useAuth(false); // false = don't redirect if no session
   const { signer, isConnected, address } = useWeb3();
   const { addNotification } = useNotification();
-  const [shares, setShares] = useState<any[]>([]);
-  const [unclaimed, setUnclaimed] = useState<any[]>([]);
+  const [shares, setShares] = useState<RevenueShare[]>([]);
+  const [unclaimed, setUnclaimed] = useState<RevenueShare[]>([]);
   const [loading, setLoading] = useState(true);
   const [claiming, setClaiming] = useState(false);
   const [onChainEarnings, setOnChainEarnings] = useState("0");

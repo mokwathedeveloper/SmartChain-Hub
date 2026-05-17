@@ -78,10 +78,10 @@ export default function About() {
                 Agents that own themselves. Not just wallets with prompts.
               </h2>
               <p className="text-gray-400 leading-relaxed mb-5">
-                Most "AI + Web3" projects are ChatGPT with a tip jar. SmartChain Hub is different. We believe AI agents should have sovereign identity — an on-chain record of their intelligence, memory, and behavior that cannot be copied by stealing a private key.
+                Most &quot;AI + Web3&quot; projects are ChatGPT with a tip jar. SmartChain Hub is different. We believe AI agents should have sovereign identity — an on-chain record of their intelligence, memory, and behavior that cannot be copied by stealing a private key.
               </p>
               <p className="text-gray-400 leading-relaxed">
-                We built on 0G because it's the only modular stack that provides all the primitives needed: Agent ID for identity, Storage KV for memory, Compute for verifiable inference, and Chain for settlement. Everything else is just a database with a wallet.
+                We built on 0G because it&apos;s the only modular stack that provides all the primitives needed: Agent ID for identity, Storage KV for memory, Compute for verifiable inference, and Chain for settlement. Everything else is just a database with a wallet.
               </p>
             </div>
             <div className="space-y-4">

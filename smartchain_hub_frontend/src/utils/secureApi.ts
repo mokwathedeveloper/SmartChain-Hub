@@ -105,7 +105,7 @@ class SecureApiClient {
   /**
    * Optimizes transaction with security validation
    */
-  async optimizeTransaction(transactionData: any) {
+  async optimizeTransaction(transactionData: Record<string, unknown>) {
     const AI_AGENT_URL = process.env.NEXT_PUBLIC_AI_AGENT_URL;
     
     if (!AI_AGENT_URL) {
@@ -167,7 +167,7 @@ class SecureApiClient {
   /**
    * Validates transaction data structure
    */
-  private validateTransactionData(data: any): boolean {
+  private validateTransactionData(data: Record<string, unknown>): boolean {
     if (!data || typeof data !== 'object') {
       return false;
     }
@@ -187,14 +187,14 @@ class SecureApiClient {
       return false;
     }
     
-    // Validate numeric fields
+    // Validate numeric fields — narrow unknown to accepted BigInt/parseInt types first
     try {
-      BigInt(data.value);
-      parseInt(data.gasLimit);
-      if (data.gasPrice) {
-        BigInt(data.gasPrice);
+      BigInt(String(data.value));
+      parseInt(String(data.gasLimit), 10);
+      if (data.gasPrice !== undefined && data.gasPrice !== null) {
+        BigInt(String(data.gasPrice));
       }
-    } catch (error) {
+    } catch {
       console.error('Invalid numeric values in transaction data');
       return false;
     }
@@ -207,5 +207,5 @@ class SecureApiClient {
 export const apiClient = new SecureApiClient();
 
 // Legacy exports for backward compatibility
-export const optimizeTransaction = (data: any) => apiClient.optimizeTransaction(data);
+export const optimizeTransaction = (data: Record<string, unknown>) => apiClient.optimizeTransaction(data);
 export const getTransactionHistory = () => apiClient.getTransactionHistory();

@@ -1,5 +1,5 @@
 import Head from "next/head";
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useWeb3 } from "@/context/Web3Context";
 import { useNotification } from "@/context/NotificationContext";
 import { ethers } from "ethers";
@@ -30,15 +30,12 @@ export default function Payments() {
   const [tab, setTab] = useState("Send");
   const [loading, setLoading] = useState(false);
   const [manualAddress, setManualAddress] = useState("");
-  const [useManual, setUseManual] = useState(false);
-
   const displayAddress = address || manualAddress;
   const isWalletConnected = isConnected || (manualAddress && manualAddress.length > 0);
-  
+
   const handleManualConnect = () => {
     if (!manualAddress.trim()) return;
     if (!/^0x[a-fA-F0-9]{40}$/.test(manualAddress.trim())) return;
-    setUseManual(true);
   };
 
   // Send

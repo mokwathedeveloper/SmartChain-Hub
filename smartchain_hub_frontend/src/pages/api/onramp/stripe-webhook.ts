@@ -25,6 +25,8 @@ async function getRawBody(req: NextApiRequest): Promise<Buffer> {
   });
 }
 
+const STRIPE_CENTS = 100; // Stripe amounts are in cents; divide by 100 for USD
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end();
 
@@ -62,7 +64,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (session.payment_status !== "paid") {
       await logPayment({
         walletAddress,
-        amountUsd: session.amount_total / 100,
+        amountUsd: session.amount_total / STRIPE_CENTS,
         a0giAmount,
         method: paymentType === "bank" ? "bank" : "stripe",
         txRef,
@@ -76,7 +78,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       await logPayment({
         walletAddress,
-        amountUsd: session.amount_total / 100,
+        amountUsd: session.amount_total / STRIPE_CENTS,
         a0giAmount,
         method: paymentType === "bank" ? "bank" : "stripe",
         txRef,
@@ -90,7 +92,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.error("A0GI delivery failed:", e.message);
       await logPayment({
         walletAddress,
-        amountUsd: session.amount_total / 100,
+        amountUsd: session.amount_total / STRIPE_CENTS,
         a0giAmount,
         method: paymentType === "bank" ? "bank" : "stripe",
         txRef,
@@ -110,7 +112,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { txHash, explorerUrl } = await deliverA0GI(walletAddress, a0giAmount, txRef);
         await logPayment({
           walletAddress,
-          amountUsd: intent.amount / 100,
+          amountUsd: intent.amount / STRIPE_CENTS,
           a0giAmount,
           method: "bank",
           txRef,

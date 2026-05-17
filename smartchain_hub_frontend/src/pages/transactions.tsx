@@ -1,5 +1,5 @@
 import Head from "next/head";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { optimizeTransaction as apiOptimize } from "@/utils/api";
@@ -9,6 +9,34 @@ import { generateZKProof } from "@/utils/zkProof";
 import { useWeb3 } from "@/context/Web3Context";
 import { hasAgentID, mintAgentID, updateAgentMemory } from "@/utils/agentId";
 import { recordTransactionOnChain } from "@/utils/blockchain";
+
+interface TransactionRow {
+  id?: string;
+  amount: number;
+  savings: number;
+  optimized_fee?: number;
+  route?: string;
+  status?: string;
+  tx_hash?: string;
+  created_at?: string;
+}
+
+interface SimResult {
+  route: string;
+  amount: number;
+  estimatedFee: string;
+  estimatedTime: number;
+  savings: string;
+  risk: string;
+  successRate: number;
+}
+
+interface RouteAnalysis {
+  route: string;
+  count: number;
+  totalSavings: number;
+  totalFees: number;
+}
 
 export default function Transactions() {
   const { user } = useAuth();

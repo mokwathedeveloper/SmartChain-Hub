@@ -35,6 +35,9 @@ export interface HealthResult {
 export interface FineTuneResult {
   ok: boolean;
   reason?: string;
+  samples?: number;
+  final_loss?: number;
+  model_hash?: string;
   [key: string]: unknown;
 }
 

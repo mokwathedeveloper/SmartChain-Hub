@@ -11,6 +11,7 @@
  * Add STRIPE_WEBHOOK_SECRET to .env.local
  */
 import type { NextApiRequest, NextApiResponse } from "next";
+import { errMsg } from "@/utils/errors";
 import { deliverA0GI, logPayment } from "@/utils/onrampDelivery";
 
 // Disable body parsing — Stripe needs raw body for signature verification
@@ -45,9 +46,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const Stripe = (await import("stripe")).default;
       const stripe = new Stripe(stripeKey);
       event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
-  } catch (e: any) {
-    console.error("Stripe webhook signature verification failed:", e.message);
-    return res.status(400).json({ error: `Webhook signature invalid: ${e.message}` });
+  } catch (e: unknown) {
+    console.error("Stripe webhook signature verification failed:", errMsg(e));
+    return res.status(400).json({ error: `Webhook signature invalid: ${errMsg(e)}` });
   }
 
   // Handle checkout.session.completed
@@ -88,8 +89,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       console.log(`✅ Delivered ${a0giAmount} A0GI to ${walletAddress} | tx: ${explorerUrl}`);
       return res.status(200).json({ received: true, txHash, explorerUrl });
-    } catch (e: any) {
-      console.error("A0GI delivery failed:", e.message);
+    } catch (e: unknown) {
+      console.error("A0GI delivery failed:", errMsg(e));
       await logPayment({
         walletAddress,
         amountUsd: session.amount_total / STRIPE_CENTS,
@@ -98,7 +99,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         txRef,
         status: "failed",
       });
-      return res.status(500).json({ error: e.message });
+      return res.status(500).json({ error: errMsg(e) });
     }
   }
 
@@ -120,8 +121,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           txHash,
         });
         console.log(`✅ Bank transfer: Delivered ${a0giAmount} A0GI to ${walletAddress} | tx: ${explorerUrl}`);
-      } catch (e: any) {
-        console.error("Bank transfer A0GI delivery failed:", e.message);
+      } catch (e: unknown) {
+        console.error("Bank transfer A0GI delivery failed:", errMsg(e));
       }
     }
   }

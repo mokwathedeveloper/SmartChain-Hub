@@ -1,14 +1,29 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ethers } from "ethers";
 import { useWeb3 } from "@/context/Web3Context";
 import { useNotification } from "@/context/NotificationContext";
 import { hasAgentID, mintAgentID, getAgentIdentity, resetMint } from "@/utils/agentId";
 
+type AgentIdentity = Awaited<ReturnType<typeof getAgentIdentity>> & {
+  teeVerified?: boolean;
+  teeMode?: string;
+  providerId?: string;
+};
+
+function errMsg(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (typeof e === "object" && e !== null) {
+    const obj = e as Record<string, unknown>;
+    return String(obj.reason ?? obj.message ?? JSON.stringify(e));
+  }
+  return String(e);
+}
+
 export default function AgentIDCard() {
-  const { signer, isConnected, address, connectWallet } = useWeb3();
+  const { signer, isConnected, connectWallet } = useWeb3();
   const { addNotification } = useNotification();
 
-  const [agent, setAgent]         = useState<any>(null);
+  const [agent, setAgent]         = useState<AgentIdentity | null>(null);
   const [loading, setLoading]     = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
   const [minting, setMinting]     = useState(false);

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { errMsg } from "@/utils/errors";
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
@@ -33,8 +34,8 @@ function WalletModal({ onClose, onConnect }: { onClose: () => void; onConnect: (
     try {
       await connectWallet();
       onClose();
-    } catch (e: any) {
-      setError(e.message || 'Connection failed');
+    } catch (e: unknown) {
+      setError(errMsg(e) || 'Connection failed');
     } finally {
       setLoading(false);
     }

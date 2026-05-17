@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/utils/supabase';
 import { useAuth } from '@/hooks/useAuth';
 
+type TxRow = { id?: string; tx_hash?: string; amount: number; status?: string; created_at: string };
+
 const TransactionList = () => {
   const { user } = useAuth(false);
-  const [txs, setTxs] = useState<any[]>([]);
+  const [txs, setTxs] = useState<TxRow[]>([]);
 
   useEffect(() => {
     if (!user) return;

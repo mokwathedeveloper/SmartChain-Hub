@@ -117,31 +117,31 @@ export default function Home() {
         {/* Glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-600/10 rounded-full blur-3xl"/>
 
-        <div className="relative container mx-auto px-6 max-w-6xl pt-24 pb-32">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
+        <div className="relative container mx-auto px-4 sm:px-6 max-w-6xl pt-14 sm:pt-24 pb-16 sm:pb-32">
+          <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
             {/* Left */}
-            <div className="flex-1 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-xs font-semibold mb-6">
+            <div className="flex-1 max-w-2xl w-full">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-xs font-semibold mb-5 sm:mb-6">
                 <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"/>
                 0G APAC Hackathon 2026 — Track 3
               </div>
-              <h1 className="text-5xl sm:text-6xl font-black text-white leading-tight mb-6">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-5 sm:mb-6">
                 Your AI Agent.<br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
                   Sovereign on 0G.
                 </span>
               </h1>
-              <p className="text-lg text-gray-400 mb-8 leading-relaxed">
+              <p className="text-base sm:text-lg text-gray-400 mb-6 sm:mb-8 leading-relaxed">
                 SmartChain Hub gives every user a sovereign AI agent with soulbound identity, persistent memory, and TEE-verified intelligence — all powered by the full 0G modular stack.
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-3 sm:gap-4">
                 <Link href="/dashboard"
-                  className="px-7 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/25 text-sm">
+                  className="px-5 sm:px-7 py-3 sm:py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/25 text-sm">
                   Launch App →
                 </Link>
                 <a href="https://scan-testnet.0g.ai/address/0x69C619374c6B901b99941Df7238fceb80d7DCd08"
                   target="_blank" rel="noreferrer"
-                  className="px-7 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl transition-all text-sm">
+                  className="px-5 sm:px-7 py-3 sm:py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl transition-all text-sm">
                   View on ChainScan ↗
                 </a>
               </div>
@@ -304,12 +304,12 @@ export default function Home() {
           </div>
 
           {/* CTA */}
-          <div className="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 border border-blue-500/20 rounded-2xl p-10">
-            <h3 className="text-3xl font-black text-white mb-4">Ready to launch your sovereign agent?</h3>
-            <p className="text-gray-400 mb-8">Connect your wallet, mint your Agent ID, and start optimizing transactions on 0G.</p>
-            <div className="flex flex-wrap gap-4 justify-center">
+          <div className="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 border border-blue-500/20 rounded-2xl p-6 sm:p-10">
+            <h3 className="text-2xl sm:text-3xl font-black text-white mb-4">Ready to launch your sovereign agent?</h3>
+            <p className="text-gray-400 mb-6 sm:mb-8">Connect your wallet, mint your Agent ID, and start optimizing transactions on 0G.</p>
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center">
               <Link href="/dashboard"
-                className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/25">
+                className="px-6 sm:px-8 py-3 sm:py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/25 text-center">
                 Get Started Free →
               </Link>
               <a href="https://github.com/mokwathedeveloper/SmartChain-Hub" target="_blank" rel="noreferrer"

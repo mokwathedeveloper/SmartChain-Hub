@@ -226,7 +226,7 @@ export default function Profile() {
                     </div>
                     <button onClick={() => setTotpStep("verify")}
                       className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-sm transition-all">
-                      I've scanned it →
+                      I&apos;ve scanned it →
                     </button>
                   </>
                 )}

@@ -1,9 +1,7 @@
 import Head from "next/head";
-import React, { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useState, useEffect } from "react";
 
 const ConsolePage = () => {
-  const { user } = useAuth();
   const [logs, setLogs] = useState<{ id: number; msg: string; type: 'wasm' | 'storage' | 'network' }[]>([]);
 
   useEffect(() => {

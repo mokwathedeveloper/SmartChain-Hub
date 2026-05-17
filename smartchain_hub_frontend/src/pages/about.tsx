@@ -23,14 +23,14 @@ export default function About() {
       <Head><title>About | SmartChain Hub</title></Head>
 
       {/* Hero */}
-      <section className="bg-gray-950 pt-20 pb-16 border-b border-gray-800">
-        <div className="container mx-auto px-6 max-w-6xl">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
+      <section className="bg-gray-950 pt-14 sm:pt-20 pb-10 sm:pb-16 border-b border-gray-800">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
+          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
             <div className="flex-1">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-xs font-semibold mb-6">
                 0G APAC Hackathon 2026
               </div>
-              <h1 className="text-5xl font-black text-white mb-5 leading-tight">
+              <h1 className="text-3xl sm:text-5xl font-black text-white mb-5 leading-tight">
                 Built for the<br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Agentic Economy</span>
               </h1>
@@ -69,9 +69,9 @@ export default function About() {
       </section>
 
       {/* Mission */}
-      <section className="py-20 bg-gray-900 border-b border-gray-800">
-        <div className="container mx-auto px-6 max-w-6xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <section className="py-12 sm:py-20 bg-gray-900 border-b border-gray-800">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             <div>
               <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">Our Mission</span>
               <h2 className="text-3xl font-black text-white mt-3 mb-5">
@@ -105,8 +105,8 @@ export default function About() {
       </section>
 
       {/* Tech Stack */}
-      <section className="py-20 bg-gray-950 border-b border-gray-800">
-        <div className="container mx-auto px-6 max-w-6xl">
+      <section className="py-12 sm:py-20 bg-gray-950 border-b border-gray-800">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
           <div className="text-center mb-12">
             <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">Technology</span>
             <h2 className="text-3xl font-black text-white mt-3">Built with the full 0G stack</h2>
@@ -124,8 +124,8 @@ export default function About() {
       </section>
 
       {/* Timeline */}
-      <section className="py-20 bg-gray-900 border-b border-gray-800">
-        <div className="container mx-auto px-6 max-w-4xl">
+      <section className="py-12 sm:py-20 bg-gray-900 border-b border-gray-800">
+        <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
           <div className="text-center mb-12">
             <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">Timeline</span>
             <h2 className="text-3xl font-black text-white mt-3">From idea to deployment</h2>
@@ -151,8 +151,8 @@ export default function About() {
       </section>
 
       {/* Contracts */}
-      <section className="py-20 bg-gray-950">
-        <div className="container mx-auto px-6 max-w-4xl">
+      <section className="py-12 sm:py-20 bg-gray-950">
+        <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
           <div className="text-center mb-12">
             <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">On-Chain</span>
             <h2 className="text-3xl font-black text-white mt-3">Deployed contracts</h2>

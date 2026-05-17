@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, type ReactNode } from 'react';
 import { ethers } from 'ethers';
 import { secureLogger } from '../utils/secureLogger';
 
@@ -92,8 +92,8 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
       if (cid !== TARGET_CHAIN_ID) {
         try {
           await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: OG_GALILEO.chainId }] });
-        } catch (e: any) {
-          if (e.code === 4902) {
+        } catch (e: unknown) {
+          if ((e as { code?: number }).code === 4902) {
             await ethereum.request({ method: 'wallet_addEthereumChain', params: [OG_GALILEO] });
           }
         }
@@ -109,7 +109,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
       setProvider(bp); setSigner(sig);
       setAddress(account); setChainId(cid);
       secureLogger.wallet('Wallet connected successfully', account);
-    } catch (e: any) {
+    } catch (e: unknown) {
       secureLogger.error('Wallet connect failed', e);
     }
   };
@@ -130,8 +130,8 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
       secureLogger.info('Wallet accounts received', { count: accounts.length });
       if (!accounts.length) return;
       await _connect(ethereum, accounts[0]);
-    } catch (e: any) {
-      if (e.code !== 4001) secureLogger.error('Wallet connection failed', e);
+    } catch (e: unknown) {
+      if ((e as { code?: number }).code !== 4001) secureLogger.error('Wallet connection failed', e);
     } finally {
       connectingRef.current = false;
     }
@@ -147,8 +147,8 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
     if (!ethereum) return;
     try {
       await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: OG_GALILEO.chainId }] });
-    } catch (e: any) {
-      if (e.code === 4902) {
+    } catch (e: unknown) {
+      if ((e as { code?: number }).code === 4902) {
         await ethereum.request({ method: 'wallet_addEthereumChain', params: [OG_GALILEO] });
       }
     }

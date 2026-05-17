@@ -38,13 +38,13 @@ export default function Contact() {
       <Head><title>Contact | SmartChain Hub</title></Head>
 
       {/* Hero */}
-      <section className="bg-gray-950 pt-20 pb-12 border-b border-gray-800">
-        <div className="container mx-auto px-6 max-w-6xl text-center">
+      <section className="bg-gray-950 pt-14 sm:pt-20 pb-10 sm:pb-12 border-b border-gray-800">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-xs font-semibold mb-5">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"/>
             We respond within 24 hours
           </div>
-          <h1 className="text-5xl font-black text-white mb-4">Get in Touch</h1>
+          <h1 className="text-3xl sm:text-5xl font-black text-white mb-4">Get in Touch</h1>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
             Questions about SmartChain Hub, 0G integration, or the hackathon submission? We'd love to hear from you.
           </p>
@@ -52,8 +52,8 @@ export default function Contact() {
       </section>
 
       {/* Contact cards */}
-      <section className="bg-gray-950 py-12 border-b border-gray-800">
-        <div className="container mx-auto px-6 max-w-6xl">
+      <section className="bg-gray-950 py-10 sm:py-12 border-b border-gray-800">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               {
@@ -98,9 +98,9 @@ export default function Contact() {
       </section>
 
       {/* Form + FAQ */}
-      <section className="bg-gray-950 py-16">
-        <div className="container mx-auto px-6 max-w-6xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <section className="bg-gray-950 py-10 sm:py-16">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
 
             {/* Form */}
             <div>

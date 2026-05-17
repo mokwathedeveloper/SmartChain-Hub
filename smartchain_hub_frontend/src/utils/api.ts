@@ -7,8 +7,28 @@ import { secureLogger } from './secureLogger';
 
 const AI_URL = () => process.env.NEXT_PUBLIC_AI_AGENT_URL || 'http://localhost:5000';
 
+export interface OptimizeResult {
+  route: string;
+  fee: number;
+  savings: number;
+  time_s?: number;
+  fallback?: boolean;
+}
+
+export interface HealthResult {
+  status: string;
+  model?: string;
+  [key: string]: unknown;
+}
+
+export interface FineTuneResult {
+  ok: boolean;
+  reason?: string;
+  [key: string]: unknown;
+}
+
 /** Optimize a transaction — calls POST /optimize on the AI agent. */
-export async function optimizeTransaction(amount: number, priority: string): Promise<any> {
+export async function optimizeTransaction(amount: number, priority: string): Promise<OptimizeResult> {
   secureLogger.info('Optimizing transaction', { amount, priority });
 
   const res = await fetch(`${AI_URL()}/optimize`, {
@@ -18,22 +38,22 @@ export async function optimizeTransaction(amount: number, priority: string): Pro
   });
 
   if (!res.ok) throw new Error(`AI agent returned ${res.status}`);
-  return res.json();
+  return res.json() as Promise<OptimizeResult>;
 }
 
 /** Health check for the AI agent. */
-export async function getAgentHealth(): Promise<any> {
+export async function getAgentHealth(): Promise<HealthResult> {
   const res = await fetch(`${AI_URL()}/health`);
   if (!res.ok) throw new Error(`Health check failed: ${res.status}`);
-  return res.json();
+  return res.json() as Promise<HealthResult>;
 }
 
 /** Trigger fine-tuning via the backend (which proxies to AI agent). */
-export async function triggerFineTune(rootHashes: string[] = [], dryRun = false): Promise<any> {
+export async function triggerFineTune(rootHashes: string[] = [], dryRun = false): Promise<FineTuneResult> {
   const res = await fetch('/api/fine-tune', {
     method:  'POST',
     headers: { 'Content-Type': 'application/json' },
     body:    JSON.stringify({ root_hashes: rootHashes, dry_run: dryRun }),
   });
-  return res.json();
+  return res.json() as Promise<FineTuneResult>;
 }

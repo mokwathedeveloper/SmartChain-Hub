@@ -13,6 +13,13 @@ export interface OptimizeResult {
   savings: number;
   time_s?: number;
   fallback?: boolean;
+  explanation?: string;
+  confidence?: number;
+  tee_verified?: boolean;
+  tee_proof?: string;
+  tee_signer?: string;
+  provider_id?: string;
+  ml_engine?: string;
 }
 
 export interface HealthResult {

@@ -10,6 +10,7 @@
  * Supported countries: Kenya (KES), Tanzania (TZS), Uganda (UGX), Rwanda (RWF)
  */
 import type { NextApiRequest, NextApiResponse } from "next";
+import { errMsg } from "@/utils/errors";
 import { logPayment } from "@/utils/onrampDelivery";
 import { rateLimit, getClientIp } from "@/utils/rateLimit";
 
@@ -125,8 +126,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         detail: data.data?.message || "",
       });
     }
-  } catch (e: any) {
-    console.error("Flutterwave M-Pesa error:", e.message);
-    return res.status(500).json({ error: e.message });
+  } catch (e: unknown) {
+    console.error("Flutterwave M-Pesa error:", errMsg(e));
+    return res.status(500).json({ error: errMsg(e) });
   }
 }

@@ -105,7 +105,7 @@ def call_0g_compute(prompt: str) -> dict:
             "model": OG_COMPUTE_MODEL,
         }
     except Exception as e:
-        print(f"0G Compute unavailable: {e}")
+        app.logger.warning("0G Compute unavailable: %s", e)
         return None
 
 
@@ -172,7 +172,7 @@ def optimize_transaction():
             result = _local_optimize(amount, priority)
         except Exception as e:
             # TF unavailable (OOM, missing model) — mathematical fallback so we never 500
-            print(f"TF optimizer failed: {e}")
+            app.logger.warning("TF optimizer failed: %s", e)
             result = _math_fallback(amount, priority)
         result["tee_verified"] = False
 

@@ -14,6 +14,7 @@
  * Returns: { proof, publicSignals, verified, commitment }
  */
 import type { NextApiRequest, NextApiResponse } from "next";
+import { errMsg } from "@/utils/errors";
 import crypto from "crypto";
 
 /** Deterministic commitment — SHA-256 of the public inputs. Used as fallback. */
@@ -91,7 +92,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       route:  route || "unknown",
     });
 
-  } catch (e: any) {
+  } catch (e: unknown) {
     // Graceful fallback — commitment hash proves the inputs without a full ZK circuit
     return res.status(200).json({
       proof:         null,
@@ -100,7 +101,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       commitment,
       method:        "commitment-sha256",
       fallback:      true,
-      reason:        e.message,
+      reason:        errMsg(e),
       route:         route || "unknown",
     });
   }

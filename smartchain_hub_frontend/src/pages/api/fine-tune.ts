@@ -37,14 +37,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .order("created_at", { ascending: false })
       .limit(100);
 
-    const transactions = (txs || []).map((tx: any) => ({
-      amount:       parseFloat(tx.amount || 0),
-      fee:          parseFloat(tx.optimized_fee || 0),
-      savings:      parseFloat(tx.savings || 0),
+    type TxRecord = { amount?: number | string; optimized_fee?: number | string; savings?: number | string; route?: string; created_at?: string };
+    type TxMapped = { amount: number; fee: number; savings: number; route: string; tee_verified: boolean; timestamp: number };
+    const transactions = (txs || []).map((tx: TxRecord): TxMapped => ({
+      amount:       parseFloat(String(tx.amount || 0)),
+      fee:          parseFloat(String(tx.optimized_fee || 0)),
+      savings:      parseFloat(String(tx.savings || 0)),
       route:        tx.route || "0G Chain Flash Route",
       tee_verified: false,
-      timestamp:    new Date(tx.created_at).getTime(),
-    })).filter((tx: any) => tx.amount > 0 && tx.savings > 0);
+      timestamp:    new Date(tx.created_at ?? 0).getTime(),
+    })).filter((tx: TxMapped) => tx.amount > 0 && tx.savings > 0);
 
     if (transactions.length < 10) {
       return res.status(422).json({

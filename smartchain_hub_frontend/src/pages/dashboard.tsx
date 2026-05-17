@@ -99,7 +99,7 @@ export default function Dashboard() {
 
         {/* Fine-tune AI Model Panel */}
         <div className="bg-gray-900 rounded-2xl p-5 border border-gray-800">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
             <div>
               <h2 className="text-sm font-bold text-white">AI Model Fine-tuning</h2>
               <p className="text-xs text-gray-500 mt-0.5">Retrain the TF model on your real transaction data stored in 0G Storage</p>
@@ -107,7 +107,7 @@ export default function Dashboard() {
             <button
               onClick={handleFineTune}
               disabled={fineTuning}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl transition-all disabled:opacity-50">
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl transition-all disabled:opacity-50 sm:shrink-0">
               {fineTuning ? (
                 <><div className="w-3 h-3 rounded-full border-2 border-white/30 border-t-white animate-spin" />Fine-tuning...</>
               ) : (

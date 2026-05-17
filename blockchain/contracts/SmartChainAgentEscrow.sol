@@ -20,7 +20,8 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
  */
 contract SmartChainAgentEscrow is Ownable, ReentrancyGuard {
 
-    uint256 public constant PLATFORM_FEE_BPS = 100; // 1% in basis points
+    uint256 public constant PLATFORM_FEE_BPS    = 100;        // 1% in basis points
+    uint256 public constant MAX_CHANNEL_DEPOSIT = 100 ether; // safeguard against accidental over-funding
     uint256 public totalFeesCollected;
 
     struct Channel {
@@ -79,6 +80,7 @@ contract SmartChainAgentEscrow is Ownable, ReentrancyGuard {
             emit ChannelOpened(cid, msg.sender, _agentB, _pricePerCall);
         }
 
+        require(ch.balance + msg.value <= MAX_CHANNEL_DEPOSIT, "Exceeds max channel deposit");
         ch.balance += msg.value;
         emit ChannelToppedUp(cid, msg.value, ch.balance);
     }

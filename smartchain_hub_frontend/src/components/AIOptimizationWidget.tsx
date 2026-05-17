@@ -43,13 +43,14 @@ const AIOptimizationWidget = ({ onStateChange }: WidgetProps) => {
       addNotification('Optimization complete ✓', 'success');
     } catch {
       setTimeout(() => {
+        const amt = parseFloat(amount);
         setOptimizedResult({
-          fee: (parseFloat(amount) * 0.005).toFixed(2),
-          savings: (parseFloat(amount) * 0.015).toFixed(2),
-          route: '0G Chain Flash Route (Fallback)',
+          fee:     Math.round(amt * 0.005 * 100) / 100,
+          savings: Math.round(amt * 0.015 * 100) / 100,
+          route:       '0G Chain Flash Route (Fallback)',
           explanation: `The AI prioritized ${priority} using simulation heuristics for 0G Newton.`,
-          confidence: 85.5,
-          ml_engine: 'Simulation Heuristics',
+          confidence:  85.5,
+          ml_engine:   'Simulation Heuristics',
         });
         setIsOptimizing(false);
         addNotification('Optimization simulated (offline mode)', 'info');
@@ -88,7 +89,7 @@ const AIOptimizationWidget = ({ onStateChange }: WidgetProps) => {
             const tx = await contract.recordTransaction(
               bytes32Hash,
               ethers.parseUnits(amount, 18),
-              ethers.parseUnits(optimizedResult.fee, 18),
+              ethers.parseUnits(String(optimizedResult.fee), 18),
               optimizedResult.route,
             );
             await tx.wait();
@@ -100,8 +101,8 @@ const AIOptimizationWidget = ({ onStateChange }: WidgetProps) => {
       const { error } = await supabase.from('transactions').insert([{
         user_id: user.id,
         amount: parseFloat(amount),
-        optimized_fee: parseFloat(optimizedResult.fee),
-        savings: parseFloat(optimizedResult.savings),
+        optimized_fee: optimizedResult.fee,
+        savings:       optimizedResult.savings,
         route: optimizedResult.route,
         status: isConnected ? 'confirmed' : 'pending',
         tx_hash,

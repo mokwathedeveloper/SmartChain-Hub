@@ -11,6 +11,7 @@
  * Add STRIPE_WEBHOOK_SECRET to .env.local
  */
 import type { NextApiRequest, NextApiResponse } from "next";
+import type Stripe from "stripe";
 import { errMsg } from "@/utils/errors";
 import { deliverA0GI, logPayment } from "@/utils/onrampDelivery";
 
@@ -41,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const rawBody = await getRawBody(req);
   const sig = req.headers["stripe-signature"] as string;
 
-  let event: any;
+  let event: Stripe.Event;
   try {
     const Stripe = (await import("stripe")).default;
       const stripe = new Stripe(stripeKey);
@@ -65,7 +66,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (session.payment_status !== "paid") {
       await logPayment({
         walletAddress,
-        amountUsd: session.amount_total / STRIPE_CENTS,
+        amountUsd: (session.amount_total ?? 0) / STRIPE_CENTS,
         a0giAmount,
         method: paymentType === "bank" ? "bank" : "stripe",
         txRef,
@@ -79,7 +80,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       await logPayment({
         walletAddress,
-        amountUsd: session.amount_total / STRIPE_CENTS,
+        amountUsd: (session.amount_total ?? 0) / STRIPE_CENTS,
         a0giAmount,
         method: paymentType === "bank" ? "bank" : "stripe",
         txRef,
@@ -93,7 +94,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.error("A0GI delivery failed:", errMsg(e));
       await logPayment({
         walletAddress,
-        amountUsd: session.amount_total / STRIPE_CENTS,
+        amountUsd: (session.amount_total ?? 0) / STRIPE_CENTS,
         a0giAmount,
         method: paymentType === "bank" ? "bank" : "stripe",
         txRef,

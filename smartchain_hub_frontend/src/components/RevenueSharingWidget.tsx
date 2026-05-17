@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { errMsg } from '@/utils/errors';
 import { supabase } from '@/utils/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotification } from '@/context/NotificationContext';
@@ -53,8 +54,8 @@ const RevenueSharingWidget = () => {
 
       addNotification(`Claimed $${revenue.user_share.toFixed(2)} ✓`, 'success');
       setRevenue({ total_platform_revenue: 0, user_share: 0 });
-    } catch (err: any) {
-      addNotification(`Claim failed: ${err.message}`, 'error');
+    } catch (err: unknown) {
+      addNotification(`Claim failed: ${errMsg(err)}`, 'error');
     } finally {
       setClaiming(false);
     }

@@ -6,6 +6,7 @@
  * localStorage in the browser is a read-through cache only.
  */
 import type { NextApiRequest, NextApiResponse } from "next";
+import { errMsg } from "@/utils/errors";
 import crypto from "crypto";
 
 const OG_KV_RPC      = "https://indexer-storage-testnet-standard.0g.ai";
@@ -37,9 +38,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (!value) return res.status(200).json({ memory: null });
       const memory = JSON.parse(new TextDecoder().decode(value));
       return res.status(200).json({ memory });
-    } catch (e: any) {
+    } catch (e: unknown) {
       // Stringify BigInt in error message to avoid JSON serialization crash
-      const msg = typeof e.message === 'string' ? e.message.replace(/\d+n/g, (s: string) => s.slice(0,-1)) : String(e);
+      const msg = typeof errMsg(e) === 'string' ? errMsg(e).replace(/\d+n/g, (s: string) => s.slice(0,-1)) : String(e);
       return res.status(200).json({ memory: null, skipped: msg });
     }
   }
@@ -64,8 +65,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const rootHash = deterministicHash(JSON.stringify(memory));
       return res.status(200).json({ ok: true, rootHash });
-    } catch (e: any) {
-      const msg = typeof e.message === 'string' ? e.message.replace(/\d+n/g, (s: string) => s.slice(0,-1)) : String(e);
+    } catch (e: unknown) {
+      const msg = typeof errMsg(e) === 'string' ? errMsg(e).replace(/\d+n/g, (s: string) => s.slice(0,-1)) : String(e);
       const rootHash = deterministicHash(JSON.stringify(memory));
       return res.status(200).json({ ok: true, skipped: msg, rootHash });
     }

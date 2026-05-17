@@ -4,6 +4,7 @@
  * Falls back to root_hashes if provided.
  */
 import type { NextApiRequest, NextApiResponse } from "next";
+import { errMsg } from "@/utils/errors";
 import { createClient } from "@supabase/supabase-js";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -78,7 +79,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const data = await upstream.json();
     return res.status(upstream.status).json({ ...data, samples: transactions.length });
-  } catch (e: any) {
-    return res.status(502).json({ ok: false, reason: `Fine-tune failed: ${e.message}`, samples: 0 });
+  } catch (e: unknown) {
+    return res.status(502).json({ ok: false, reason: `Fine-tune failed: ${errMsg(e)}`, samples: 0 });
   }
 }

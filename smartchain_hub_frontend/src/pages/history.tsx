@@ -1,11 +1,13 @@
 import Head from "next/head";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
 
+type TxRow = { id?: string; tx_hash?: string; amount?: number; savings?: number; optimized_fee?: number; status?: string; created_at?: string; route?: string; storage_root?: string; storage_scan_url?: string };
+
 export default function HistoryPage() {
   const { user } = useAuth();
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<TxRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
@@ -127,7 +129,7 @@ export default function HistoryPage() {
                           </svg>
                         )}
                       </div>
-                      <p className="text-xs text-gray-600 mt-0.5">{new Date(tx.created_at).toLocaleString()}</p>
+                      <p className="text-xs text-gray-600 mt-0.5">{new Date(tx.created_at ?? 0).toLocaleString()}</p>
                     </td>
                     <td className="px-5 py-4 text-sm font-semibold text-white">${Number(tx.amount).toLocaleString()}</td>
                     <td className="px-5 py-4 text-sm text-gray-400">${Number(tx.optimized_fee || 0).toFixed(2)}</td>
@@ -147,7 +149,7 @@ export default function HistoryPage() {
                       )}
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${statusBadge(tx.status)}`}>
+                      <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${statusBadge(tx.status ?? '')}`}>
                         {tx.status}
                       </span>
                     </td>

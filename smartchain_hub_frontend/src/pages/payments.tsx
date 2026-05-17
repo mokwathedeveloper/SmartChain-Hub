@@ -6,6 +6,8 @@ import { useNotification } from "@/context/NotificationContext";
 import { ethers } from "ethers";
 import { depositToChannel, settleCall, withdrawFromChannel, getChannelState } from "@/utils/agentEscrow";
 
+type EscrowChannel = Awaited<ReturnType<typeof getChannelState>>;
+
 const OG_RPC = "https://evmrpc-testnet.0g.ai";
 const OG_NETWORK = ethers.Network.from({ chainId: 16602, name: 'og-galileo' });
 // Module-level static-network provider — created once, skips network detection, never causes re-render
@@ -55,7 +57,7 @@ export default function Payments() {
   const [escrowDeposit, setEscrowDeposit]         = useState("");
   const [escrowAgentA, setEscrowAgentA]           = useState(""); // for Claim Per Call
   const [escrowWithdrawB, setEscrowWithdrawB]     = useState(""); // for Withdraw — separate from Open
-  const [escrowChannel, setEscrowChannel]         = useState<any>(null);
+  const [escrowChannel, setEscrowChannel]         = useState<EscrowChannel | null>(null);
   const [escrowLoading, setEscrowLoading]         = useState(false);
   const [escrowCheckA, setEscrowCheckA]           = useState(""); // for Check Channel
   const [escrowCheckB, setEscrowCheckB]           = useState(""); // for Check Channel

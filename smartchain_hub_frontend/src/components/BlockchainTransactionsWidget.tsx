@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/utils/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 
+type TxRow = { id?: string; tx_hash?: string; amount: number; status?: string; created_at: string };
+
 const BlockchainTransactionsWidget = () => {
   const { user } = useAuth();
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<TxRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

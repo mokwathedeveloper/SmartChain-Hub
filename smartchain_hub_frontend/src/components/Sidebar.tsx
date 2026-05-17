@@ -40,7 +40,10 @@ const Sidebar = ({ onClose }: SidebarProps) => {
   const isActive = (path: string) => router.pathname === path || (path === '/transactions' && router.pathname === '/console');
 
   return (
-    <aside className="w-60 bg-gray-950 border-r border-gray-800 h-screen flex flex-col">
+    <aside
+      className="w-60 bg-gray-950 border-r border-gray-800 flex flex-col"
+      style={{ height: '100vh', /* dvh progressive enhancement */ minHeight: '-webkit-fill-available' }}
+    >
       {/* Logo */}
       <div className="px-5 py-5 flex items-center justify-between border-b border-gray-800">
         <Link href="/dashboard" className="flex items-center gap-3">

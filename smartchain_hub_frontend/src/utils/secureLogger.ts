@@ -8,25 +8,21 @@
  * @param input - User input to sanitize
  * @returns Sanitized string safe for logging
  */
-function sanitizeForLogging(input: any): string {
-  if (input === null || input === undefined) {
-    return 'null';
+function sanitizeForLogging(input: unknown): string {
+  if (input === null || input === undefined) return 'null';
+
+  let str: string;
+  if (typeof input === 'string') {
+    str = input;
+  } else {
+    try { str = JSON.stringify(input); } catch { str = String(input); }
   }
-  
-  if (typeof input !== 'string') {
-    try {
-      input = JSON.stringify(input);
-    } catch {
-      input = String(input);
-    }
-  }
-  
-  // Remove newlines, carriage returns, and other control characters
-  return input
-    .replace(/[\r\n\t]/g, ' ')           // Replace line breaks with spaces
-    .replace(/[\x00-\x1F\x7F]/g, '')     // Remove control characters
-    .replace(/\x1b\[[0-9;]*m/g, '')      // Remove ANSI escape codes
-    .substring(0, 1000);                 // Limit length to prevent log flooding
+
+  return str
+    .replace(/[\r\n\t]/g, ' ')
+    .replace(/[\x00-\x1F\x7F]/g, '')
+    .replace(/\x1b\[[0-9;]*m/g, '')
+    .substring(0, 1000);
 }
 
 /**
@@ -53,7 +49,7 @@ export const secureLogger = {
   /**
    * Logs info message with sanitized input
    */
-  info: (message: string, data?: any) => {
+  info: (message: string, data?: unknown) => {
     const sanitizedMessage = sanitizeForLogging(message);
     const timestamp = new Date().toISOString();
     
@@ -68,7 +64,7 @@ export const secureLogger = {
   /**
    * Logs error message with sanitized input
    */
-  error: (message: string, error?: any) => {
+  error: (message: string, error?: unknown) => {
     const sanitizedMessage = sanitizeForLogging(message);
     const timestamp = new Date().toISOString();
     
@@ -85,7 +81,7 @@ export const secureLogger = {
   /**
    * Logs warning message with sanitized input
    */
-  warn: (message: string, data?: any) => {
+  warn: (message: string, data?: unknown) => {
     const sanitizedMessage = sanitizeForLogging(message);
     const timestamp = new Date().toISOString();
     
@@ -100,7 +96,7 @@ export const secureLogger = {
   /**
    * Logs debug message with sanitized input (only in development)
    */
-  debug: (message: string, data?: any) => {
+  debug: (message: string, data?: unknown) => {
     if (process.env.NODE_ENV === 'development') {
       const sanitizedMessage = sanitizeForLogging(message);
       const timestamp = new Date().toISOString();
@@ -117,7 +113,7 @@ export const secureLogger = {
   /**
    * Logs wallet-related events with address sanitization
    */
-  wallet: (event: string, address?: string, data?: any) => {
+  wallet: (event: string, address?: string, data?: unknown) => {
     const sanitizedEvent = sanitizeForLogging(event);
     const timestamp = new Date().toISOString();
     
@@ -139,17 +135,18 @@ export const secureLogger = {
   /**
    * Logs transaction-related events with sanitized data
    */
-  transaction: (event: string, txData?: any) => {
+  transaction: (event: string, txData?: Record<string, unknown>) => {
     const sanitizedEvent = sanitizeForLogging(event);
     const timestamp = new Date().toISOString();
     
     if (txData) {
-      // Sanitize transaction data for logging
+      const toStr      = typeof txData.to      === 'string' ? txData.to      : '';
+      const hashStr    = typeof txData.hash     === 'string' ? txData.hash    : '';
       const sanitizedTxData = {
-        to: txData.to ? sanitizeAddress(txData.to) : 'unknown',
-        value: txData.value ? sanitizeForLogging(txData.value) : 'unknown',
+        to:       toStr      ? sanitizeAddress(toStr)              : 'unknown',
+        value:    txData.value    ? sanitizeForLogging(txData.value)    : 'unknown',
         gasLimit: txData.gasLimit ? sanitizeForLogging(txData.gasLimit) : 'unknown',
-        hash: txData.hash ? `${txData.hash.substring(0, 10)}...` : 'unknown'
+        hash:     hashStr    ? `${hashStr.substring(0, 10)}...`    : 'unknown',
       };
       
       console.log(`[${timestamp}] [TRANSACTION] ${sanitizedEvent}`, sanitizedTxData);

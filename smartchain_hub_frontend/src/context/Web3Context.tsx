@@ -2,7 +2,12 @@ import { createContext, useContext, useState, useEffect, useRef, type ReactNode 
 import { ethers } from 'ethers';
 import { secureLogger } from '../utils/secureLogger';
 
-declare global { interface Window { ethereum?: any; } }
+interface EthereumProvider {
+  request(args: { method: string; params?: unknown[] }): Promise<unknown>;
+  on(event: string, handler: (...args: unknown[]) => void): void;
+  removeListener?(event: string, handler: (...args: unknown[]) => void): void;
+}
+declare global { interface Window { ethereum?: EthereumProvider; } }
 
 const OG_GALILEO = {
   chainId: '0x40DA',
@@ -37,7 +42,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
   const [chainId, setChainId]       = useState<string | null>(null);
   const [noWallet, setNoWallet]     = useState(false);
   const [sdkConnected, setSdkConnected] = useState(false);
-  const sdkRef = useRef<any>(null);
+  const sdkRef = useRef<unknown>(null);
   const connectingRef = useRef(false); // guard against duplicate connect calls
 
   // Initialise MetaMask SDK on mount
@@ -63,7 +68,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
           // Auto-reconnect if already authorised
           const ethereum = sdk.getProvider() || window.ethereum;
           if (ethereum) {
-            const accounts: string[] = await ethereum.request({ method: 'eth_accounts' });
+            const accounts = await ethereum.request({ method: 'eth_accounts' }) as string[];
             if (accounts.length) {
               await _connect(ethereum, accounts[0]);
             }
@@ -72,7 +77,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
       } catch {
         // SDK failed — fall back to window.ethereum
         if (!cancelled && window.ethereum) {
-          const accounts: string[] = await window.ethereum.request({ method: 'eth_accounts' }).catch(() => []);
+          const accounts = (await window.ethereum.request({ method: 'eth_accounts' }).catch(() => [])) as string[];
           if (accounts.length) await _connect(window.ethereum, accounts[0]);
         }
       }
@@ -80,10 +85,12 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
     return () => { cancelled = true; };
   }, []);
 
-  const _getEthereum = () =>
-    (sdkRef.current?.getProvider?.()) || window.ethereum;
+  const _getEthereum = () => {
+    type SdkLike = { getProvider?(): EthereumProvider | undefined };
+    return (sdkRef.current as SdkLike | null)?.getProvider?.() || window.ethereum;
+  };
 
-  const _connect = async (ethereum: any, account: string) => {
+  const _connect = async (ethereum: EthereumProvider, account: string) => {
     try {
       const bp = new ethers.BrowserProvider(ethereum);
       const network = await bp.getNetwork();
@@ -126,7 +133,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
     connectingRef.current = true;
     try {
       secureLogger.info('Initiating wallet connection');
-      const accounts: string[] = await ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts = await ethereum.request({ method: 'eth_requestAccounts' }) as string[];
       secureLogger.info('Wallet accounts received', { count: accounts.length });
       if (!accounts.length) return;
       await _connect(ethereum, accounts[0]);
@@ -139,7 +146,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
 
   const disconnectWallet = () => {
     setAddress(null); setProvider(null); setSigner(null); setChainId(null);
-    try { sdkRef.current?.disconnect?.(); } catch {}
+    try { (sdkRef.current as { disconnect?(): void } | null)?.disconnect?.(); } catch {}
   };
 
   const switchToOG = async () => {
@@ -159,7 +166,8 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
     const ethereum = _getEthereum();
     if (!ethereum) return;
 
-    const onAccounts = (accounts: string[]) => {
+    const onAccounts = (...args: unknown[]) => {
+      const accounts = (args[0] as string[]) ?? [];
       if (accounts.length) { setAddress(accounts[0]); }
       else disconnectWallet();
     };

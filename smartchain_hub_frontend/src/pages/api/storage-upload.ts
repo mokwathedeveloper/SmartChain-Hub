@@ -5,6 +5,7 @@
  * Returns: { rootHash, txHash, storageScanUrl }
  */
 import type { NextApiRequest, NextApiResponse } from "next";
+import { errMsg } from "@/utils/errors";
 import crypto from "crypto";
 
 function fallbackHash(data: object): string {
@@ -54,14 +55,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       txHash,
       storageScanUrl: txHash ? `https://storagescan-newton.0g.ai/tx/${txHash}` : "",
     });
-  } catch (e: any) {
-    console.warn("0G Storage upload failed:", e.message);
+  } catch (e: unknown) {
+    console.warn("0G Storage upload failed:", errMsg(e));
     return res.status(200).json({
       rootHash:       fallbackHash(data),
       txHash:         "",
       storageScanUrl: "",
       fallback:       true,
-      reason:         e.message,
+      reason:         errMsg(e),
     });
   }
 }

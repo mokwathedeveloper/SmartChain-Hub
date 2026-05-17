@@ -1,5 +1,5 @@
 import Head from "next/head";
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/router";
@@ -47,7 +47,6 @@ export default function Profile() {
 
   /* ── 2FA state ── */
   const [twoFA, setTwoFA]           = useState(false);
-  const [twoFASaving, setTwoFASaving] = useState(false);
   // TOTP enrollment
   const [show2FAModal, setShow2FAModal]   = useState(false);
   const [totpQR, setTotpQR]               = useState("");
@@ -103,7 +102,7 @@ export default function Profile() {
   };
 
   /* ── save personal info ── */
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: { preventDefault(): void }) => {
     e.preventDefault();
     if (!user) return;
     setSaving(true);
@@ -114,7 +113,7 @@ export default function Profile() {
   };
 
   /* ── change password ── */
-  const handlePasswordChange = async (e: React.FormEvent) => {
+  const handlePasswordChange = async (e: { preventDefault(): void }) => {
     e.preventDefault();
     setPwError("");
     if (newPw.length < 8) { setPwError("Password must be at least 8 characters."); return; }
@@ -140,7 +139,7 @@ export default function Profile() {
   };
 
   /* ── 2FA: verify TOTP code ── */
-  const handle2FAVerify = async (e: React.FormEvent) => {
+  const handle2FAVerify = async (e: { preventDefault(): void }) => {
     e.preventDefault();
     if (totpCode.length !== 6) { setTotpError('Enter the 6-digit code from your authenticator app.'); return; }
     setTotpLoading(true); setTotpError("");
@@ -155,7 +154,7 @@ export default function Profile() {
   };
 
   /* ── 2FA: disable ── */
-  const handle2FADisable = async (e: React.FormEvent) => {
+  const handle2FADisable = async (e: { preventDefault(): void }) => {
     e.preventDefault();
     if (disableCode.length !== 6) { setDisableError('Enter the 6-digit code to confirm.'); return; }
     setDisableLoading(true); setDisableError("");

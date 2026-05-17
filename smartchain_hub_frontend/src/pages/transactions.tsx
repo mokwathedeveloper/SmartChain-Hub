@@ -2,7 +2,7 @@ import Head from "next/head";
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
-import { optimizeTransaction as apiOptimize } from "@/utils/api";
+import { optimizeTransaction as apiOptimize, type OptimizeResult } from "@/utils/api";
 import { storageService } from "@/utils/storage";
 import { loadAgentMemory, saveAgentMemory, mergeOptimizationIntoMemory, hydrateAgentMemory } from "@/utils/agentMemory";
 import { generateZKProof } from "@/utils/zkProof";
@@ -45,16 +45,16 @@ export default function Transactions() {
   const [amount, setAmount] = useState("");
   const [priority, setPriority] = useState("efficiency");
   const [optimizing, setOptimizing] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<OptimizeResult | null>(null);
   const [saving, setSaving] = useState(false);
   const [zkCommitment, setZkCommitment] = useState("");
-  const [txList, setTxList] = useState<any[]>([]);
+  const [txList, setTxList] = useState<TransactionRow[]>([]);
   const [stats, setStats] = useState({ savings: 0, efficiency: 0, avgConfMs: 0 });
 
   // Simulate tab state
   const [simAmount, setSimAmount] = useState("");
   const [simRoute, setSimRoute] = useState("0G Chain Flash");
-  const [simResult, setSimResult] = useState<any>(null);
+  const [simResult, setSimResult] = useState<SimResult | null>(null);
   const [simRunning, setSimRunning] = useState(false);
 
   // Hydrate from 0G KV on mount (authoritative persistent memory)
@@ -72,13 +72,12 @@ export default function Transactions() {
     const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(10);
     const txs = data || [];
     setTxList(txs);
-    const totalSavings = txs.reduce((s: number, t: any) => s + Number(t.savings || 0), 0);
-    const totalAmt     = txs.reduce((s: number, t: any) => s + Number(t.amount || 0), 0);
+    const totalSavings = txs.reduce((s: number, t: TransactionRow) => s + Number(t.savings || 0), 0);
+    const totalAmt     = txs.reduce((s: number, t: TransactionRow) => s + Number(t.amount || 0), 0);
     const efficiency   = totalAmt > 0 ? Math.min(Math.round((totalSavings / totalAmt) * 100), 99) : 0;
-    // Avg confirmation: use estimated_time_s from route if stored, else derive from route name
     const routeTimes: Record<string, number> = { 'Flash': 8, 'Speed': 3, 'Bridge': 15, 'Economy': 45 };
     const avgConfMs = txs.length > 0
-      ? Math.round(txs.reduce((s: number, t: any) => {
+      ? Math.round(txs.reduce((s: number, t: TransactionRow) => {
           const key = Object.keys(routeTimes).find(k => (t.route || '').includes(k)) || '';
           return s + (routeTimes[key] || 12);
         }, 0) / txs.length)
@@ -97,11 +96,11 @@ export default function Transactions() {
     } catch {
       const amt = parseFloat(amount);
       setResult({
-        fee: (amt * 0.005).toFixed(2),
-        savings: (amt * 0.015).toFixed(2),
-        route: "0G Chain Flash Route",
+        fee:         Math.round(amt * 0.005 * 100) / 100,
+        savings:     Math.round(amt * 0.015 * 100) / 100,
+        route:       "0G Chain Flash Route",
         explanation: `Optimized for ${priority} using 0G Newton heuristics.`,
-        confidence: 87,
+        confidence:  87,
         tee_verified: false,
       });
     } finally { setOptimizing(false); }
@@ -115,8 +114,8 @@ export default function Transactions() {
       let localZkCommitment = "";
       try {
         const zkResult = await generateZKProof(
-          parseFloat(amount), parseFloat(result.fee),
-          parseFloat(result.savings), result.route, user.id
+          parseFloat(amount), result.fee,
+          result.savings, result.route, user.id
         );
         localZkCommitment = zkResult.commitment;
         setZkCommitment(localZkCommitment);
@@ -126,8 +125,8 @@ export default function Transactions() {
       const storageResult = await storageService.uploadWithProof({
         user_id: user.id,
         amount: parseFloat(amount),
-        fee: parseFloat(result.fee),
-        savings: parseFloat(result.savings),
+        fee: result.fee,
+        savings: result.savings,
         route: result.route,
         tee_verified: result.tee_verified,
         tee_proof: result.tee_proof || "",
@@ -138,8 +137,8 @@ export default function Transactions() {
       await supabase.from('transactions').insert([{
         user_id: user.id,
         amount: parseFloat(amount),
-        optimized_fee: parseFloat(result.fee),
-        savings: parseFloat(result.savings),
+        optimized_fee: result.fee,
+        savings: result.savings,
         route: result.route,
         status: 'pending',
         tx_hash: storageResult.txHash || storageResult.rootHash?.slice(0, 42) || storageResult.rootHash,
@@ -151,7 +150,7 @@ export default function Transactions() {
       const existing = loadAgentMemory(user.id);
       const updated = mergeOptimizationIntoMemory(
         existing, user.id, priority,
-        parseFloat(amount), result.route, parseFloat(result.savings)
+        parseFloat(amount), result.route, result.savings
       );
       await saveAgentMemory(updated);
 
@@ -160,9 +159,8 @@ export default function Transactions() {
         try {
           const minted = await hasAgentID(signer);
           if (!minted) await mintAgentID(signer);
-          await updateAgentMemory(signer, storageResult.rootHash, parseFloat(result.savings));
-          // Record transaction on SmartChainTransaction contract
-          const onChainTxHash = await recordTransactionOnChain(signer, parseFloat(amount), parseFloat(result.fee), result.route);
+          await updateAgentMemory(signer, storageResult.rootHash, result.savings);
+          const onChainTxHash = await recordTransactionOnChain(signer, parseFloat(amount), result.fee, result.route);
           // Update Supabase status to confirmed with real on-chain tx hash
           await supabase.from('transactions')
             .update({ status: 'confirmed', tx_hash: onChainTxHash })
@@ -218,7 +216,7 @@ export default function Transactions() {
   };
 
   // Analyze: group txs by route and compute stats
-  const analyzeData = txList.reduce((acc: Record<string, any>, tx) => {
+  const analyzeData = txList.reduce((acc: Record<string, RouteAnalysis>, tx) => {
     const r = tx.route || "Unknown";
     if (!acc[r]) acc[r] = { route: r, count: 0, totalSavings: 0, totalFees: 0 };
     acc[r].count++;
@@ -226,7 +224,7 @@ export default function Transactions() {
     acc[r].totalFees += Number(tx.optimized_fee || 0);
     return acc;
   }, {});
-  const analyzeRows = Object.values(analyzeData) as any[];
+  const analyzeRows: RouteAnalysis[] = Object.values(analyzeData);
 
   return (
     <>

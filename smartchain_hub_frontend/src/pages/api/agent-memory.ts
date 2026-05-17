@@ -34,7 +34,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const { KvClient } = await import("@0glabs/0g-ts-sdk");
       const kvClient = new KvClient(OG_KV_RPC);
-      const value = await (kvClient as any).getValue(STREAM_ID, memoryKey(userId));
+      type KvClientLike = { getValue(id: bigint, key: Uint8Array): Promise<Uint8Array | null> };
+      const value = await (kvClient as unknown as KvClientLike).getValue(STREAM_ID, memoryKey(userId));
       if (!value) return res.status(200).json({ memory: null });
       const memory = JSON.parse(new TextDecoder().decode(value));
       return res.status(200).json({ memory });
@@ -59,8 +60,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const signer   = new ethers.Wallet(privateKey, provider);
       const kvClient = new KvClient(OG_KV_RPC);
 
-      const batcher = new (Batcher as any)(STREAM_ID, [kvClient], null, provider);
-      batcher.streamDataBuilder.set(STREAM_ID as any, memoryKey(userId), new TextEncoder().encode(JSON.stringify(memory)));
+      type BatcherLike = { streamDataBuilder: { set(id: bigint, key: Uint8Array, val: Uint8Array): void }; exec(signer: unknown): Promise<void> };
+      type BatcherCtor = new(id: bigint, clients: unknown[], opts: null, provider: unknown) => BatcherLike;
+      const batcher = new (Batcher as unknown as BatcherCtor)(STREAM_ID, [kvClient], null, provider);
+      batcher.streamDataBuilder.set(STREAM_ID, memoryKey(userId), new TextEncoder().encode(JSON.stringify(memory)));
       await batcher.exec(signer);
 
       const rootHash = deterministicHash(JSON.stringify(memory));

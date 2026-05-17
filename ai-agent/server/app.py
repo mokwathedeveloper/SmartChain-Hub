@@ -122,7 +122,7 @@ def health():
 
 @app.route('/optimize', methods=['POST'])
 def optimize_transaction():
-    data = request.json
+    data = request.json or {}
     amount = data.get('amount')
     priority = data.get('priority', 'efficiency')
 
@@ -139,10 +139,13 @@ def optimize_transaction():
         priority = 'efficiency'
 
     # Try 0G Compute first
-    og_result = call_0g_compute(
-        f"Optimize a blockchain transaction of ${amount} with priority: {priority}. "
-        f"Return JSON with: fee (number), savings (number), route (string), confidence (number 0-100)."
-    )
+    try:
+        og_result = call_0g_compute(
+            f"Optimize a blockchain transaction of ${amount} with priority: {priority}. "
+            f"Return JSON with: fee (number), savings (number), route (string), confidence (number 0-100)."
+        )
+    except Exception:
+        og_result = None
 
     if og_result:
         # Parse 0G Compute response
@@ -155,7 +158,6 @@ def optimize_transaction():
                 "confidence": round(float(parsed.get("confidence", 95.0)), 1),
                 "ml_engine": f"0G Compute / {OG_COMPUTE_MODEL}",
                 "explanation": EXPLANATIONS.get(priority, "AI optimized via 0G Compute."),
-                # TEE proof metadata for UI badge
                 "tee_verified": True,
                 "tee_mode": og_result["tee_mode"],
                 "tee_proof": og_result["tee_proof"],
@@ -166,11 +168,43 @@ def optimize_transaction():
             result = _local_optimize(amount, priority)
             result["tee_verified"] = False
     else:
-        # Local TensorFlow fallback
-        result = _local_optimize(amount, priority)
+        try:
+            result = _local_optimize(amount, priority)
+        except Exception as e:
+            # TF unavailable (OOM, missing model) — mathematical fallback so we never 500
+            print(f"TF optimizer failed: {e}")
+            result = _math_fallback(amount, priority)
         result["tee_verified"] = False
 
     return jsonify(result)
+
+
+ROUTE_PARAMS = {
+    'efficiency': {"name": "0G Chain Flash Route",          "fee_pct": 0.003, "time_s": 8},
+    'speed':      {"name": "Standard Layer 2 Aggregator",   "fee_pct": 0.005, "time_s": 3},
+    'security':   {"name": "Decentralized Liquidity Bridge","fee_pct": 0.008, "time_s": 15},
+}
+
+def _math_fallback(amount: float, priority: str) -> dict:
+    """Pure-math fallback — no TF dependency. Always succeeds."""
+    route = ROUTE_PARAMS.get(priority, ROUTE_PARAMS['efficiency'])
+    fee     = round(amount * route["fee_pct"], 2)
+    savings = round(max(0.0, amount * 0.015 - fee), 2)
+    return {
+        "route":            route["name"],
+        "fee":              max(fee, 0.01),
+        "savings":          savings,
+        "confidence":       87.0,
+        "risk":             "Low",
+        "congestion":       40,
+        "ml_engine":        "Heuristic (TF unavailable)",
+        "estimated_time_s": route["time_s"],
+        "tee_mode":         "local",
+        "tee_proof":        "",
+        "tee_signer":       "",
+        "provider_id":      "heuristic",
+        "explanation":      EXPLANATIONS.get(priority, "Optimized using 0G heuristics."),
+    }
 
 
 def _local_optimize(amount: float, priority: str) -> dict:

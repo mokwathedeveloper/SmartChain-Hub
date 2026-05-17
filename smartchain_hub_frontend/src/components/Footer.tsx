@@ -2,8 +2,8 @@ import Link from 'next/link';
 
 const Footer = () => (
   <footer className="bg-gray-950 border-t border-gray-800">
-    <div className="container mx-auto px-6 max-w-6xl py-14">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+    <div className="container mx-auto px-4 sm:px-6 max-w-6xl py-10 sm:py-14">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 mb-10 sm:mb-12">
 
         {/* Brand column */}
         <div className="md:col-span-1">
@@ -102,18 +102,18 @@ const Footer = () => (
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p className="text-xs text-gray-600">
-          © {new Date().getFullYear()} SmartChain Hub. Built for the 0G APAC Hackathon 2026.
+      <div className="border-t border-gray-800 pt-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p className="text-xs text-gray-600 text-center sm:text-left">
+          © {new Date().getFullYear()} SmartChain Hub · Built for the 0G APAC Hackathon 2026.
         </p>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
           <span className="flex items-center gap-1.5 text-xs text-gray-600">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"/>
             0G Galileo Testnet · Live
           </span>
-          <span className="text-xs text-gray-700">|</span>
+          <span className="hidden sm:inline text-xs text-gray-700">·</span>
           <span className="text-xs text-gray-600">Chain ID 16602</span>
-          <span className="text-xs text-gray-700">|</span>
+          <span className="hidden sm:inline text-xs text-gray-700">·</span>
           <a href="https://scan-testnet.0g.ai/address/0xf95A1610be22046c334E3bD1b11D2B88519E6C52"
             target="_blank" rel="noreferrer"
             className="text-xs text-blue-500 hover:text-blue-400 transition-colors">

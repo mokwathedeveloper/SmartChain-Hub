@@ -28,9 +28,10 @@ contract SmartChainRevenue is Ownable, ReentrancyGuard {
     uint256 public constant SHARE_PERCENTAGE = 10; // 10% of fee back to stakers
 
     event StakerRegistered(address indexed staker, uint256 stakeAmount);
-    event StakerDeregistered(address indexed staker);
+    event StakerDeregistered(address indexed staker, uint256 pendingEarningsPreserved);
     event RevenueDistributed(uint256 totalFee, uint256 shareAmount, uint256 stakerCount);
     event EarningsClaimed(address indexed staker, uint256 amount);
+    event DustRefunded(address indexed to, uint256 amount);
 
     constructor() Ownable(msg.sender) {}
 
@@ -54,15 +55,18 @@ contract SmartChainRevenue is Ownable, ReentrancyGuard {
     }
 
     /**
-     * @dev Deregister and forfeit pending earnings (or claim first).
+     * @dev Deregister as a staker. Pending earnings are preserved and can still
+     *      be claimed via claimEarnings() after deregistration.
      */
     function deregisterStaker() external {
         require(stakers[msg.sender].registered, "Not registered");
+        uint256 preserved = stakers[msg.sender].pendingEarnings;
         totalStaked -= stakers[msg.sender].stakeAmount;
         stakers[msg.sender].registered  = false;
         stakers[msg.sender].stakeAmount = 0;
+        // pendingEarnings intentionally kept — caller can still claim them
 
-        // Remove from list
+        // Remove from active staker list
         for (uint256 i = 0; i < stakerList.length; i++) {
             if (stakerList[i] == msg.sender) {
                 stakerList[i] = stakerList[stakerList.length - 1];
@@ -70,7 +74,7 @@ contract SmartChainRevenue is Ownable, ReentrancyGuard {
                 break;
             }
         }
-        emit StakerDeregistered(msg.sender);
+        emit StakerDeregistered(msg.sender, preserved);
     }
 
     /**
@@ -99,11 +103,12 @@ contract SmartChainRevenue is Ownable, ReentrancyGuard {
 
         totalDistributed += distributed;
 
-        // Refund any dust back to owner
+        // Refund rounding dust back to owner and emit for audit trail
         uint256 dust = msg.value - distributed;
         if (dust > 0) {
             (bool ok,) = owner().call{value: dust}("");
             require(ok, "Dust refund failed");
+            emit DustRefunded(owner(), dust);
         }
 
         emit RevenueDistributed(_totalFee, distributed, stakerCount);

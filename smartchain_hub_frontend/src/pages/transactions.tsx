@@ -531,7 +531,7 @@ export default function Transactions() {
               {txList.length > 0 ? txList.map((tx, i) => (
                 <tr key={i} className="border-b border-gray-800 hover:bg-gray-800/50">
                   <td className="px-6 py-4 text-sm text-gray-200 font-mono">{tx.tx_hash?.slice(0, 16)}...</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{new Date(tx.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{new Date(tx.created_at ?? 0).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
                   <td className="px-6 py-4 text-sm text-gray-200">${Number(tx.amount).toLocaleString()}</td>
                   <td className="px-6 py-4 text-sm text-gray-200">${Number(tx.optimized_fee || 0).toFixed(2)}</td>
                   <td className="px-6 py-4"><span className="text-xs px-2.5 py-1 rounded-full font-medium bg-green-500/10 text-green-400">${Number(tx.savings || 0).toFixed(2)}</span></td>

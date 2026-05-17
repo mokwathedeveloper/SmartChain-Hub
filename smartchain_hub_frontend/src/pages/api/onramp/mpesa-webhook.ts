@@ -10,6 +10,7 @@
  * Add FLUTTERWAVE_WEBHOOK_HASH to .env.local (from Flutterwave dashboard)
  */
 import type { NextApiRequest, NextApiResponse } from "next";
+import { errMsg } from "@/utils/errors";
 import { deliverA0GI, logPayment } from "@/utils/onrampDelivery";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -73,8 +74,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     console.log(`✅ M-Pesa: Delivered ${a0giAmount} A0GI to ${walletAddress} | tx: ${explorerUrl}`);
     return res.status(200).json({ received: true, txHash, explorerUrl });
-  } catch (e: any) {
-    console.error("A0GI delivery failed after M-Pesa:", e.message);
+  } catch (e: unknown) {
+    console.error("A0GI delivery failed after M-Pesa:", errMsg(e));
     await logPayment({
       walletAddress,
       amountUsd: parseFloat(usdAmount || "0"),
@@ -83,7 +84,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       txRef: tx_ref,
       status: "failed",
     });
-    return res.status(500).json({ error: e.message });
+    return res.status(500).json({ error: errMsg(e) });
   }
 }
 

@@ -70,7 +70,7 @@ const HeroSection = () => {
   }
 
   return (
-    <section className="bg-deep-blue text-white py-16 px-10 rounded-[3rem] mb-12 shadow-2xl shadow-deep-blue/20 overflow-hidden relative">
+    <section className="bg-deep-blue text-white py-10 sm:py-16 px-4 sm:px-8 rounded-2xl sm:rounded-[3rem] mb-8 sm:mb-12 shadow-2xl shadow-deep-blue/20 overflow-hidden relative">
       {/* Visual background decorations */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-electric-purple/10 rounded-full blur-[100px] -mr-48 -mt-48"></div>
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px] -ml-32 -mb-32"></div>

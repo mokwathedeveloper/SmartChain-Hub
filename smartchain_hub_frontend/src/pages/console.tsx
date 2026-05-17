@@ -27,13 +27,13 @@ const ConsolePage = () => {
         <title>Developer Console | SmartChain Hub</title>
       </Head>
 
-      <div className="space-y-8 animate-fade-in">
-        <div className="bg-gray-900 rounded-[2.5rem] p-10 border border-white/5 shadow-2xl overflow-hidden relative">
+      <div className="space-y-6 animate-fade-in">
+        <div className="bg-gray-900 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-8 lg:p-10 border border-white/5 shadow-2xl overflow-hidden relative">
           <div className="absolute top-0 right-0 w-full h-full opacity-20 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-          
-          <div className="flex items-center justify-between mb-10 relative z-10">
+
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-6 sm:mb-10 relative z-10">
             <div>
-              <h2 className="text-2xl font-black text-white tracking-tight">System Console</h2>
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">System Console</h2>
               <p className="text-sm text-gray-500 font-bold">Real-time modular layer activity.</p>
             </div>
             <div className="flex items-center space-x-4">
@@ -44,8 +44,8 @@ const ConsolePage = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 relative z-10">
-            <div className="lg:col-span-3 bg-black/50 rounded-3xl p-8 font-mono text-[11px] leading-relaxed h-[500px] overflow-y-auto border border-white/5 custom-scrollbar">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 relative z-10">
+            <div className="lg:col-span-3 bg-black/50 rounded-2xl sm:rounded-3xl p-4 sm:p-8 font-mono text-[11px] leading-relaxed h-64 sm:h-96 lg:h-[500px] overflow-y-auto border border-white/5 scrollbar-hide">
               {logs.map(log => (
                 <div key={log.id} className="mb-2 flex items-start animate-fade-in">
                   <span className="text-gray-600 shrink-0 mr-4">[{new Date(log.id).toLocaleTimeString()}]</span>

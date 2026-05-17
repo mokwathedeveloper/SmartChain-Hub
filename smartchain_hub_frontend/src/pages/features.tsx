@@ -155,7 +155,7 @@ export default function Features() {
       <section className="py-12 sm:py-20 bg-gray-900">
         <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
           <h2 className="text-3xl font-black text-white text-center mb-3">How we compare</h2>
-          <p className="text-gray-500 text-center mb-12">Most "AI + Web3" projects are just ChatGPT with a tip jar.</p>
+          <p className="text-gray-500 text-center mb-12">Most &quot;AI + Web3&quot; projects are just ChatGPT with a tip jar.</p>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>

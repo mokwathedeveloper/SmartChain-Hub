@@ -30,7 +30,10 @@ const Layout = ({ children }: LayoutProps) => {
           />
         )}
         {/* Sidebar */}
-        <div className={`fixed lg:sticky lg:top-0 lg:h-screen z-[70] transition-transform duration-300 shrink-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        <div
+          className={`fixed lg:sticky lg:top-0 lg:h-screen z-[70] transition-transform duration-300 shrink-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
+          style={{ willChange: 'transform' }}
+        >
           <Sidebar onClose={() => setIsSidebarOpen(false)} />
         </div>
         {/* Main content */}

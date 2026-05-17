@@ -11,6 +11,7 @@
  * Returns: { url: string } — redirect to Stripe Checkout
  */
 import type { NextApiRequest, NextApiResponse } from "next";
+import { errMsg } from "@/utils/errors";
 import { rateLimit, getClientIp } from "@/utils/rateLimit";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -86,8 +87,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     return res.status(200).json({ url: session.url, txRef });
-  } catch (e: any) {
-    console.error("Stripe error:", e.message);
-    return res.status(500).json({ error: e.message });
+  } catch (e: unknown) {
+    console.error("Stripe error:", errMsg(e));
+    return res.status(500).json({ error: errMsg(e) });
   }
 }

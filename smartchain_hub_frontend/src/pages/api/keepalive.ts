@@ -5,6 +5,7 @@
  * Called by Vercel cron every 14 minutes (see vercel.json).
  */
 import type { NextApiRequest, NextApiResponse } from "next";
+import { errMsg } from "@/utils/errors";
 
 export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
   const agentUrl = process.env.NEXT_PUBLIC_AI_AGENT_URL || "https://smartchain-ai-agent.onrender.com";
@@ -18,14 +19,14 @@ export default async function handler(_req: NextApiRequest, res: NextApiResponse
     });
     const data = await r.json();
     return res.status(200).json({ ok: true, warmed: true, agent: data });
-  } catch (e: any) {
+  } catch (e: unknown) {
     // Also fall back to /health ping so we at least keep the process alive
     try {
       const h = await fetch(`${agentUrl}/health`, { signal: AbortSignal.timeout(8000) });
       const health = await h.json();
       return res.status(200).json({ ok: true, warmed: false, agent: health });
     } catch {
-      return res.status(200).json({ ok: false, error: e.message });
+      return res.status(200).json({ ok: false, error: errMsg(e) });
     }
   }
 }

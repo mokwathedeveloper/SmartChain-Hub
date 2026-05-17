@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type LogEntry = { id: number; message: string; type: 'info' | 'success' | 'process' };
 

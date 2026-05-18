@@ -46,7 +46,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const amt  = parseFloat(amount);
   const f    = parseFloat(fee);
-  const sav  = parseFloat(savings);
+  // Clamp savings to 20% of amount — out-of-distribution ML predictions can
+  // exceed the ZK circuit limit for very large amounts; clamp rather than reject.
+  const rawSav = parseFloat(savings);
+  const sav  = Math.min(rawSav, amt * 0.20);
 
   const validationError = validateInputs(amt, f, sav);
   if (validationError) return res.status(422).json({ error: validationError });

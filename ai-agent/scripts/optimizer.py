@@ -42,9 +42,11 @@ class TransactionOptimizer:
         optimized_fee = amount * route["base_fee_pct"]
         savings = max(0.0, standard_fee - optimized_fee)
 
-        # Adjust savings slightly using model's predicted rate
-        model_savings = amount * prediction["savings_rate"]
-        final_savings = round((savings + model_savings) / 2, 2)
+        # Clamp savings_rate to training range (max 4%) — prevents out-of-distribution
+        # predictions from producing absurd savings for very large amounts (>$100k)
+        clamped_rate = min(prediction["savings_rate"], 0.04)
+        model_savings = amount * clamped_rate
+        final_savings = round(min((savings + model_savings) / 2, amount * 0.20), 2)
 
         risk_labels = {(0.0, 0.1): "Very Low", (0.1, 0.2): "Low", (0.2, 0.35): "Medium", (0.35, 1.0): "High"}
         risk = prediction["risk_score"]

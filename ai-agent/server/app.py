@@ -24,7 +24,17 @@ def fine_tune(root_hashes, dry_run=False):
     return _fine_tune(root_hashes, dry_run=dry_run)
 
 app = Flask(__name__)
-CORS(app)
+CORS(
+    app,
+    origins=[
+        "https://smartchainhubfrontend.vercel.app",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+    supports_credentials=False,
+)
 
 # 0G Compute configuration
 # Docs: https://docs.0g.ai/build-with-0g/compute-network/sdk
@@ -118,6 +128,11 @@ def health():
         "og_compute_model": OG_COMPUTE_MODEL,
         "og_compute_rpc": OG_COMPUTE_RPC,
     })
+
+
+@app.route('/optimize', methods=['OPTIONS'])
+def optimize_preflight():
+    return '', 204
 
 
 @app.route('/optimize', methods=['POST'])
@@ -217,6 +232,11 @@ def _local_optimize(amount: float, priority: str) -> dict:
     r["provider_id"] = "local-tf"
     r.setdefault("estimated_time_s", 12)
     return r
+
+
+@app.route('/fine-tune', methods=['OPTIONS'])
+def fine_tune_preflight():
+    return '', 204
 
 
 @app.route('/fine-tune', methods=['POST'])

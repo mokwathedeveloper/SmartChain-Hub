@@ -40,7 +40,7 @@ interface RouteAnalysis {
 
 export default function Transactions() {
   const { user } = useAuth();
-  const { signer, isConnected } = useWeb3();
+  const { signer, isConnected, address, connectWallet, noWallet } = useWeb3();
   const [activeTab, setActiveTab] = useState("Optimize");
   const [amount, setAmount] = useState("");
   const [priority, setPriority] = useState("efficiency");
@@ -48,6 +48,10 @@ export default function Transactions() {
   const [result, setResult] = useState<OptimizeResult | null>(null);
   const [saving, setSaving] = useState(false);
   const [zkCommitment, setZkCommitment] = useState("");
+  const [successData, setSuccessData] = useState<{
+    amount: number; route: string; fee: number; savings: number;
+    txHash?: string; zkCommitment?: string; timestamp: number;
+  } | null>(null);
   const [txList, setTxList] = useState<TransactionRow[]>([]);
   const [stats, setStats] = useState({ savings: 0, efficiency: 0, avgConfMs: 0 });
 
@@ -183,8 +187,19 @@ export default function Transactions() {
           .eq('storage_root', storageResult.rootHash);
       }
 
+      // Show success screen with summary data
+      setSuccessData({
+        amount:      parseFloat(amount),
+        route:       result.route,
+        fee:         result.fee,
+        savings:     result.savings,
+        txHash:      storageResult.txHash || storageResult.rootHash?.slice(0, 42),
+        zkCommitment: localZkCommitment || undefined,
+        timestamp:   Date.now(),
+      });
       setResult(null);
       setAmount("");
+      setZkCommitment("");
       fetchTxList();
     } finally {
       setSaving(false);
@@ -259,105 +274,401 @@ export default function Transactions() {
 
         {/* ── OPTIMIZE TAB ── */}
         {activeTab === "Optimize" && (
-          <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
-            <h2 className="text-base font-bold text-white mb-5">AI Transaction Optimizer</h2>
-            <div className="space-y-4 max-w-lg">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1.5">Transaction Amount ($)</label>
-                <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00"
-                  className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-900"/>
-              </div>
-              <div className="flex gap-2">
-                {['efficiency','speed','security'].map(p => (
-                  <button key={p} onClick={() => setPriority(p)}
-                    className={`flex-1 py-2.5 text-xs font-semibold rounded-xl capitalize transition-all border ${priority === p ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-800 text-gray-400 border-gray-700 hover:border-gray-500'}`}>
-                    {p}
-                  </button>
-                ))}
-              </div>
-              {!result ? (
-                <button onClick={handleOptimize} disabled={!amount || optimizing}
-                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-50">
-                  {optimizing ? 'AI Processing...' : 'Optimize Transaction'}
-                </button>
-              ) : (
-                <div className="space-y-3">
-                  <div className="p-4 bg-gray-800 rounded-xl border border-gray-700">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-3">
-                      <div><p className="text-xs text-gray-500">Optimized Fee</p><p className="text-lg font-bold text-white">${result.fee}</p></div>
-                      <div><p className="text-xs text-gray-500">Savings</p><p className="text-lg font-bold text-green-600">${result.savings}</p></div>
-                      <div><p className="text-xs text-gray-500">Est. Time</p><p className="text-lg font-bold text-blue-600">{result.estimated_time_s || 12}s</p></div>
-                    </div>
-                    <p className="text-xs text-gray-500 mb-1">Route: <span className="font-medium text-gray-200">{result.route}</span></p>
-                    <div className="flex items-center gap-3 mb-2">
-                      {result.risk && <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${result.risk === 'Very Low' || result.risk === 'Low' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}>Risk: {result.risk}</span>}
-                      {result.congestion !== undefined && <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-medium">Network: {result.congestion}% congestion</span>}
-                    </div>
-                    <p className="text-xs text-gray-500 italic">{result.explanation}</p>
-                    <div className="mt-2 flex items-center gap-2">
-                      <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-green-500 rounded-full" style={{ width: `${result.confidence}%` }}/>
-                      </div>
-                      <span className="text-xs text-gray-500">{result.confidence}% confidence</span>
-                    </div>
-                  </div>
+          !isConnected ? (
+            /* ── Wallet Gate ── */
+            <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+              {/* Top accent bar */}
+              <div className="h-1 w-full bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600" />
 
-                  {/* TEE Verification Badge */}
-                  <div className={`flex items-center gap-3 p-3 rounded-xl border ${result.tee_verified ? 'bg-blue-500/10 border-blue-500/30' : 'bg-blue-500/[0.05] border-blue-500/20'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${result.tee_verified ? 'bg-blue-600' : 'bg-blue-500/30'}`}>
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                      </svg>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      {result.tee_verified ? (
-                        <>
-                          <p className="text-xs font-bold text-blue-700">✓ Verified inside TEE — {result.tee_mode}</p>
-                          <p className="text-xs text-blue-500 truncate">Provider: {result.provider_id}</p>
-                          {result.tee_proof && (
-                            <p className="text-xs text-blue-400 font-mono truncate">Proof: {result.tee_proof.slice(0, 32)}...</p>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-xs font-bold text-blue-400">AI Inference Active — TensorFlow 2.16</p>
-                          <p className="text-xs text-gray-500">Routes to 0G Compute TeeML when broker is available</p>
-                        </>
-                      )}
-                    </div>
-                    <span className={`text-xs px-2 py-1 rounded-full font-semibold shrink-0 ${result.tee_verified ? 'bg-blue-600 text-white' : 'bg-blue-500/20 text-blue-300'}`}>
-                      {result.ml_engine?.includes('0G') ? '0G Compute' : '0G AI'}
-                    </span>
+              <div className="px-6 py-14 flex flex-col items-center text-center max-w-md mx-auto">
+                {/* Animated wallet icon */}
+                <div className="relative mb-6">
+                  <div className="w-20 h-20 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center">
+                    <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"
+                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                    </svg>
                   </div>
+                  {/* Pulsing ring */}
+                  <span className="absolute inset-0 rounded-2xl border border-blue-500/30 animate-ping opacity-30" />
+                </div>
 
-                  {/* ZK Proof Badge */}
-                  {zkCommitment && (
-                    <div className="flex items-center gap-3 p-3 rounded-xl border bg-purple-500/10 border-purple-500/30">
-                      <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center shrink-0">
-                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                <h2 className="text-xl font-bold text-white mb-2">Wallet Connection Required</h2>
+                <p className="text-sm text-gray-400 leading-relaxed mb-8">
+                  Connect your Web3 wallet to run AI-powered transaction optimization,
+                  generate ZK proofs, and record results permanently on the 0G chain.
+                </p>
+
+                {/* Feature list */}
+                <div className="w-full bg-gray-800/60 border border-gray-700/60 rounded-xl p-4 mb-8 text-left space-y-2.5">
+                  {[
+                    { icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z", color: "text-green-400", text: "AI-optimized routes with TensorFlow 2.16" },
+                    { icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z", color: "text-purple-400", text: "ZK proof generation anchored on-chain" },
+                    { icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z", color: "text-blue-400", text: "TEE-verified inference via 0G Compute" },
+                    { icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z", color: "text-yellow-400", text: "Revenue sharing & staking rewards" },
+                  ].map(({ icon, color, text }) => (
+                    <div key={text} className="flex items-center gap-3">
+                      <div className={`w-5 h-5 shrink-0 ${color}`}>
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
                         </svg>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-purple-400">✓ ZK Proof Generated</p>
-                        <p className="text-xs text-purple-300 font-mono truncate">Commitment: {zkCommitment.slice(0, 26)}...</p>
-                        <p className="text-xs text-gray-500">Proves: savings &gt; 0, fee &lt; 2%, rate in valid range</p>
-                      </div>
-                      <span className="text-xs px-2 py-1 rounded-full font-semibold shrink-0 bg-purple-600 text-white">ZK</span>
+                      <span className="text-sm text-gray-300">{text}</span>
                     </div>
-                  )}
+                  ))}
+                </div>
 
-                  <div className="flex gap-3">
-                    <button onClick={() => { setResult(null); setZkCommitment(""); }} className="flex-1 py-2.5 border border-gray-700 text-gray-500 text-sm font-medium rounded-xl hover:bg-gray-800">Reset</button>
-                    <button onClick={handleConfirm} disabled={saving}
-                      className="flex-[2] py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-50">
-                      {saving ? 'Saving...' : 'Confirm & Save'}
-                    </button>
+                {/* Connect button */}
+                <button
+                  onClick={connectWallet}
+                  className="w-full flex items-center justify-center gap-3 py-3.5 bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-blue-600/25 mb-3"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 40 40" fill="none">
+                    <path d="M35.5 4L22.5 13.5L25 8L35.5 4Z" fill="#E17726"/>
+                    <path d="M4.5 4L17.4 13.6L15 8L4.5 4Z" fill="#E27625"/>
+                    <path d="M30.5 28.1L27 33.5L34.7 35.6L36.9 28.2L30.5 28.1Z" fill="#E27625"/>
+                    <path d="M3.1 28.2L5.3 35.6L13 33.5L9.5 28.1L3.1 28.2Z" fill="#E27625"/>
+                  </svg>
+                  Connect MetaMask
+                </button>
+
+                {/* No-wallet fallback */}
+                {noWallet && (
+                  <div className="w-full flex items-start gap-2.5 bg-yellow-500/8 border border-yellow-500/25 text-yellow-400 px-4 py-3 rounded-xl text-xs mb-3">
+                    <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>No wallet detected in your browser. Install MetaMask to continue.</span>
+                  </div>
+                )}
+
+                <a href="https://metamask.io/download/" target="_blank" rel="noreferrer"
+                  className="text-xs text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-1">
+                  Don&apos;t have a wallet? Get MetaMask free
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          ) : (
+            /* ── Optimizer Form (wallet connected) ── */
+            <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+              {/* Connected wallet banner */}
+              <div className="flex items-center justify-between px-6 py-3 bg-green-500/[0.06] border-b border-green-500/15">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse shrink-0" />
+                  <span className="text-xs font-semibold text-green-400">Wallet Connected</span>
+                  <span className="text-xs text-gray-500 font-mono hidden sm:inline">
+                    {address?.slice(0, 6)}...{address?.slice(-4)}
+                  </span>
+                </div>
+                <span className="text-xs text-gray-600 hidden sm:inline">0G Galileo Testnet</span>
+              </div>
+
+              {/* ── SUCCESS SCREEN ── */}
+              {successData && !result && (
+                <div className="relative overflow-hidden">
+                  {/* Gradient top accent */}
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 via-emerald-400 to-teal-500" />
+
+                  {/* Background ambient */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-gray-900 to-emerald-900/10 pointer-events-none" />
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/6 rounded-full blur-3xl -mr-24 -mt-24 pointer-events-none" />
+
+                  <div className="relative px-6 py-10 flex flex-col items-center text-center">
+                    {/* Animated check circle */}
+                    <div className="relative mb-6">
+                      <div className="w-20 h-20 rounded-full bg-green-500/10 border-2 border-green-500/30 flex items-center justify-center animate-scale-in">
+                        <div className="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center">
+                          <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            style={{ strokeDasharray: 40, strokeDashoffset: 0, animation: 'dash 0.6s ease-out 0.2s both' }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"/>
+                          </svg>
+                        </div>
+                      </div>
+                      {/* Pulsing outer ring */}
+                      <span className="absolute inset-0 rounded-full border-2 border-green-400/20 animate-ping" style={{ animationDuration: '2s' }} />
+                    </div>
+
+                    <h2 className="text-2xl font-black text-white mb-2">Optimization Complete!</h2>
+                    <p className="text-sm text-gray-400 mb-8 max-w-sm">
+                      Your transaction has been AI-optimized, ZK-proved, and permanently recorded on the 0G blockchain.
+                    </p>
+
+                    {/* Summary cards */}
+                    <div className="w-full grid grid-cols-3 gap-3 mb-6 max-w-md">
+                      <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-4 text-center">
+                        <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Amount</p>
+                        <p className="text-xl font-black text-white tabular-nums">${successData.amount.toLocaleString()}</p>
+                      </div>
+                      <div className="bg-green-500/[0.08] border border-green-500/20 rounded-2xl p-4 text-center">
+                        <p className="text-[10px] text-green-400/70 uppercase tracking-widest mb-1.5">Saved</p>
+                        <p className="text-xl font-black text-green-400 tabular-nums">${successData.savings.toFixed(2)}</p>
+                      </div>
+                      <div className="bg-blue-500/[0.08] border border-blue-500/20 rounded-2xl p-4 text-center">
+                        <p className="text-[10px] text-blue-400/70 uppercase tracking-widest mb-1.5">Fee Paid</p>
+                        <p className="text-xl font-black text-blue-400 tabular-nums">${successData.fee.toFixed(2)}</p>
+                      </div>
+                    </div>
+
+                    {/* Route & proof badges */}
+                    <div className="w-full max-w-md space-y-2.5 mb-6">
+                      {/* Route */}
+                      <div className="flex items-center gap-3 px-4 py-3 bg-gray-800/60 border border-gray-700/60 rounded-xl text-left">
+                        <svg className="w-4 h-4 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[10px] text-gray-500 uppercase tracking-widest">Optimized Route</p>
+                          <p className="text-sm font-semibold text-gray-200 truncate">{successData.route}</p>
+                        </div>
+                        <span className="badge-chain shrink-0">0G</span>
+                      </div>
+
+                      {/* On-chain */}
+                      <div className="flex items-center gap-3 px-4 py-3 bg-emerald-500/[0.06] border border-emerald-500/20 rounded-xl text-left">
+                        <svg className="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[10px] text-gray-500 uppercase tracking-widest">0G Storage Receipt</p>
+                          {successData.txHash ? (
+                            <a href={`https://scan-testnet.0g.ai/tx/${successData.txHash}`} target="_blank" rel="noreferrer"
+                              className="text-xs font-mono text-emerald-400 hover:text-emerald-300 transition-colors truncate block">
+                              {successData.txHash.slice(0, 20)}...{successData.txHash.slice(-6)} ↗
+                            </a>
+                          ) : (
+                            <p className="text-xs text-emerald-400">Stored on 0G Network</p>
+                          )}
+                        </div>
+                        <span className="badge-confirmed shrink-0">Confirmed</span>
+                      </div>
+
+                      {/* ZK proof */}
+                      {successData.zkCommitment && (
+                        <div className="flex items-center gap-3 px-4 py-3 bg-purple-500/[0.06] border border-purple-500/20 rounded-xl text-left">
+                          <svg className="w-4 h-4 text-purple-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                          </svg>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[10px] text-gray-500 uppercase tracking-widest">ZK Commitment</p>
+                            <p className="text-xs font-mono text-purple-400 truncate">
+                              {successData.zkCommitment.slice(0, 24)}...
+                            </p>
+                          </div>
+                          <span className="badge-zk shrink-0">ZK</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Timestamp */}
+                    <p className="text-xs text-gray-600 mb-7">
+                      Recorded at {new Date(successData.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                    </p>
+
+                    {/* CTAs */}
+                    <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
+                      <button
+                        onClick={() => setSuccessData(null)}
+                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 hover:-translate-y-0.5">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        New Optimization
+                      </button>
+                      <button
+                        onClick={() => setActiveTab("Analyze")}
+                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold text-sm rounded-xl transition-all hover:-translate-y-0.5">
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        View Analytics
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
+
+              {/* ── FORM (shown when no successData and no result pending) ── */}
+              {!successData && (
+              <div className="p-6">
+                <h2 className="text-base font-bold text-white mb-5">AI Transaction Optimizer</h2>
+                <div className="space-y-4 max-w-lg">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1.5">Transaction Amount ($)</label>
+                    <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00"
+                      className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800"/>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1.5">Optimization Priority</label>
+                    <div className="flex gap-2">
+                      {[
+                        { id: 'efficiency', label: 'Efficiency', desc: 'Low fee' },
+                        { id: 'speed',      label: 'Speed',      desc: 'Fast confirm' },
+                        { id: 'security',   label: 'Security',   desc: 'Max safety' },
+                      ].map(p => (
+                        <button key={p.id} onClick={() => setPriority(p.id)}
+                          className={`flex-1 py-2.5 px-1 text-xs font-semibold rounded-xl transition-all border flex flex-col items-center gap-0.5 ${
+                            priority === p.id
+                              ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/20'
+                              : 'bg-gray-800 text-gray-400 border-gray-700 hover:border-gray-500 hover:text-gray-200'
+                          }`}>
+                          <span>{p.label}</span>
+                          <span className={`text-[10px] font-normal ${priority === p.id ? 'text-blue-200' : 'text-gray-600'}`}>{p.desc}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {!result ? (
+                    <button onClick={handleOptimize} disabled={!amount || optimizing}
+                      className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                      {optimizing ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          AI Processing...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                          </svg>
+                          Optimize Transaction
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <div className="space-y-3">
+                      {/* Result card */}
+                      <div className="p-4 bg-gray-800 rounded-xl border border-green-500/20">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="w-2 h-2 rounded-full bg-green-400" />
+                          <span className="text-xs font-bold text-green-400 uppercase tracking-wider">Optimization Result</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4 mb-3">
+                          <div>
+                            <p className="text-xs text-gray-500 mb-0.5">Optimized Fee</p>
+                            <p className="text-lg font-bold text-white">${result.fee}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 mb-0.5">Savings</p>
+                            <p className="text-lg font-bold text-green-400">${result.savings}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 mb-0.5">Est. Time</p>
+                            <p className="text-lg font-bold text-blue-400">{result.estimated_time_s || 12}s</p>
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500 mb-2">
+                          Route: <span className="font-medium text-gray-300">{result.route}</span>
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          {result.risk && (
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                              result.risk === 'Very Low' || result.risk === 'Low'
+                                ? 'bg-green-500/10 text-green-400'
+                                : 'bg-yellow-500/10 text-yellow-400'
+                            }`}>Risk: {result.risk}</span>
+                          )}
+                          {result.congestion !== undefined && (
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-medium">
+                              Network: {result.congestion}% congested
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500 italic mb-2">{result.explanation}</p>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                            <div className="h-full bg-green-500 rounded-full" style={{ width: `${result.confidence}%` }}/>
+                          </div>
+                          <span className="text-xs text-gray-500 shrink-0">{result.confidence}% confidence</span>
+                        </div>
+                      </div>
+
+                      {/* TEE badge */}
+                      <div className={`flex items-center gap-3 p-3 rounded-xl border ${
+                        result.tee_verified
+                          ? 'bg-blue-500/10 border-blue-500/30'
+                          : 'bg-gray-800/60 border-gray-700/60'
+                      }`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                          result.tee_verified ? 'bg-blue-600' : 'bg-gray-700'
+                        }`}>
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          {result.tee_verified ? (
+                            <>
+                              <p className="text-xs font-bold text-blue-300">Verified inside TEE — {result.tee_mode}</p>
+                              <p className="text-xs text-blue-400 truncate">Provider: {result.provider_id}</p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-xs font-bold text-gray-300">AI Inference — TensorFlow 2.16</p>
+                              <p className="text-xs text-gray-500">Routes to 0G Compute TeeML when broker is available</p>
+                            </>
+                          )}
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded-full font-semibold shrink-0 ${
+                          result.tee_verified ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400'
+                        }`}>
+                          {result.ml_engine?.includes('0G') ? '0G Compute' : '0G AI'}
+                        </span>
+                      </div>
+
+                      {/* ZK Proof badge */}
+                      {zkCommitment && (
+                        <div className="flex items-center gap-3 p-3 rounded-xl border bg-purple-500/10 border-purple-500/30">
+                          <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center shrink-0">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold text-purple-300">ZK Proof Generated</p>
+                            <p className="text-xs text-purple-400 font-mono truncate">
+                              {zkCommitment.slice(0, 28)}...
+                            </p>
+                          </div>
+                          <span className="text-xs px-2 py-1 rounded-full font-semibold shrink-0 bg-purple-600 text-white">ZK</span>
+                        </div>
+                      )}
+
+                      <div className="flex gap-3">
+                        <button onClick={() => { setResult(null); setZkCommitment(""); }}
+                          className="flex-1 py-2.5 border border-gray-700 text-gray-400 text-sm font-medium rounded-xl hover:bg-gray-800 transition-colors">
+                          Reset
+                        </button>
+                        <button onClick={handleConfirm} disabled={saving}
+                          className="flex-[2] py-2.5 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-green-600/20 disabled:opacity-50 flex items-center justify-center gap-2">
+                          {saving ? (
+                            <>
+                              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              Recording on-chain...
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+                              </svg>
+                              Confirm &amp; Record On-Chain
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              )}
             </div>
-          </div>
+          )
         )}
 
         {/* ── ANALYZE TAB ── */}

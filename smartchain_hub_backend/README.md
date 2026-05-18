@@ -1,7 +1,11 @@
 <div align="center">
 
-# 🔧 SmartChain Hub — Backend API
-### *Express.js API layer coordinating AI · Blockchain · 0G Storage · Supabase*
+> **SUPERSEDED** — This Express.js layer is an early prototype and is **not running in production**.
+> The live production stack is: **Next.js API routes** (`smartchain_hub_frontend/src/pages/api/`) → **Flask AI Agent** (`ai-agent/`).
+> This directory is preserved for reference only.
+
+# 🔧 SmartChain Hub — Backend API (Legacy)
+### *Express.js API layer — superseded by Next.js API routes + Flask AI agent*
 
 [![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![Express](https://img.shields.io/badge/Express-4.x-000000?style=flat-square&logo=express&logoColor=white)](https://expressjs.com)

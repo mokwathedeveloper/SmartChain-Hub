@@ -8,6 +8,7 @@ const stats = [
   {
     label: "Transactions Optimized",
     value: "124K+",
+    sub: "projected at scale",
     icon: (
       <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/>
@@ -17,8 +18,9 @@ const stats = [
     bg: "bg-blue-500/10 border-blue-500/20",
   },
   {
-    label: "Total Savings",
+    label: "User Savings Potential",
     value: "$2.4M",
+    sub: "estimated at capacity",
     icon: (
       <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -28,8 +30,9 @@ const stats = [
     bg: "bg-green-500/10 border-green-500/20",
   },
   {
-    label: "Active Agents",
+    label: "Sovereign Agents",
     value: "8,200+",
+    sub: "addressable market",
     icon: (
       <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2"/>
@@ -41,6 +44,7 @@ const stats = [
   {
     label: "0G Chain TXs",
     value: "340K+",
+    sub: "system design capacity",
     icon: (
       <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
@@ -141,8 +145,8 @@ const features = [
 const steps = [
   {
     n: "01",
-    title: "Connect Wallet",
-    desc: "Connect MetaMask to 0G Galileo Testnet. Your wallet becomes your agent's sovereign identity.",
+    title: "Connect Wallet or Try Demo",
+    desc: "Use Demo Mode instantly — no wallet needed. Or connect MetaMask to 0G Galileo Testnet for full on-chain interactions.",
     icon: (
       <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
@@ -215,7 +219,7 @@ export default function Home() {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-xs font-semibold mb-6 hover:bg-blue-500/15 transition-colors cursor-default">
                 <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"/>
-                0G APAC Hackathon 2026 — Track 3
+                0G APAC Hackathon 2026 — Track 2: Agentic Trading Arena
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.1] mb-5">
@@ -228,22 +232,23 @@ export default function Home() {
               </p>
 
               <div className="flex flex-wrap gap-3 sm:gap-4">
-                <Link href="/dashboard"
+                {/* Primary — judges can try this immediately, no wallet required */}
+                <Link href="/transactions"
                   className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 hover:-translate-y-0.5 text-sm">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
+                  Try Demo — No Wallet Needed
+                </Link>
+                <Link href="/dashboard"
+                  className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold rounded-xl transition-all text-sm hover:-translate-y-0.5">
                   Launch App
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                   </svg>
                 </Link>
-                <a href="https://scan-testnet.0g.ai/address/0x69C619374c6B901b99941Df7238fceb80d7DCd08"
-                  target="_blank" rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold rounded-xl transition-all text-sm hover:-translate-y-0.5">
-                  View on ChainScan
-                  <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                  </svg>
-                </a>
               </div>
+              <p className="text-xs text-gray-600 mt-2">No signup required for demo · Full features with MetaMask</p>
 
               {/* Contract badges */}
               <div className="flex flex-wrap gap-2 mt-8">
@@ -331,6 +336,7 @@ export default function Home() {
                 <div className="text-center sm:text-left">
                   <div className={`text-2xl sm:text-3xl font-black ${s.color} tabular-nums`}>{s.value}</div>
                   <div className="text-xs sm:text-sm text-gray-500 leading-tight mt-0.5">{s.label}</div>
+                  <div className="text-[10px] text-gray-700 leading-tight mt-0.5 italic">{s.sub}</div>
                 </div>
               </div>
             ))}
@@ -404,7 +410,7 @@ export default function Home() {
         <div className="container mx-auto px-6 max-w-4xl">
           <div className="text-center mb-12">
             <span className="section-label">Economic Flywheel</span>
-            <h2 className="section-title mt-3 mb-4">3 on-chain interactions per user action</h2>
+            <h2 className="section-title mt-3 mb-4">4 on-chain actions per user optimization</h2>
             <div className="flex flex-wrap justify-center gap-2.5">
               {[
                 { text: "Optimize", main: true },
@@ -432,15 +438,16 @@ export default function Home() {
             <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative text-center">
-              <h3 className="text-2xl sm:text-3xl font-black text-white mb-3">Ready to launch your sovereign agent?</h3>
-              <p className="text-gray-400 mb-8 max-w-md mx-auto">Connect your wallet, mint your Agent ID, and start optimizing transactions on 0G.</p>
+              <h3 className="text-2xl sm:text-3xl font-black text-white mb-3">Try a live optimization now</h3>
+              <p className="text-gray-400 mb-2 max-w-md mx-auto">Enter any amount. The AI runs inside a TEE on 0G Compute and returns an optimized route with a cryptographic proof — in seconds.</p>
+              <p className="text-xs text-blue-400/70 mb-8">No wallet · No signup · Full on-chain demo</p>
               <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center">
-                <Link href="/dashboard"
+                <Link href="/transactions"
                   className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 hover:-translate-y-0.5 text-sm">
-                  Get Started Free
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                   </svg>
+                  Try Demo Free
                 </Link>
                 <a href="https://github.com/mokwathedeveloper/SmartChain-Hub" target="_blank" rel="noreferrer"
                   className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold rounded-xl transition-all hover:-translate-y-0.5 text-sm">

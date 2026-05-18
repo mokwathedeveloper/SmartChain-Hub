@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { errMsg } from "@/utils/errors";
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
@@ -217,7 +218,7 @@ const Header = ({ onMenuClick }: HeaderProps) => {
                   <Link href="/profile">
                     <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-gray-800 hover:ring-blue-600 transition-all cursor-pointer shrink-0">
                       {avatarUrl
-                        ? <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                        ? <Image src={avatarUrl} alt="avatar" fill className="object-cover" />
                         : <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
                             {user.email?.[0]?.toUpperCase()}
                           </div>
@@ -340,7 +341,7 @@ const Header = ({ onMenuClick }: HeaderProps) => {
           <Link href="/profile">
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden ring-2 ring-gray-800 hover:ring-blue-600 transition-all cursor-pointer shrink-0">
               {avatarUrl
-                ? <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                ? <Image src={avatarUrl} alt="avatar" fill className="object-cover" />
                 : <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
                     {user?.email?.[0]?.toUpperCase() || 'U'}
                   </div>

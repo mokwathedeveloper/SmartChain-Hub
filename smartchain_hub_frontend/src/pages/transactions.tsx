@@ -72,10 +72,12 @@ export default function Transactions() {
   // Hydrate from 0G KV on mount (authoritative persistent memory)
   useEffect(() => {
     if (!user) return;
-    hydrateAgentMemory(user.id).then(mem => {
-      if (!mem) return;
-      if (mem.preferredPriority) setPriority(mem.preferredPriority);
-      if (mem.lastAmount) setAmount(String(mem.lastAmount));
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      hydrateAgentMemory(user.id, session?.access_token ?? "").then(mem => {
+        if (!mem) return;
+        if (mem.preferredPriority) setPriority(mem.preferredPriority);
+        if (mem.lastAmount) setAmount(String(mem.lastAmount));
+      });
     });
   }, [user]);
 
@@ -247,9 +249,10 @@ export default function Transactions() {
 
       // Agent memory — non-blocking
       try {
+        const { data: { session } } = await supabase.auth.getSession();
         const existing = loadAgentMemory(user.id);
         const updated = mergeOptimizationIntoMemory(existing, user.id, priority, parsedAmount, result.route, result.savings);
-        await saveAgentMemory(updated);
+        await saveAgentMemory(updated, session?.access_token ?? "");
       } catch { /* non-blocking */ }
 
       // On-chain agent ID update — non-blocking

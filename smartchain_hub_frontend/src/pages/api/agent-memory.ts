@@ -7,6 +7,7 @@
  */
 import type { NextApiRequest, NextApiResponse } from "next";
 import { errMsg } from "@/utils/errors";
+import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 
 const OG_KV_RPC      = "https://indexer-storage-testnet-standard.0g.ai";
@@ -22,6 +23,18 @@ function deterministicHash(content: string): string {
   return "0x" + crypto.createHash("sha256").update(content).digest("hex");
 }
 
+async function getAuthenticatedUserId(req: NextApiRequest): Promise<string | null> {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  if (!token) return null;
+  const supabase = createClient(
+    (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim(),
+    (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim(),
+  );
+  const { data: { user } } = await supabase.auth.getUser(token);
+  return user?.id ?? null;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const privateKey = process.env.STORAGE_PRIVATE_KEY;
 
@@ -29,6 +42,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "GET") {
     const userId = req.query.userId as string;
     if (!userId) return res.status(400).json({ error: "userId required" });
+
+    const authedId = await getAuthenticatedUserId(req);
+    if (!authedId || authedId !== userId) return res.status(401).json({ error: "Unauthorized" });
     if (!privateKey) return res.status(200).json({ memory: null, skipped: "no key" });
 
     try {
@@ -50,6 +66,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "POST") {
     const { userId, memory } = req.body;
     if (!userId || !memory) return res.status(400).json({ error: "userId and memory required" });
+
+    const authedId = await getAuthenticatedUserId(req);
+    if (!authedId || authedId !== userId) return res.status(401).json({ error: "Unauthorized" });
     if (!privateKey) return res.status(200).json({ ok: true, skipped: "no key" });
 
     try {

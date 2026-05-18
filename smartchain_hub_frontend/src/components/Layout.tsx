@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
@@ -21,6 +21,9 @@ const Layout = ({ children }: LayoutProps) => {
   if (isAppRoute) {
     return (
       <div className="flex min-h-screen min-h-dvh bg-gray-950">
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:text-sm focus:font-semibold">
+          Skip to main content
+        </a>
         {/* Mobile overlay — covers full viewport including iOS notch areas */}
         {isSidebarOpen && (
           <div
@@ -39,7 +42,7 @@ const Layout = ({ children }: LayoutProps) => {
         {/* Main content */}
         <div className="flex-1 flex flex-col min-h-screen min-h-dvh min-w-0 overflow-x-hidden">
           <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
-          <main className="flex-grow p-3 sm:p-4 lg:p-6 overflow-y-auto bg-gray-950">
+          <main id="main-content" className="flex-grow p-3 sm:p-4 lg:p-6 overflow-y-auto bg-gray-950">
             {children}
           </main>
         </div>

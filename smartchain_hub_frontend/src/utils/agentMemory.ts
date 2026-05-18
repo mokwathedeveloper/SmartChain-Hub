@@ -36,15 +36,18 @@ function localKey(userId: string): string {
  * Persist memory to localStorage immediately, then async-write to 0G Storage KV.
  * Returns the rootHash from 0G KV if available (used to update Agent ID on-chain).
  */
-export async function saveAgentMemory(memory: AgentMemory): Promise<string> {
+export async function saveAgentMemory(memory: AgentMemory, accessToken = ""): Promise<string> {
   // Always write locally first for instant UI responsiveness
   localStorage.setItem(localKey(memory.userId), JSON.stringify(memory));
 
   try {
     const res = await fetch("/api/agent-memory", {
       method:  "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ userId: memory.userId, memory }),
+      headers: {
+        "Content-Type": "application/json",
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      },
+      body: JSON.stringify({ userId: memory.userId, memory }),
     });
     if (res.ok) {
       const data = await res.json();
@@ -76,9 +79,11 @@ export function loadAgentMemory(userId: string): AgentMemory | null {
  * Call this once on app mount to sync across devices.
  * Updates localStorage cache if server version is newer.
  */
-export async function hydrateAgentMemory(userId: string): Promise<AgentMemory | null> {
+export async function hydrateAgentMemory(userId: string, accessToken = ""): Promise<AgentMemory | null> {
   try {
-    const res = await fetch(`/api/agent-memory?userId=${encodeURIComponent(userId)}`);
+    const res = await fetch(`/api/agent-memory?userId=${encodeURIComponent(userId)}`, {
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+    });
     if (!res.ok) return loadAgentMemory(userId);
 
     const data = await res.json();

@@ -20,7 +20,10 @@ export default function Dashboard() {
   const [fineTuneResult, setFineTuneResult] = useState<FineTuneResult | null>(null);
 
   useEffect(() => {
-    if (user) hydrateAgentMemory(user.id).catch(() => {});
+    if (!user) return;
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      hydrateAgentMemory(user.id, session?.access_token ?? "").catch(() => {});
+    });
   }, [user]);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/utils/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import Tooltip from './Tooltip';
@@ -10,47 +10,45 @@ const HeroSection = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      fetchProfileAndStats();
-    }
+    if (!user) return;
+    const fetchProfileAndStats = async () => {
+      setLoading(true);
+      try {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('full_name, balance')
+          .eq('id', user.id)
+          .single();
+
+        if (profileData) setProfile(profileData);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const { count: optimizedToday } = await supabase
+          .from('transactions')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .gte('created_at', today.toISOString());
+
+        const { count: pendingTransactions } = await supabase
+          .from('transactions')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('status', 'pending');
+
+        setStats({
+          optimizedToday: optimizedToday || 0,
+          pendingTransactions: pendingTransactions || 0,
+        });
+      } catch (error) {
+        console.error("Error fetching hero stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfileAndStats();
   }, [user]);
-
-  const fetchProfileAndStats = async () => {
-    setLoading(true);
-    try {
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('full_name, balance')
-        .eq('id', user?.id)
-        .single();
-      
-      if (profileData) setProfile(profileData);
-
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const { count: optimizedToday } = await supabase
-        .from('transactions')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user?.id)
-        .gte('created_at', today.toISOString());
-
-      const { count: pendingTransactions } = await supabase
-        .from('transactions')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user?.id)
-        .eq('status', 'pending');
-
-      setStats({
-        optimizedToday: optimizedToday || 0,
-        pendingTransactions: pendingTransactions || 0
-      });
-    } catch (error) {
-      console.error("Error fetching hero stats:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (authLoading || loading) {
     return (

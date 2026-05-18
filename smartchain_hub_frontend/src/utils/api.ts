@@ -63,11 +63,14 @@ export async function getAgentHealth(): Promise<HealthResult> {
 }
 
 /** Trigger fine-tuning via the backend (which proxies to AI agent). */
-export async function triggerFineTune(rootHashes: string[] = [], dryRun = false): Promise<FineTuneResult> {
+export async function triggerFineTune(rootHashes: string[] = [], dryRun = false, accessToken = ""): Promise<FineTuneResult> {
   const res = await fetch('/api/fine-tune', {
     method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ root_hashes: rootHashes, dry_run: dryRun }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+    body: JSON.stringify({ root_hashes: rootHashes, dry_run: dryRun }),
   });
   return res.json() as Promise<FineTuneResult>;
 }

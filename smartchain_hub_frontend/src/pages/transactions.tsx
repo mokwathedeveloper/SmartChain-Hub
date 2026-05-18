@@ -121,16 +121,18 @@ export default function Transactions() {
   useEffect(() => { fetchTxList(); }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleOptimize = async () => {
-    if (!amount) return;
+    const parsed = parseFloat(amount);
+    if (!amount || isNaN(parsed) || parsed <= 0) return;
     setOptimizing(true);
     setResult(null);
 
     if (demoMode) {
       await new Promise(r => setTimeout(r, 1800));
-      const amt = parseFloat(amount);
+      const amt = parsed;
       const routeParams: Record<string, { fee: number; time: number; route: string }> = {
         efficiency: { fee: Math.round(amt * 0.003 * 100) / 100, time: 8,  route: "0G Chain Flash Route" },
         speed:      { fee: Math.round(amt * 0.005 * 100) / 100, time: 3,  route: "Standard Layer 2 Aggregator" },
+        balanced:   { fee: Math.round(amt * 0.004 * 100) / 100, time: 6,  route: "0G Balanced Bridge Route" },
         security:   { fee: Math.round(amt * 0.008 * 100) / 100, time: 15, route: "Decentralized Liquidity Bridge" },
       };
       const p = routeParams[priority] ?? routeParams.efficiency;
@@ -155,9 +157,9 @@ export default function Transactions() {
     }
 
     try {
-      setResult(await apiOptimize(parseFloat(amount), priority));
+      setResult(await apiOptimize(parsed, priority));
     } catch {
-      const amt = parseFloat(amount);
+      const amt = parsed;
       setResult({
         fee:         Math.round(amt * 0.005 * 100) / 100,
         savings:     Math.round(amt * 0.015 * 100) / 100,
@@ -337,7 +339,7 @@ export default function Transactions() {
 
   return (
     <>
-      <Head><title>Transaction Optimization | SmartChain Hub</title></Head>
+      <Head><title>Transaction Optimization | SmartChain Hub</title><meta name="robots" content="noindex,nofollow" /></Head>
       <div className="space-y-6">
 
         {/* Tabs */}

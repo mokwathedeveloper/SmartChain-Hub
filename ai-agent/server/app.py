@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import sys, os, json, requests
 from dotenv import load_dotenv
 
@@ -34,6 +36,13 @@ CORS(
     methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
     supports_credentials=False,
+)
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "60 per hour"],
+    storage_uri="memory://",
 )
 
 # 0G Compute configuration
@@ -136,6 +145,7 @@ def optimize_preflight():
 
 
 @app.route('/optimize', methods=['POST'])
+@limiter.limit("30 per minute")
 def optimize_transaction():
     data = request.json or {}
     amount = data.get('amount')
@@ -240,6 +250,7 @@ def fine_tune_preflight():
 
 
 @app.route('/fine-tune', methods=['POST'])
+@limiter.limit("5 per hour")
 def fine_tune_model():
     """
     POST /fine-tune

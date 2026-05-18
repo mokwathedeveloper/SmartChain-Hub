@@ -23,7 +23,7 @@ export default function Signup() {
     });
   }, [router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (password !== confirmPassword) { setError("Passwords do not match"); return; }
     if (!agreed) { setError("Please agree to the Terms of Service"); return; }
@@ -55,17 +55,35 @@ export default function Signup() {
             <h2 className="text-4xl font-black text-white mb-4">Join the Agentic Economy.</h2>
             <p className="text-gray-400 text-lg mb-8">Every account gets a sovereign AI agent with on-chain identity and persistent memory on 0G.</p>
             <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-5">
-              <p className="text-xs text-gray-500 uppercase font-bold tracking-widest mb-3">What you get</p>
+              <p className="text-xs text-gray-500 uppercase font-bold tracking-widest mb-4">What you get</p>
               {[
-                ["🤖", "Soulbound Agent ID", "Non-transferable NFT on 0G Chain"],
-                ["🧠", "Persistent Memory", "Survives browser resets via 0G KV"],
-                ["⚡", "AI Optimization", "TEE-verified via 0G Compute"],
-                ["💰", "Revenue Sharing", "Earn from every platform transaction"],
-              ].map(([icon, title, desc]) => (
-                <div key={title} className="flex items-start gap-3 mb-3 last:mb-0">
-                  <span className="text-lg">{icon}</span>
+                {
+                  icon: <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>,
+                  bg: "bg-blue-500/10 border-blue-500/20",
+                  title: "Soulbound Agent ID", desc: "Non-transferable NFT on 0G Chain",
+                },
+                {
+                  icon: <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>,
+                  bg: "bg-purple-500/10 border-purple-500/20",
+                  title: "Persistent Memory", desc: "Survives browser resets via 0G KV",
+                },
+                {
+                  icon: <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>,
+                  bg: "bg-green-500/10 border-green-500/20",
+                  title: "AI Optimization", desc: "TEE-verified via 0G Compute",
+                },
+                {
+                  icon: <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>,
+                  bg: "bg-yellow-500/10 border-yellow-500/20",
+                  title: "Revenue Sharing", desc: "Earn from every platform transaction",
+                },
+              ].map(({ icon, bg, title, desc }) => (
+                <div key={title} className="flex items-center gap-3 mb-3 last:mb-0">
+                  <div className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 ${bg}`}>
+                    {icon}
+                  </div>
                   <div>
-                    <p className="text-white text-sm font-semibold">{title}</p>
+                    <p className="text-white text-sm font-semibold leading-tight">{title}</p>
                     <p className="text-gray-500 text-xs">{desc}</p>
                   </div>
                 </div>

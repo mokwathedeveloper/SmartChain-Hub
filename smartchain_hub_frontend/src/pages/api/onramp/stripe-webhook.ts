@@ -76,7 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      const { txHash, explorerUrl } = await deliverA0GI(walletAddress, a0giAmount, txRef);
+      const { txHash, explorerUrl } = await deliverA0GI(walletAddress, a0giAmount);
 
       await logPayment({
         walletAddress,
@@ -111,7 +111,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (walletAddress && a0giAmount && txRef) {
       try {
-        const { txHash, explorerUrl } = await deliverA0GI(walletAddress, a0giAmount, txRef);
+        const { txHash, explorerUrl } = await deliverA0GI(walletAddress, a0giAmount);
         await logPayment({
           walletAddress,
           amountUsd: intent.amount / STRIPE_CENTS,

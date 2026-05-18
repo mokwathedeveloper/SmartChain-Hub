@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+Allow: /features
+Allow: /about
+Allow: /documentation
+Allow: /blog
+Allow: /contact
+
+Disallow: /dashboard
+Disallow: /transactions
+Disallow: /revenue
+Disallow: /payments
+Disallow: /onramp
+Disallow: /history
+Disallow: /profile
+Disallow: /console
+Disallow: /api/
+
+Sitemap: https://smartchainhubfrontend.vercel.app/sitemap.xml

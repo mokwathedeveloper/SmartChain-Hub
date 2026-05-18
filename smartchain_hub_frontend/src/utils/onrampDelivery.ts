@@ -11,7 +11,6 @@
 export async function deliverA0GI(
   walletAddress: string,
   a0giAmount: string,
-  _txRef: string   // kept for caller symmetry; not encodable on-chain
 ): Promise<{ txHash: string; explorerUrl: string }> {
   const { ethers } = await import("ethers");
 

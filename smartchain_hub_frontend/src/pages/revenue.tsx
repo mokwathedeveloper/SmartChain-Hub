@@ -2,7 +2,7 @@ import Head from "next/head";
 import { errMsg } from "@/utils/errors";
 import { useState, useEffect } from "react";
 
-type RevenueShare = { user_share?: number; total_platform_revenue?: number; claimed?: boolean };
+type RevenueShare = { user_share?: number; total_platform_revenue?: number; claimed?: boolean; created_at?: string };
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { useWeb3 } from "@/context/Web3Context";
@@ -212,7 +212,7 @@ export default function Revenue() {
             <tbody>
               {shares.length > 0 ? shares.map((r, i) => (
                 <tr key={i} className="border-b border-gray-800 hover:bg-gray-800/50">
-                  <td className="px-6 py-4 text-sm font-semibold text-gray-200">{new Date(r.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</td>
+                  <td className="px-6 py-4 text-sm font-semibold text-gray-200">{new Date(r.created_at ?? 0).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">${Number(r.user_share).toFixed(2)}</td>
                   <td className="px-6 py-4">
                     <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${r.claimed ? 'bg-gray-800 text-gray-500' : 'bg-green-500/10 text-green-400'}`}>

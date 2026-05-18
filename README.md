@@ -8,10 +8,10 @@
 
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-smartchainhubfrontend.vercel.app-6366f1?style=for-the-badge)](https://smartchainhubfrontend.vercel.app)
 [![0G Galileo](https://img.shields.io/badge/Network-0G_Galileo_Testnet-0ea5e9?style=for-the-badge&logo=ethereum)](https://scan-testnet.0g.ai)
-[![Track](https://img.shields.io/badge/Track_3-Agentic_Economy-10b981?style=for-the-badge)](https://0g.ai)
+[![Track](https://img.shields.io/badge/Track_2-Agentic_Trading_Arena-6366f1?style=for-the-badge)](https://0g.ai)
 [![License](https://img.shields.io/badge/License-MIT-f59e0b?style=for-the-badge)](LICENSE)
 
-> **0G APAC Hackathon 2026 — Track 3: Agentic Economy & Autonomous Applications**
+> **0G APAC Hackathon 2026 — Track 2: Agentic Trading Arena (Verifiable Finance)**
 
 *"Every optimization generates 4 verifiable on-chain actions. Every interaction makes the agent smarter. Every agent earns revenue autonomously."*
 
@@ -51,49 +51,48 @@ Every agent is a **first-class economic actor** on 0G Chain.
 
 ## 🏗️ System Architecture
 
-```
-╔══════════════════════════════════════════════════════════════════════╗
-║                    USER BROWSER  ·  Next.js 16 + React 19           ║
-║                                                                      ║
-║   [ Login ] → [ Dashboard ] → [ Agent ID Card ] → [ Optimizer ]     ║
-║   [ ZK Badge ] · [ TEE Badge ] · [ Escrow UI ] · [ Fine-tune ]      ║
-╚══════════════════════════╦═══════════════════════════════════════════╝
-                           ║  REST / JSON
-╔══════════════════════════╩═══════════════════════════════════════════╗
-║              BACKEND API  ·  Node.js / Express                      ║
-║                                                                      ║
-║   POST /api/transactions/process   → optimize + store + record      ║
-║   POST /api/transactions/fine-tune → fetch 0G roots → train         ║
-╚══════════╦═══════════════════════════════════════════════════════════╝
-           ║
-     ╔═════╩══════════════════════════════════════════╗
-     ║                                               ║
-╔════╩═════════════════╗   ╔═══════════════════════════════════════════╗
-║  AI AGENT            ║   ║  0G STORAGE LAYER  ·  Next.js API Routes  ║
-║  ─────────────────── ║   ║  ─────────────────────────────────────── ║
-║  Model: LLaMA 3.1 8B ║   ║  POST /api/storage-upload  → Log layer   ║
-║  Mode:  TeeML        ║   ║  GET/POST /api/agent-memory → KV layer   ║
-║  POST /fine-tune     ║   ║  POST /api/zk-proof → ZK commitment      ║
-║  TF 2.16 fallback    ║   ║  Returns Merkle root hash                ║
-╚══════════════════════╝   ╚═══════════════════════╦═══════════════════╝
-                                                   ║ rootHash committed
-                           ╔═══════════════════════╩═══════════════════╗
-                           ║  0G CHAIN  ·  5 Smart Contracts           ║
-                           ║  ─────────────────────────────────────── ║
-                           ║  SmartChainAgentID   → soulbound NFT      ║
-                           ║    .mintAgentID()    → one per wallet     ║
-                           ║    .updateMemory()   → KV root on-chain   ║
-                           ║    .reputation       → increments/tx      ║
-                           ║                                           ║
-                           ║  SmartChainAgentEscrow → micropayments    ║
-                           ║    .deposit()        → fund channel       ║
-                           ║    .payPerCall()     → claim per API      ║
-                           ║    .withdraw()       → reclaim balance    ║
-                           ║                                           ║
-                           ║  SmartChainTransaction → record tx        ║
-                           ║  SmartChainRevenue     → auto payout      ║
-                           ║  SmartChainPayments    → stake / earn     ║
-                           ╚═══════════════════════════════════════════╝
+```mermaid
+flowchart TD
+    User(["👤 User\nNext.js 16 + React 19\nVercel"])
+
+    subgraph Frontend["Frontend — Next.js API Routes"]
+        Storage["💾 /api/storage-upload\n@0glabs/0g-ts-sdk\nMerkle tree upload"]
+        Memory["🧠 /api/agent-memory\n0G KV Batcher\nPersistent cross-device"]
+        Proof["🔐 /api/zk-proof\nSHA-256 commitment\nVerifiable on-chain"]
+        FineTune["📈 /api/fine-tune\nFetches Supabase tx data\nProxies to AI agent"]
+    end
+
+    subgraph AIAgent["AI Agent — Flask · Render"]
+        Broker["☁️ 0G Compute Broker\nbroker.0g.ai\nTeeML inference"]
+        TFModel["🤖 TensorFlow 2.16\n6-feature neural net\nFine-tuned on user data"]
+        Broker -- "fallback" --> TFModel
+    end
+
+    subgraph ZeroGChain["0G Chain — Galileo Testnet · ID 16602"]
+        AgentID["🪪 SmartChainAgentID\n0x69C6...DCd08\nSoulbound NFT · reputation++"]
+        TxRecord["📝 SmartChainTransaction\n0xf95A...C52\nImmutable tx log"]
+        Revenue["💰 SmartChainRevenue\n0x8858...A08\n0.5% fee → stakers"]
+        Payments["💸 SmartChainPayments\n0x540a...7eB\nStake · earn · claim"]
+        Escrow["🔒 SmartChainEscrow\n0x0A39...A17\nMicropayment channels"]
+    end
+
+    subgraph ZeroGStorage["0G Storage — Decentralised"]
+        LogLayer["📦 Log Layer\nImmutable tx receipts\nMerkle root returned"]
+        KVLayer["🗂 KV Layer\nAgent memory\nMillisecond reads"]
+    end
+
+    User -- "optimize / confirm" --> Frontend
+    User -- "ethers.js signer" --> ZeroGChain
+    Frontend -- "POST /optimize" --> AIAgent
+    FineTune -- "transactions JSON" --> AIAgent
+    Storage -- "MemData upload" --> LogLayer
+    Memory -- "KvClient Batcher" --> KVLayer
+    LogLayer -- "rootHash" --> AgentID
+    KVLayer -- "memoryRoot" --> AgentID
+    AgentID -- "reputation++" --> Revenue
+    TxRecord --> Revenue
+    Revenue --> Payments
+    Proof -- "commitment anchored" --> AgentID
 ```
 
 ---
@@ -111,7 +110,7 @@ Every single optimization triggers a self-reinforcing loop across the entire 0G 
   │   🤖  AI Agent (0G Compute TeeML)                              │
   │          │  LLaMA 3.1 8B returns optimized route + TEE proof   │
   │          ▼                                                      │
-  │   🔐  ZK Proof generated (Groth16 / SHA-256 commitment)        │
+  │   🔐  Cryptographic Commitment Proof (SHA-256 anchored)         │
   │          │  proves: savings > 0, fee < 2%, rate ∈ [0.001,0.04] │
   │          ▼                                                      │
   │   📦  Receipt → 0G Storage Log                                 │

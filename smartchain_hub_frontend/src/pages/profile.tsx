@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
@@ -216,7 +217,7 @@ export default function Profile() {
                     <div className="flex justify-center">
                       {totpLoading
                         ? <div className="w-10 h-10 rounded-full border-2 border-blue-500/30 border-t-blue-500 animate-spin" />
-                        : <img src={totpQR} alt="TOTP QR Code" className="w-48 h-48 rounded-xl border border-white/10" />
+                        : <Image src={totpQR!} alt="TOTP QR Code" width={192} height={192} unoptimized className="rounded-xl border border-white/10" />
                       }
                     </div>
                     {/* Manual secret */}
@@ -383,7 +384,7 @@ export default function Profile() {
             <div className="relative mb-4 group">
               <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/10 shadow-xl">
                 {displayAvatar
-                  ? <img src={displayAvatar} alt="avatar" className="w-full h-full object-cover"/>
+                  ? <Image src={displayAvatar!} alt="avatar" fill className="object-cover" unoptimized />
                   : <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-3xl font-bold">
                       {initials}
                     </div>

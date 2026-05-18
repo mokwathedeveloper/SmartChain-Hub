@@ -65,7 +65,9 @@ export default function Dashboard() {
     setFineTuning(true);
     setFineTuneResult(null);
     try {
-      const result = await triggerFineTune([], false);
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token ?? "";
+      const result = await triggerFineTune([], false, token);
       setFineTuneResult(result);
     } catch (e: unknown) {
       setFineTuneResult({ ok: false, reason: errMsg(e) });

@@ -79,23 +79,23 @@ export default function Login() {
             <p className="text-gray-500 mb-8">Sign in to access your sovereign agent</p>
 
             {error && (
-              <div className="mb-5 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-xl">{error}</div>
+              <div role="alert" className="mb-5 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-xl">{error}</div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs text-gray-500 font-medium mb-1.5">Email</label>
-                <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
+                <label htmlFor="login-email" className="block text-xs text-gray-500 font-medium mb-1.5">Email</label>
+                <input id="login-email" type="email" required value={email} onChange={e => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm transition-colors"/>
               </div>
               <div>
-                <label className="block text-xs text-gray-500 font-medium mb-1.5">Password</label>
+                <label htmlFor="login-password" className="block text-xs text-gray-500 font-medium mb-1.5">Password</label>
                 <div className="relative">
-                  <input type={showPassword ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)}
+                  <input id="login-password" type={showPassword ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••"
                     className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm pr-11 transition-colors"/>
-                  <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  <button type="button" aria-label={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       {showPassword

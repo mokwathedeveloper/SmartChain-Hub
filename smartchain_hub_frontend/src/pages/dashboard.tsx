@@ -94,7 +94,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <Head><title>Dashboard | SmartChain Hub</title></Head>
+      <Head><title>Dashboard | SmartChain Hub</title><meta name="robots" content="noindex,nofollow" /></Head>
       <div className="space-y-5 animate-fade-in-up">
 
         {/* Agent ID Card */}

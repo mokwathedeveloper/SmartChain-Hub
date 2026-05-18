@@ -110,23 +110,23 @@ export default function Signup() {
             <p className="text-gray-500 mb-8">Free forever. No credit card required.</p>
 
             {error && (
-              <div className="mb-5 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-xl">{error}</div>
+              <div role="alert" className="mb-5 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-xl">{error}</div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs text-gray-500 font-medium mb-1.5">Full Name</label>
-                <input type="text" required value={name} onChange={e => setName(e.target.value)} placeholder="Satoshi Nakamoto" className={inputCls}/>
+                <label htmlFor="signup-name" className="block text-xs text-gray-500 font-medium mb-1.5">Full Name</label>
+                <input id="signup-name" type="text" required value={name} onChange={e => setName(e.target.value)} placeholder="Satoshi Nakamoto" className={inputCls}/>
               </div>
               <div>
-                <label className="block text-xs text-gray-500 font-medium mb-1.5">Email</label>
-                <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" className={inputCls}/>
+                <label htmlFor="signup-email" className="block text-xs text-gray-500 font-medium mb-1.5">Email</label>
+                <input id="signup-email" type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" className={inputCls}/>
               </div>
               <div>
-                <label className="block text-xs text-gray-500 font-medium mb-1.5">Password</label>
+                <label htmlFor="signup-password" className="block text-xs text-gray-500 font-medium mb-1.5">Password</label>
                 <div className="relative">
-                  <input type={showPassword ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 8 characters" className={`${inputCls} pr-11`}/>
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                  <input id="signup-password" type={showPassword ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 8 characters" className={`${inputCls} pr-11`}/>
+                  <button type="button" aria-label={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                     </svg>
@@ -134,10 +134,10 @@ export default function Signup() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-gray-500 font-medium mb-1.5">Confirm Password</label>
+                <label htmlFor="signup-confirm" className="block text-xs text-gray-500 font-medium mb-1.5">Confirm Password</label>
                 <div className="relative">
-                  <input type={showConfirm ? "text" : "password"} required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Repeat password" className={`${inputCls} pr-11`}/>
-                  <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                  <input id="signup-confirm" type={showConfirm ? "text" : "password"} required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Repeat password" className={`${inputCls} pr-11`}/>
+                  <button type="button" aria-label={showConfirm ? "Hide password" : "Show password"} onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                     </svg>

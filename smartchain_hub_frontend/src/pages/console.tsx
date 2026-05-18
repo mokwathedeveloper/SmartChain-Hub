@@ -23,6 +23,7 @@ const ConsolePage = () => {
     <>
       <Head>
         <title>Developer Console | SmartChain Hub</title>
+        <meta name="robots" content="noindex,nofollow" />
       </Head>
 
       <div className="space-y-6 animate-fade-in">

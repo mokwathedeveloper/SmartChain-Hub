@@ -52,7 +52,7 @@ export default function HistoryPage() {
 
   return (
     <>
-      <Head><title>History | SmartChain Hub</title></Head>
+      <Head><title>History | SmartChain Hub</title><meta name="robots" content="noindex,nofollow" /></Head>
       <div className="space-y-6">
 
         {/* Stats */}

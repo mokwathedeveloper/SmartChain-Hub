@@ -7,9 +7,15 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { errMsg } from "@/utils/errors";
 import { createClient } from "@supabase/supabase-js";
+import { rateLimit, getClientIp } from "@/utils/rateLimit";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end();
+
+  // Rate limit: 5 fine-tune calls per hour per IP
+  if (!rateLimit(`fine-tune:${getClientIp(req)}`, 5, 3_600_000)) {
+    return res.status(429).json({ ok: false, reason: "Too many requests — try again later" });
+  }
 
   // Verify caller has a valid Supabase session
   const authHeader = req.headers.authorization || "";

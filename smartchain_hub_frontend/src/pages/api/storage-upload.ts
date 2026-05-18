@@ -6,6 +6,7 @@
  */
 import type { NextApiRequest, NextApiResponse } from "next";
 import { errMsg } from "@/utils/errors";
+import { rateLimit, getClientIp } from "@/utils/rateLimit";
 import crypto from "crypto";
 
 function fallbackHash(data: object): string {
@@ -14,6 +15,11 @@ function fallbackHash(data: object): string {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end();
+
+  // Rate limit: 20 uploads per minute per IP
+  if (!rateLimit(`storage:${getClientIp(req)}`, 20, 60_000)) {
+    return res.status(429).json({ error: "Too many requests — try again later" });
+  }
 
   const { data } = req.body;
   if (!data) return res.status(400).json({ error: "data required" });

@@ -31,7 +31,7 @@ const DonutChart = ({ pct }: { pct: number }) => {
     <div className="flex flex-col sm:flex-row items-center gap-5 sm:gap-8 w-full">
       {/* SVG fills its container — max 180px on mobile, 200px on desktop */}
       <div className="relative w-40 h-40 sm:w-48 sm:h-48 shrink-0">
-        <svg viewBox="0 0 200 200" className="w-full h-full">
+        <svg viewBox="0 0 200 200" className="w-full h-full" role="img" aria-label={`Revenue distribution chart — your share is ${pct.toFixed(1)}%`}>
           {segments.map((seg, i) => {
             const da = seg.p * circ;
             const el = <circle key={i} cx={cx} cy={cy} r={r} fill="none" stroke={seg.color} strokeWidth="28"
@@ -131,7 +131,7 @@ export default function Revenue() {
 
   return (
     <>
-      <Head><title>Revenue Sharing | SmartChain Hub</title></Head>
+      <Head><title>Revenue Sharing | SmartChain Hub</title><meta name="robots" content="noindex,nofollow" /></Head>
       <div className="space-y-6">
         {/* On-chain stats — always visible when wallet connected */}
         {address && (

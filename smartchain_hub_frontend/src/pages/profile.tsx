@@ -183,7 +183,7 @@ export default function Profile() {
 
   return (
     <>
-      <Head><title>Profile Settings | SmartChain Hub</title></Head>
+      <Head><title>Profile Settings | SmartChain Hub</title><meta name="robots" content="noindex,nofollow" /></Head>
 
       {/* ── 2FA Enrollment Modal ── */}
       {show2FAModal && (

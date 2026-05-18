@@ -232,7 +232,7 @@ export default function Payments() {
   if (!isWalletConnected) {
     return (
       <>
-        <Head><title>Payments | SmartChain Hub</title></Head>
+        <Head><title>Payments | SmartChain Hub</title><meta name="robots" content="noindex,nofollow" /></Head>
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="w-16 h-16 bg-blue-600/10 border border-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -284,7 +284,7 @@ export default function Payments() {
 
   return (
     <>
-      <Head><title>Payments | SmartChain Hub</title></Head>
+      <Head><title>Payments | SmartChain Hub</title><meta name="robots" content="noindex,nofollow" /></Head>
       <div className="space-y-6">
 
         {/* Tabs */}

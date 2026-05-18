@@ -2,12 +2,12 @@
 
 <img src="../logo/logo.png" alt="SmartChain Hub" width="80" />
 
-# 🏆 SmartChain Hub — Hackathon Submission
-### 0G APAC Hackathon 2026 · Track 3: Agentic Economy & Autonomous Applications
+# SmartChain Hub — Hackathon Submission
+### 0G APAC Hackathon 2026 · Track 2: Agentic Trading Arena
 
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-smartchainhubfrontend.vercel.app-6366f1?style=for-the-badge)](https://smartchainhubfrontend.vercel.app)
 [![0G Galileo](https://img.shields.io/badge/Network-0G_Galileo_Testnet-0ea5e9?style=for-the-badge)](https://scan-testnet.0g.ai)
-[![Track 3](https://img.shields.io/badge/Track_3-Agentic_Economy-10b981?style=for-the-badge)](https://0g.ai)
+[![Track 2](https://img.shields.io/badge/Track_2-Agentic_Trading_Arena-6366f1?style=for-the-badge)](https://0g.ai)
 
 </div>
 
@@ -27,7 +27,7 @@
 
 ## 3 · Track
 
-**Track 3 — Agentic Economy & Autonomous Applications**
+**Track 2 — Agentic Trading Arena (Verifiable Finance)**
 
 ---
 
@@ -125,7 +125,7 @@ TEE-Verified Intelligence (0G Compute TeeML)
 
 - [ ] **Link:** `[INSERT YOUTUBE OR LOOM LINK]` ← **ACTION REQUIRED before submission**
 
-Script: [`docs/demo/DEMO_SCRIPT.md`](../demo/DEMO_SCRIPT.md)
+Script: [`docs/demo/PITCH_VIDEO_SCRIPT_FINAL.md`](../demo/PITCH_VIDEO_SCRIPT_FINAL.md)
 
 ---
 
@@ -160,14 +160,15 @@ Template: [`docs/submission/SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md)
 
 ✅ Frontend (Next.js 16 + React 19 + TypeScript 6)
    16 pages · 17 components · 9 API routes
-   AgentIDCard with TEE + ZK badges
+   AgentIDCard with TEE badge and cryptographic commitment proof badge
    Stripe + Flutterwave M-Pesa on-ramp
+   Demo Mode — full AI optimizer flow without wallet required
 
 ✅ 0G Storage Log — immutable tx receipts via @0glabs/0g-ts-sdk MemData
 ✅ 0G Storage KV — versioned agent memory with cross-device sync
-✅ ZK Proofs — snarkjs Groth16 + SHA-256 commitment fallback
-✅ 245 automated tests — 100% pass rate
-✅ Rust WASM optimizer module compiled
+✅ Cryptographic Commitment Proofs — SHA-256 anchored on-chain every transaction
+✅ Model Intelligence widget — fine-tune trigger with live model hash update
+✅ 6 Supabase migrations applied
 ```
 
 ---
@@ -178,10 +179,10 @@ Every optimization generates **4 verifiable on-chain actions:**
 
 ```
 User optimizes transaction
-  → [1] 0G Storage Log upload      → Merkle rootHash
-  → [2] ZK proof generated         → SHA-256 commitment
-  → [3] AgentID.updateMemory()     → reputation++ on-chain
-  → [4] Revenue event              → 0.5% fee distributed to stakers
+  → [1] 0G Storage Log upload              → Merkle rootHash
+  → [2] Cryptographic commitment proof     → SHA-256 anchored on-chain
+  → [3] AgentID.updateMemory()             → reputation++ on-chain
+  → [4] Revenue event                      → 0.5% fee distributed to stakers
 ```
 
 ---
@@ -204,7 +205,7 @@ Not currently fundraising. Built as a hackathon submission demonstrating the ful
 
 <div align="center">
 
-**SmartChain Hub** · 0G APAC Hackathon 2026 · Track 3
+**SmartChain Hub** · 0G APAC Hackathon 2026 · **Track 2: Agentic Trading Arena**
 
 `#BuildOn0G` · `#AgenticEconomy` · `#0GHackathon`
 

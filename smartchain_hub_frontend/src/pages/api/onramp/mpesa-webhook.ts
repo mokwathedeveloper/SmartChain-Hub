@@ -60,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { txHash, explorerUrl } = await deliverA0GI(walletAddress, a0giAmount, tx_ref);
+    const { txHash, explorerUrl } = await deliverA0GI(walletAddress, a0giAmount);
 
     await logPayment({
       walletAddress,

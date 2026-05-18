@@ -146,7 +146,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
 
   const disconnectWallet = () => {
     setAddress(null); setProvider(null); setSigner(null); setChainId(null);
-    try { (sdkRef.current as { disconnect?(): void } | null)?.disconnect?.(); } catch {}
+    try { (sdkRef.current as { terminate?(): void } | null)?.terminate?.(); } catch {}
   };
 
   const switchToOG = async () => {

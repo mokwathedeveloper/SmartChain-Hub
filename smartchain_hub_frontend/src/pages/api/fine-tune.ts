@@ -2,6 +2,7 @@
  * POST /api/fine-tune
  * Fetches real transaction data from Supabase and sends to AI agent for fine-tuning.
  * Falls back to root_hashes if provided.
+ * Requires a valid Supabase user session (Authorization: Bearer <access_token>).
  */
 import type { NextApiRequest, NextApiResponse } from "next";
 import { errMsg } from "@/utils/errors";
@@ -10,11 +11,21 @@ import { createClient } from "@supabase/supabase-js";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end();
 
-  const aiAgentUrl = (process.env.NEXT_PUBLIC_AI_AGENT_URL || "https://smartchain-ai-agent.onrender.com").trim();
-  const { root_hashes = [], dry_run = false } = req.body || {};
+  // Verify caller has a valid Supabase session
+  const authHeader = req.headers.authorization || "";
+  const accessToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  if (!accessToken) return res.status(401).json({ ok: false, reason: "Unauthorized" });
 
   const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
+  const anonKey     = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim();
   const serviceKey  = (process.env.SUPABASE_SERVICE_KEY || "").trim();
+
+  const anonClient = createClient(supabaseUrl, anonKey);
+  const { data: { user }, error: authErr } = await anonClient.auth.getUser(accessToken);
+  if (authErr || !user) return res.status(401).json({ ok: false, reason: "Unauthorized" });
+
+  const aiAgentUrl = (process.env.NEXT_PUBLIC_AI_AGENT_URL || "https://smartchain-ai-agent.onrender.com").trim();
+  const { root_hashes = [], dry_run = false } = req.body || {};
 
   if (!serviceKey) {
     return res.status(503).json({

@@ -12,7 +12,7 @@
 [![License](https://img.shields.io/badge/License-MIT-f59e0b?style=for-the-badge)](LICENSE)
 [![Responsible AI](https://img.shields.io/badge/Responsible_AI-Security_·_Privacy_·_Verifiability-10b981?style=for-the-badge)](RESPONSIBLE_DEVELOPMENT.md)
 
-> **0G APAC Hackathon 2026 — Track 2: Agentic Trading Arena (Verifiable Finance)**
+> **0G APAC Hackathon 2026 — Track 3: Agentic Economy & Autonomous Applications**
 
 *"Every optimization generates 4 verifiable on-chain actions. Every interaction makes the agent smarter. Every agent earns revenue autonomously."*
 

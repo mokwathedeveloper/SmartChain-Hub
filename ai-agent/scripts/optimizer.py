@@ -4,16 +4,9 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from models.savings_model import SavingsModel
+from constants import ROUTE_PARAMS, STANDARD_FEE_PCT
 
 class TransactionOptimizer:
-    STANDARD_FEE_PCT = 0.015  # 1.5% market standard
-
-    ROUTES = {
-        'efficiency': {"name": "0G Chain Flash Route",          "base_fee_pct": 0.003, "time_s": 8},
-        'speed':      {"name": "Standard Layer 2 Aggregator",   "base_fee_pct": 0.005, "time_s": 3},
-        'security':   {"name": "Decentralized Liquidity Bridge", "base_fee_pct": 0.008, "time_s": 15},
-    }
-
     PRIORITY_MAP = {'efficiency': 0, 'speed': 1, 'security': 2}
 
     def __init__(self):
@@ -31,15 +24,15 @@ class TransactionOptimizer:
 
     def optimize(self, amount: float, priority: str = 'efficiency') -> dict:
         priority_idx = self.PRIORITY_MAP.get(priority, 0)
-        route = self.ROUTES.get(priority, self.ROUTES['efficiency'])
+        route = ROUTE_PARAMS.get(priority, ROUTE_PARAMS['efficiency'])
         congestion = self._get_congestion()
         hour = float(datetime.datetime.now().hour)
 
         # Get all 3 outputs from the improved model
         prediction = self.model.predict(amount, priority_idx, congestion, hour)
 
-        standard_fee = amount * self.STANDARD_FEE_PCT
-        optimized_fee = amount * route["base_fee_pct"]
+        standard_fee = amount * STANDARD_FEE_PCT
+        optimized_fee = amount * route["fee_pct"]
         savings = max(0.0, standard_fee - optimized_fee)
 
         # Clamp savings_rate to training range (max 4%) — prevents out-of-distribution

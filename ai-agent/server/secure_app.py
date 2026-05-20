@@ -36,12 +36,10 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', secrets.token_hex(32))
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
+from config import ALLOWED_ORIGINS
+
 # Secure CORS configuration
-CORS(app, origins=[
-    'https://smartchainhubfrontend.vercel.app',
-    'http://localhost:3000',
-    'http://127.0.0.1:3000'
-], supports_credentials=True, methods=['GET', 'POST', 'OPTIONS'])
+CORS(app, origins=ALLOWED_ORIGINS, supports_credentials=True, methods=['GET', 'POST', 'OPTIONS'])
 
 # Rate limiting storage (in production, use Redis)
 request_counts = {}

@@ -9,6 +9,9 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from constants import ROUTE_PARAMS, STANDARD_FEE_PCT
+from config import ALLOWED_ORIGINS
+
 # Lazy-load TF optimizer — avoids OOM crash on Render free tier (512MB)
 # TF is only loaded on first /optimize or /fine-tune request
 _optimizer = None
@@ -26,12 +29,6 @@ def fine_tune(root_hashes, dry_run=False):
     return _fine_tune(root_hashes, dry_run=dry_run)
 
 app = Flask(__name__)
-
-ALLOWED_ORIGINS = [
-    "https://smartchainhubfrontend.vercel.app",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
 
 CORS(
     app,
@@ -225,17 +222,11 @@ def optimize_transaction():
     return jsonify(result)
 
 
-ROUTE_PARAMS = {
-    'efficiency': {"name": "0G Chain Flash Route",          "fee_pct": 0.003, "time_s": 8},
-    'speed':      {"name": "Standard Layer 2 Aggregator",   "fee_pct": 0.005, "time_s": 3},
-    'security':   {"name": "Decentralized Liquidity Bridge","fee_pct": 0.008, "time_s": 15},
-}
-
 def _math_fallback(amount: float, priority: str) -> dict:
     """Pure-math fallback — no TF dependency. Always succeeds."""
     route = ROUTE_PARAMS.get(priority, ROUTE_PARAMS['efficiency'])
     fee     = round(amount * route["fee_pct"], 2)
-    savings = round(max(0.0, amount * 0.015 - fee), 2)
+    savings = round(max(0.0, amount * STANDARD_FEE_PCT - fee), 2)
     return {
         "route":            route["name"],
         "fee":              max(fee, 0.01),

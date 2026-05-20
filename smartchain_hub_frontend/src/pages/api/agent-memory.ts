@@ -7,7 +7,7 @@
  */
 import type { NextApiRequest, NextApiResponse } from "next";
 import { errMsg } from "@/utils/errors";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/utils/supabase";
 import crypto from "crypto";
 
 const OG_KV_RPC      = "https://indexer-storage-testnet-standard.0g.ai";
@@ -27,10 +27,6 @@ async function getAuthenticatedUserId(req: NextApiRequest): Promise<string | nul
   const authHeader = req.headers.authorization || "";
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
   if (!token) return null;
-  const supabase = createClient(
-    (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim(),
-    (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim(),
-  );
   const { data: { user } } = await supabase.auth.getUser(token);
   return user?.id ?? null;
 }

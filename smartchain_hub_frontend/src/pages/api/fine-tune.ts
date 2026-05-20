@@ -7,6 +7,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { errMsg } from "@/utils/errors";
 import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/utils/supabase";
 import { rateLimit, getClientIp } from "@/utils/rateLimit";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -22,15 +23,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const accessToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
   if (!accessToken) return res.status(401).json({ ok: false, reason: "Unauthorized" });
 
-  const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
-  const anonKey     = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim();
-  const serviceKey  = (process.env.SUPABASE_SERVICE_KEY || "").trim();
-
-  const anonClient = createClient(supabaseUrl, anonKey);
-  const { data: { user }, error: authErr } = await anonClient.auth.getUser(accessToken);
+  const { data: { user }, error: authErr } = await supabase.auth.getUser(accessToken);
   if (authErr || !user) return res.status(401).json({ ok: false, reason: "Unauthorized" });
 
-  const aiAgentUrl = (process.env.NEXT_PUBLIC_AI_AGENT_URL || "https://smartchain-ai-agent.onrender.com").trim();
+  const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
+  const serviceKey  = (process.env.SUPABASE_SERVICE_KEY || "").trim();
+  const aiAgentUrl  = (process.env.NEXT_PUBLIC_AI_AGENT_URL || "https://smartchain-ai-agent.onrender.com").trim();
   const { root_hashes = [], dry_run = false } = req.body || {};
 
   if (!serviceKey) {

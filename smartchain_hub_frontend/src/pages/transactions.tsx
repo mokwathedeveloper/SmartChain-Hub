@@ -49,6 +49,7 @@ export default function Transactions() {
   const [optimizing, setOptimizing] = useState(false);
   const [result, setResult] = useState<OptimizeResult | null>(null);
   const [saving, setSaving] = useState(false);
+  const [amountError, setAmountError] = useState("");
   const [zkCommitment, setZkCommitment] = useState("");
   const [successData, setSuccessData] = useState<{
     amount: number; route: string; fee: number; savings: number;
@@ -124,34 +125,45 @@ export default function Transactions() {
 
   const handleOptimize = async () => {
     const parsed = parseFloat(amount);
-    if (!amount || isNaN(parsed) || parsed <= 0) return;
+    if (!amount || isNaN(parsed) || parsed <= 0) {
+      setAmountError("Please enter a valid amount greater than 0");
+      return;
+    }
+    if (parsed > 1_000_000) {
+      setAmountError("Max transaction amount is $1,000,000");
+      return;
+    }
+    setAmountError("");
     setOptimizing(true);
     setResult(null);
 
     if (demoMode) {
       await new Promise(r => setTimeout(r, 1800));
       const amt = parsed;
-      const routeParams: Record<string, { fee: number; time: number; route: string }> = {
-        efficiency: { fee: Math.round(amt * 0.003 * 100) / 100, time: 8,  route: "0G Chain Flash Route" },
-        speed:      { fee: Math.round(amt * 0.005 * 100) / 100, time: 3,  route: "Standard Layer 2 Aggregator" },
-        balanced:   { fee: Math.round(amt * 0.004 * 100) / 100, time: 6,  route: "0G Balanced Bridge Route" },
-        security:   { fee: Math.round(amt * 0.008 * 100) / 100, time: 15, route: "Decentralized Liquidity Bridge" },
+      const congestion = Math.floor(Math.random() * 55) + 15; // 15–70%
+      const congestionMultiplier = 1 + (congestion / 100) * 0.4; // higher congestion = higher fees
+      const savingsRate = Math.max(0.005, 0.045 - (congestion / 100) * 0.03); // 0.5–4.5% savings
+      const routeParams: Record<string, { fee: number; time: number; route: string; confidence: number }> = {
+        efficiency: { fee: Math.round(amt * 0.003 * congestionMultiplier * 100) / 100, time: 8,  route: "0G Chain Flash Route", confidence: 94 },
+        speed:      { fee: Math.round(amt * 0.005 * congestionMultiplier * 100) / 100, time: 3,  route: "Standard Layer 2 Aggregator", confidence: 91 },
+        balanced:   { fee: Math.round(amt * 0.004 * congestionMultiplier * 100) / 100, time: 6,  route: "0G Balanced Bridge Route", confidence: 96 },
+        security:   { fee: Math.round(amt * 0.008 * congestionMultiplier * 100) / 100, time: 15, route: "Decentralized Liquidity Bridge", confidence: 99 },
       };
       const p = routeParams[priority] ?? routeParams.efficiency;
       setResult({
         fee:              p.fee,
-        savings:          Math.round(Math.max(0, amt * 0.015 - p.fee) * 100) / 100,
+        savings:          Math.round(Math.max(0, amt * savingsRate) * 100) / 100,
         route:            p.route,
-        explanation:      "AI routed via 0G Compute TeeML — selected lowest-fee path across 12 provider nodes with TEE execution proof.",
-        confidence:       94,
+        explanation:      `AI routed via 0G Compute TeeML — selected lowest-fee path across 12 provider nodes. Network congestion at ${congestion}% — ${congestion < 40 ? "optimal window" : "high traffic detected, rerouted via backup nodes"}.`,
+        confidence:       p.confidence,
         tee_verified:     true,
         tee_mode:         "TeeML",
         tee_proof:        "0x4a2bfc83e1d7a9c0b5f23891...",
         tee_signer:       "0xTEENode-0G-Galileo-01",
         provider_id:      "0g-compute-broker-demo",
         ml_engine:        "0G Compute / llama-3.1-8b-instruct",
-        risk:             "Low",
-        congestion:       "38",
+        risk:             congestion > 55 ? "Medium" : "Low",
+        congestion:       String(congestion),
         estimated_time_s: p.time,
       });
       setOptimizing(false);
@@ -510,6 +522,16 @@ export default function Transactions() {
               {/* ── SUCCESS SCREEN ── */}
               {successData && !result && (
                 <div className="relative overflow-hidden">
+                  {/* Demo watermark banner */}
+                  {demoMode && (
+                    <div className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500/10 border-b border-amber-500/25">
+                      <svg className="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.263a1 1 0 01-1.447.894L15 14M3 8a2 2 0 00-2 2v4a2 2 0 002 2h9a2 2 0 002-2v-4a2 2 0 00-2-2H3z"/>
+                      </svg>
+                      <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Demo Transaction</span>
+                      <span className="text-xs text-gray-500">— Simulated · No real funds moved · No on-chain write</span>
+                    </div>
+                  )}
                   {/* Gradient top accent */}
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 via-emerald-400 to-teal-500" />
 
@@ -534,7 +556,9 @@ export default function Transactions() {
 
                     <h2 className="text-2xl font-black text-white mb-2">Optimization Complete!</h2>
                     <p className="text-sm text-gray-400 mb-8 max-w-sm">
-                      Your transaction has been AI-optimized, ZK-proved, and permanently recorded on the 0G blockchain.
+                      {demoMode
+                        ? "Simulated AI optimization with realistic 0G Compute data. Connect your wallet to run this for real on-chain."
+                        : "Your transaction has been AI-optimized, ZK-proved, and permanently recorded on the 0G blockchain."}
                     </p>
 
                     {/* Summary cards */}
@@ -609,23 +633,38 @@ export default function Transactions() {
                     </p>
 
                     {/* CTAs */}
-                    <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
-                      <button
-                        onClick={() => setSuccessData(null)}
-                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 hover:-translate-y-0.5">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                        </svg>
-                        New Optimization
-                      </button>
-                      <Link
-                        href="/history"
-                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold text-sm rounded-xl transition-all hover:-translate-y-0.5">
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        View History
-                      </Link>
+                    <div className="flex flex-col gap-3 w-full max-w-sm">
+                      {demoMode && (
+                        <button
+                          onClick={() => { setSuccessData(null); setDemoMode(false); connectWallet(); }}
+                          className="w-full flex items-center justify-center gap-2 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 hover:-translate-y-0.5">
+                          <svg className="w-4 h-4" viewBox="0 0 40 40" fill="none">
+                            <path d="M35.5 4L22.5 13.5L25 8L35.5 4Z" fill="#fff"/>
+                            <path d="M4.5 4L17.4 13.6L15 8L4.5 4Z" fill="#fff"/>
+                          </svg>
+                          Connect Wallet — Try for Real
+                        </button>
+                      )}
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => setSuccessData(null)}
+                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold text-sm rounded-xl transition-all hover:-translate-y-0.5">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                          </svg>
+                          New Optimization
+                        </button>
+                        {!demoMode && (
+                          <Link
+                            href="/history"
+                            className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold text-sm rounded-xl transition-all hover:-translate-y-0.5">
+                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            View History
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -638,8 +677,24 @@ export default function Transactions() {
                 <div className="space-y-4 max-w-lg">
                   <div>
                     <label className="block text-xs text-gray-500 mb-1.5">Transaction Amount ($)</label>
-                    <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00"
-                      className="w-full px-4 py-3 border border-gray-700 rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800"/>
+                    <input
+                      type="number" value={amount}
+                      onChange={e => { setAmount(e.target.value); if (amountError) setAmountError(""); }}
+                      placeholder="0.00"
+                      className={`w-full px-4 py-3 border rounded-xl text-sm text-gray-200 focus:outline-none focus:ring-2 bg-gray-800 transition-colors ${
+                        amountError
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-700 focus:ring-blue-500"
+                      }`}
+                    />
+                    {amountError && (
+                      <p className="text-xs text-red-400 mt-1.5 flex items-center gap-1">
+                        <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {amountError}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -663,22 +718,34 @@ export default function Transactions() {
                     </div>
                   </div>
 
-                  {!result ? (
-                    <button onClick={handleOptimize} disabled={!amount || optimizing}
+                  {optimizing ? (
+                    /* Processing skeleton */
+                    <div className="space-y-3 animate-pulse">
+                      <div className="p-4 bg-gray-800 rounded-xl border border-blue-500/20">
+                        <div className="flex items-center gap-2 mb-4">
+                          <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping" />
+                          <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">AI Processing via 0G Compute TEE...</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4 mb-4">
+                          {[...Array(3)].map((_, i) => (
+                            <div key={i}>
+                              <div className="h-3 bg-gray-700 rounded mb-2 w-16" />
+                              <div className="h-6 bg-gray-700 rounded w-12" />
+                            </div>
+                          ))}
+                        </div>
+                        <div className="h-3 bg-gray-700 rounded w-3/4 mb-2" />
+                        <div className="h-2 bg-gray-700 rounded w-full mt-3" />
+                      </div>
+                      <div className="h-12 bg-gray-800 rounded-xl border border-blue-500/20" />
+                    </div>
+                  ) : !result ? (
+                    <button onClick={handleOptimize} disabled={!amount}
                       className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                      {optimizing ? (
-                        <>
-                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          AI Processing...
-                        </>
-                      ) : (
-                        <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                          </svg>
-                          Optimize Transaction
-                        </>
-                      )}
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                      </svg>
+                      Optimize Transaction
                     </button>
                   ) : (
                     <div className="space-y-3">

@@ -10,6 +10,7 @@
 [![0G Galileo](https://img.shields.io/badge/Network-0G_Galileo_Testnet-0ea5e9?style=for-the-badge&logo=ethereum)](https://scan-testnet.0g.ai)
 [![Track](https://img.shields.io/badge/Track_2-Agentic_Trading_Arena-6366f1?style=for-the-badge)](https://0g.ai)
 [![License](https://img.shields.io/badge/License-MIT-f59e0b?style=for-the-badge)](LICENSE)
+[![Responsible AI](https://img.shields.io/badge/Responsible_AI-Security_·_Privacy_·_Verifiability-10b981?style=for-the-badge)](RESPONSIBLE_DEVELOPMENT.md)
 
 > **0G APAC Hackathon 2026 — Track 2: Agentic Trading Arena (Verifiable Finance)**
 
@@ -524,6 +525,7 @@ npx hardhat test
 - **Contributors:** [CONTRIBUTORS.md](CONTRIBUTORS.md)
 - **Changelog:** [CHANGELOG.md](CHANGELOG.md)
 - **Performance Benchmarks:** [docs/performance/BENCHMARKS.md](docs/performance/BENCHMARKS.md)
+- **Responsible Development:** [RESPONSIBLE_DEVELOPMENT.md](RESPONSIBLE_DEVELOPMENT.md)
 
 ---
 

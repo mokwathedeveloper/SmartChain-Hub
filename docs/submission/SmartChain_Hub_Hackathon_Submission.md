@@ -123,7 +123,9 @@ TEE-Verified Intelligence (0G Compute TeeML)
 
 ## 11 · Demo Video
 
-- [ ] **Link:** `[INSERT YOUTUBE OR LOOM LINK]` ← **ACTION REQUIRED before submission**
+- [x] **Demo video:** https://www.loom.com/share/c7eb4766f3cc4e5d84bab3b47e213670
+- [x] **Pitch video:** https://www.loom.com/share/ca100db12c6e40daa5e9b3b29e432e4d
+- [ ] Submit demo link on HackQuest ← **ACTION REQUIRED**
 
 Script: [`docs/demo/PITCH_VIDEO_SCRIPT_FINAL.md`](../demo/PITCH_VIDEO_SCRIPT_FINAL.md)
 

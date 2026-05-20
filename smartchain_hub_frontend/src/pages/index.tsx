@@ -185,9 +185,9 @@ const steps = [
   },
 ];
 
+
 export default function Home() {
   const router = useRouter();
-
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) router.replace('/dashboard');
@@ -402,6 +402,31 @@ export default function Home() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── VIDEO DEMO ───────────────────────────────────────────── */}
+      <section className="bg-gray-950 py-24">
+        <div className="container mx-auto px-6 max-w-5xl">
+          <div className="text-center mb-10">
+            <span className="section-label">See It In Action</span>
+            <h2 className="section-title mt-3 mb-4">Watch the demo</h2>
+            <p className="section-sub max-w-xl mx-auto">See SmartChain Hub running live — AI optimization inside a TEE, soulbound identity, and on-chain receipts in real time.</p>
+          </div>
+
+          <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/50 bg-gray-900">
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent z-10" />
+            <div style={{ padding: "56.25% 0 0 0", position: "relative" }}>
+              <iframe
+                src="https://www.loom.com/embed/c7eb4766f3cc4e5d84bab3b47e213670?hide_owner=true&hide_share=true&hide_title=false&hideEmbedTopBar=false"
+                frameBorder="0"
+                allowFullScreen
+                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+                title="SmartChain Hub Demo"
+              />
+            </div>
+          </div>
+          <p className="text-center text-gray-500 text-sm mt-4">Watch SmartChain Hub optimize a real transaction on 0G Compute</p>
         </div>
       </section>
 

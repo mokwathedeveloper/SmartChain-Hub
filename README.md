@@ -439,6 +439,48 @@ PRIVATE_KEY=                         # Deployer wallet
 
 ---
 
+## 🔧 Troubleshooting
+
+### Wallet won't connect
+- Ensure MetaMask is installed and unlocked
+- Switch network to **0G Galileo Testnet** (Chain ID `16602`, RPC `https://evmrpc-testnet.0g.ai`)
+- Get testnet tokens at [hub.0g.ai/faucet](https://hub.0g.ai/faucet)
+- If MetaMask shows "Pending", reset your account: MetaMask → Settings → Advanced → Reset Account
+
+### AI Agent returns fallback result (no TEE badge)
+- The 0G Compute broker may be temporarily unavailable — this is expected on testnet
+- The local TensorFlow model activates automatically as fallback
+- Check broker status: `curl https://broker.0g.ai/health`
+- Check AI agent status: `curl https://smartchain-hub.onrender.com/health`
+
+### Render cold start takes 15+ seconds
+- The free tier spins down after 15 minutes of inactivity
+- The app sends a keepalive ping every 4 minutes to reduce this
+- First request after inactivity: wait up to 30 seconds for warm-up
+
+### 0G Storage upload fails silently
+- Confirm `STORAGE_PRIVATE_KEY` wallet has A0GI balance: [faucet](https://hub.0g.ai/faucet)
+- This is non-blocking — Supabase insert still succeeds; on-chain receipt is retried next optimization
+- Check indexer: `https://storagescan-galileo.0g.ai`
+
+### Supabase "relation does not exist" error
+- Run all 7 migrations in order in your Supabase SQL editor (see Quick Start → Step 2)
+- Confirm Row Level Security is enabled on `transactions` and `revenue_shares` tables
+
+### Contract call reverts
+- Ensure your wallet is on **Chain ID 16602** (not mainnet or another testnet)
+- AgentID mint is one-per-wallet — `mintAgentID()` reverts if already minted
+- Check contract status on [ChainScan](https://scan-testnet.0g.ai/address/0x69C619374c6B901b99941Df7238fceb80d7DCd08)
+
+### Frontend build fails
+```bash
+# Clear Next.js cache
+rm -rf smartchain_hub_frontend/.next
+cd smartchain_hub_frontend && npm install && npm run build
+```
+
+---
+
 ## 🧪 Testing
 
 ```bash
@@ -479,6 +521,9 @@ npx hardhat test
 - **Contracts:** Verified on [0G ChainScan](https://scan-testnet.0g.ai)
 - **Pitch Deck:** [docs/demo/SmartChain_Hub_Pitch_Deck.md](docs/demo/SmartChain_Hub_Pitch_Deck.md)
 - **Submission Checklist:** [docs/submission/SUBMISSION_CHECKLIST.md](docs/submission/SUBMISSION_CHECKLIST.md)
+- **Contributors:** [CONTRIBUTORS.md](CONTRIBUTORS.md)
+- **Changelog:** [CHANGELOG.md](CHANGELOG.md)
+- **Performance Benchmarks:** [docs/performance/BENCHMARKS.md](docs/performance/BENCHMARKS.md)
 
 ---
 

@@ -192,14 +192,8 @@ const Header = ({ onMenuClick }: HeaderProps) => {
       <>
         <header className="bg-gray-950/90 sticky top-0 z-50 backdrop-blur-md border-b border-gray-800">
           <div className="container mx-auto px-4 sm:px-6 max-w-6xl flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center gap-2.5 shrink-0">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-                <svg width="16" height="16" viewBox="0 0 40 40" fill="none">
-                  <path d="M20 4L34 12V28L20 36L6 28V12L20 4Z" fill="white" opacity="0.9"/>
-                  <path d="M20 12L28 16.5V25.5L20 30L12 25.5V16.5L20 12Z" fill="#3B82F6"/>
-                </svg>
-              </div>
-              <span className="font-bold text-white text-sm">SmartChain Hub</span>
+            <Link href="/" className="flex items-center shrink-0">
+              <Image src="/logo-full.png" alt="SmartChain Hub" width={130} height={32} className="object-contain" priority />
             </Link>
 
             {/* Desktop nav */}

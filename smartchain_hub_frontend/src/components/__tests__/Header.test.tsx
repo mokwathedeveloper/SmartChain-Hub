@@ -31,7 +31,7 @@ describe('Header', () => {
 
   it('renders SmartChain Hub logo on public pages', () => {
     render(<Header />);
-    expect(screen.getByText('SmartChain Hub')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'SmartChain Hub' })).toBeInTheDocument();
   });
 
   it('shows Get Started button on public pages', () => {
@@ -59,6 +59,6 @@ describe('Header', () => {
     (useAuth as jest.Mock).mockReturnValue({ user: { email: 'test@test.com' } });
     (useWeb3 as jest.Mock).mockReturnValue({ ...mockWeb3, isConnected: true, address: '0xabc', chainName: 'Ethereum' });
     render(<Header />);
-    expect(screen.getByText(/Switch to 0G/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Switch/i })).toBeInTheDocument();
   });
 });

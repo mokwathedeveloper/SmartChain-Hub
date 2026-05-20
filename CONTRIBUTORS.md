@@ -7,7 +7,7 @@
 **SmartChain Hub** — The First Sovereign AI Agent Economy on 0G
 
 [![0G APAC Hackathon](https://img.shields.io/badge/0G_APAC_Hackathon-2026-0ea5e9?style=for-the-badge&logo=ethereum&logoColor=white)](https://0g.ai)
-[![Track 2](https://img.shields.io/badge/Track_2-Agentic_Trading_Arena-6366f1?style=for-the-badge)](https://0g.ai)
+[![Track 3](https://img.shields.io/badge/Track_3-Agentic_Economy-10b981?style=for-the-badge)](https://0g.ai)
 [![MIT License](https://img.shields.io/badge/License-MIT-f59e0b?style=for-the-badge)](LICENSE)
 
 </div>
@@ -71,7 +71,7 @@ Apr 16 ────────────────────────�
   │                                                            │
   │                     May 18 ──────────────────────┐        │
   │                          │                        │        │
-  │                          ├── 🔄 Track 2 pivot     │        │
+  │                          ├── ✅ Track 3 confirmed  │        │
   │                          ├── 🔐 TeeML + TEE badge  │        │
   │                          ├── 🧠 0G KV Memory       │        │
   │                          ├── 📈 Fine-tune pipeline │        │
@@ -88,7 +88,7 @@ Apr 16 ────────────────────────�
 | Apr 16, 2026 | Project initialized — Next.js + Supabase auth + core components | ✅ |
 | Apr 16, 2026 | 5 smart contracts deployed to 0G Galileo Testnet | ✅ |
 | Apr 16, 2026 | Flask AI agent + TensorFlow 2.16 model operational | ✅ |
-| May 18, 2026 | Track 2 pivot — Agentic Trading Arena focus | ✅ |
+| May 18, 2026 | Track 3 confirmed — Agentic Economy & Autonomous Applications | ✅ |
 | May 18, 2026 | 0G Compute TeeML integration + TEE verification badges | ✅ |
 | May 18, 2026 | 0G Storage KV agent memory + fine-tuning pipeline | ✅ |
 | May 18, 2026 | Rate limiting · keepalive ping · production hardening | ✅ |

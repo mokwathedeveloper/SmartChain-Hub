@@ -1,8 +1,9 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
+import type { User } from "@supabase/supabase-js";
 
 const stats = [
   {
@@ -188,11 +189,17 @@ const steps = [
 
 export default function Home() {
   const router = useRouter();
+  const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) router.replace('/dashboard');
+      setLoggedInUser(session?.user ?? null);
     });
-  }, [router]);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setLoggedInUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   return (
     <>
@@ -231,24 +238,48 @@ export default function Home() {
                 SmartChain Hub gives every user a sovereign AI agent with soulbound identity, persistent memory, and TEE-verified intelligence — all powered by the full 0G modular stack.
               </p>
 
-              <div className="flex flex-wrap gap-3 sm:gap-4">
-                {/* Primary — judges can try this immediately, no wallet required */}
-                <Link href="/transactions"
-                  className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 hover:-translate-y-0.5 text-sm">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                  </svg>
-                  Try Demo — No Wallet Needed
-                </Link>
-                <Link href="/dashboard"
-                  className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold rounded-xl transition-all text-sm hover:-translate-y-0.5">
-                  Launch App
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                  </svg>
-                </Link>
-              </div>
-              <p className="text-xs text-gray-600 mt-2">No signup required for demo · Full features with MetaMask</p>
+              {loggedInUser ? (
+                /* ── Logged-in CTA ── */
+                <div className="flex flex-wrap gap-3 sm:gap-4">
+                  <Link href="/dashboard"
+                    className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-violet-600/30 hover:shadow-violet-600/50 hover:-translate-y-0.5 text-sm">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    Go to Dashboard
+                  </Link>
+                  <Link href="/transactions"
+                    className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold rounded-xl transition-all text-sm hover:-translate-y-0.5">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    AI Optimizer
+                  </Link>
+                </div>
+              ) : (
+                /* ── Guest CTA ── */
+                <div className="flex flex-wrap gap-3 sm:gap-4">
+                  <Link href="/transactions"
+                    className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 hover:-translate-y-0.5 text-sm">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    Try Demo — No Wallet Needed
+                  </Link>
+                  <Link href="/signup"
+                    className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold rounded-xl transition-all text-sm hover:-translate-y-0.5">
+                    Create Account
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                    </svg>
+                  </Link>
+                </div>
+              )}
+              <p className="text-xs text-gray-600 mt-2">
+                {loggedInUser
+                  ? `Signed in as ${loggedInUser.email}`
+                  : "No signup required for demo · Full features with account"}
+              </p>
 
               {/* Contract badges */}
               <div className="flex flex-wrap gap-2 mt-8">

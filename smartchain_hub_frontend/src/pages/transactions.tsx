@@ -40,7 +40,7 @@ interface RouteAnalysis {
 }
 
 export default function Transactions() {
-  const { user } = useAuth();
+  const { user } = useAuth(false); // demo is public — auth is optional, not required
   const { signer, isConnected, address, connectWallet, noWallet } = useWeb3();
   const [activeTab, setActiveTab] = useState("Optimize");
   const [demoMode, setDemoMode] = useState(false);

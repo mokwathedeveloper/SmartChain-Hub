@@ -3,11 +3,11 @@
 <img src="../logo/logo.png" alt="SmartChain Hub" width="80" />
 
 # SmartChain Hub — Hackathon Submission
-### 0G APAC Hackathon 2026 · Track 2: Agentic Trading Arena
+### 0G APAC Hackathon 2026 · Track 3: Agentic Economy & Autonomous Applications
 
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-smartchainhubfrontend.vercel.app-6366f1?style=for-the-badge)](https://smartchainhubfrontend.vercel.app)
 [![0G Galileo](https://img.shields.io/badge/Network-0G_Galileo_Testnet-0ea5e9?style=for-the-badge)](https://scan-testnet.0g.ai)
-[![Track 2](https://img.shields.io/badge/Track_2-Agentic_Trading_Arena-6366f1?style=for-the-badge)](https://0g.ai)
+[![Track 3](https://img.shields.io/badge/Track_3-Agentic_Economy-10b981?style=for-the-badge)](https://0g.ai)
 
 </div>
 
@@ -27,7 +27,7 @@
 
 ## 3 · Track
 
-**Track 2 — Agentic Trading Arena (Verifiable Finance)**
+**Track 3 — Agentic Economy & Autonomous Applications (Verifiable Finance)**
 
 ---
 
@@ -205,7 +205,7 @@ Not currently fundraising. Built as a hackathon submission demonstrating the ful
 
 <div align="center">
 
-**SmartChain Hub** · 0G APAC Hackathon 2026 · **Track 2: Agentic Trading Arena**
+**SmartChain Hub** · 0G APAC Hackathon 2026 · **Track 3: Agentic Economy & Autonomous Applications**
 
 `#BuildOn0G` · `#AgenticEconomy` · `#0GHackathon`
 

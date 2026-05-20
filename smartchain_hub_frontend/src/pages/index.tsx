@@ -259,7 +259,7 @@ export default function Home() {
               ) : (
                 /* ── Guest CTA ── */
                 <div className="flex flex-wrap gap-3 sm:gap-4">
-                  <Link href="/transactions"
+                  <Link href="/transactions?demo=true"
                     className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 hover:-translate-y-0.5 text-sm">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
@@ -498,7 +498,7 @@ export default function Home() {
               <p className="text-gray-400 mb-2 max-w-md mx-auto">Enter any amount. The AI runs inside a TEE on 0G Compute and returns an optimized route with a cryptographic proof — in seconds.</p>
               <p className="text-xs text-blue-400/70 mb-8">No wallet · No signup · Full on-chain demo</p>
               <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center">
-                <Link href="/transactions"
+                <Link href="/transactions?demo=true"
                   className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 hover:-translate-y-0.5 text-sm">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>

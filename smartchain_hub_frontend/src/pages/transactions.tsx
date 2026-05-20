@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
@@ -40,6 +41,7 @@ interface RouteAnalysis {
 }
 
 export default function Transactions() {
+  const router = useRouter();
   const { user } = useAuth(false); // demo is public — auth is optional, not required
   const { signer, isConnected, address, connectWallet, noWallet } = useWeb3();
   const [activeTab, setActiveTab] = useState("Optimize");
@@ -88,6 +90,13 @@ export default function Transactions() {
       .then(h => setModelHealth(h as unknown as { og_compute: boolean; og_compute_model: string }))
       .catch(() => {});
   }, []);
+
+  // Auto-activate demo mode when linked from landing page with ?demo=true
+  useEffect(() => {
+    if (router.isReady && router.query.demo === 'true' && !isConnected) {
+      setDemoMode(true);
+    }
+  }, [router.isReady, router.query.demo, isConnected]);
 
   const handleFineTune = async () => {
     setFineTuning(true);
@@ -187,11 +196,12 @@ export default function Transactions() {
 
   const handleConfirm = async () => {
     if (!result) return;
-    if (!user && !demoMode) return;
+    // No user and not in demo mode — treat as demo to give full UX experience
+    const effectiveDemoMode = demoMode || !user;
     setSaving(true);
 
     // Demo mode — simulate a brief "recording" delay then show success
-    if (demoMode) {
+    if (effectiveDemoMode) {
       await new Promise(r => setTimeout(r, 2000));
       setSuccessData({
         amount:       parseFloat(amount),
@@ -209,7 +219,7 @@ export default function Transactions() {
       return;
     }
 
-    // At this point demoMode is false, so user must be non-null (guarded above)
+    // effectiveDemoMode is false here, so user is non-null
     if (!user) { setSaving(false); return; }
 
     const parsedAmount = parseFloat(amount);

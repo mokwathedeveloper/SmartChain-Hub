@@ -26,13 +26,16 @@ def fine_tune(root_hashes, dry_run=False):
     return _fine_tune(root_hashes, dry_run=dry_run)
 
 app = Flask(__name__)
+
+ALLOWED_ORIGINS = [
+    "https://smartchainhubfrontend.vercel.app",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
 CORS(
     app,
-    origins=[
-        "https://smartchainhubfrontend.vercel.app",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ],
+    origins=ALLOWED_ORIGINS,
     methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
     supports_credentials=False,
@@ -126,6 +129,24 @@ def call_0g_compute(prompt: str) -> dict:
     except Exception as e:
         app.logger.warning("0G Compute unavailable: %s", e)
         return None
+
+
+@app.after_request
+def inject_cors_headers(response):
+    """Belt-and-suspenders: ensure CORS headers on every Flask response,
+    including error responses that flask-cors may skip."""
+    origin = request.headers.get('Origin', '')
+    if origin in ALLOWED_ORIGINS:
+        response.headers['Access-Control-Allow-Origin'] = origin
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
+        response.headers['Vary'] = 'Origin'
+    return response
+
+
+@app.route('/health', methods=['OPTIONS'])
+def health_preflight():
+    return '', 204
 
 
 @app.route('/health', methods=['GET'])

@@ -103,9 +103,10 @@ SmartChainTransaction   0xf95A1610be22046c334E3bD1b11D2B88519E6C52
 
 ### 4 · Demo Video (3 min max)
 
-- [ ] Record using the script in `docs/demo/DEMO_SCRIPT.md` ← **ACTION REQUIRED**
-- [ ] Upload to YouTube or Loom (public, unlisted OK) ← **ACTION REQUIRED**
-- [ ] Submit link on HackQuest ← **ACTION REQUIRED**
+- [x] Recorded and uploaded to Loom ✅
+- [x] Demo video: https://www.loom.com/share/c7eb4766f3cc4e5d84bab3b47e213670
+- [x] Pitch video: https://www.loom.com/share/ca100db12c6e40daa5e9b3b29e432e4d
+- [ ] Submit demo link on HackQuest ← **ACTION REQUIRED**
 
 **Demo flow:**
 ```
@@ -188,6 +189,8 @@ The agent remembers you across sessions — not from a DB, from 0G.
 | **Project Name** | SmartChain Hub |
 | **Track** | Track 3 — Agentic Economy |
 | **Live Demo** | https://smartchainhubfrontend.vercel.app |
+| **Demo Video** | https://www.loom.com/share/c7eb4766f3cc4e5d84bab3b47e213670 |
+| **Pitch Video** | https://www.loom.com/share/ca100db12c6e40daa5e9b3b29e432e4d |
 | **Primary Contract** | `0xf95A1610be22046c334E3bD1b11D2B88519E6C52` |
 | **Agent ID Contract** | `0x69C619374c6B901b99941Df7238fceb80d7DCd08` |
 | **Explorer** | https://scan-testnet.0g.ai/address/0xf95A1610be22046c334E3bD1b11D2B88519E6C52 |
@@ -214,8 +217,8 @@ The agent remembers you across sessions — not from a DB, from 0G.
 | Priority | Status | Action | Notes |
 |---|---|---|---|
 | 🔴 HIGH | [ ] | Make GitHub repo **PUBLIC** | Required before HackQuest submission |
-| 🔴 HIGH | [ ] | Record 3-minute demo video | Script: `docs/demo/DEMO_SCRIPT.md` |
-| 🔴 HIGH | [ ] | Upload demo to YouTube or Loom | Must be public or unlisted |
+| 🔴 HIGH | ✅ | Demo video recorded and uploaded | https://www.loom.com/share/c7eb4766f3cc4e5d84bab3b47e213670 |
+| 🔴 HIGH | ✅ | Pitch video recorded and uploaded | https://www.loom.com/share/ca100db12c6e40daa5e9b3b29e432e4d |
 | 🔴 HIGH | [ ] | Submit demo link on HackQuest | Mandatory field |
 | 🔴 HIGH | [ ] | Post on X using template above | Mandatory per hackathon rules |
 | 🔴 HIGH | [ ] | Submit X post link on HackQuest | Mandatory field |

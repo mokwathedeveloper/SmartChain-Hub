@@ -219,7 +219,7 @@ export default function Home() {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-xs font-semibold mb-6 hover:bg-blue-500/15 transition-colors cursor-default">
                 <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"/>
-                0G APAC Hackathon 2026 — Track 2: Agentic Trading Arena
+                0G APAC Hackathon 2026 — Track 3: Agentic Economy
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.1] mb-5">

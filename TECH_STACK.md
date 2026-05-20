@@ -1,10 +1,19 @@
 <div align="center">
 
-# ⛓ SmartChain Hub — Technical Architecture & Stack
+<img src="docs/logo/logo.png" alt="SmartChain Hub Logo" width="90" />
+
+# SmartChain Hub — Technical Architecture & Stack
 
 ### *The First Sovereign AI Agent Economy on 0G*
 
 > Every component chosen with purpose. Every layer verifiable on-chain.
+
+[![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org)
+[![Python](https://img.shields.io/badge/Python_3.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow_2.16-FF6F00?style=flat-square&logo=tensorflow&logoColor=white)](https://tensorflow.org)
+[![Solidity](https://img.shields.io/badge/Solidity_0.8.20-363636?style=flat-square&logo=solidity&logoColor=white)](https://soliditylang.org)
+[![0G Stack](https://img.shields.io/badge/0G_Stack-Chain_·_Compute_·_Storage-0ea5e9?style=flat-square)](https://0g.ai)
+[![Vercel](https://img.shields.io/badge/Deployed-Vercel_+_Render-000000?style=flat-square&logo=vercel&logoColor=white)](https://vercel.com)
 
 </div>
 

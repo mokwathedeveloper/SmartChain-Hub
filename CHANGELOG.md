@@ -38,10 +38,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## ![v2.0.0](https://img.shields.io/badge/v2.0.0-6366f1?style=flat-square) — 2026-05-18 · Track 2 Pivot + 0G Compute TeeML
+## ![v2.0.0](https://img.shields.io/badge/v2.0.0-6366f1?style=flat-square) — 2026-05-18 · Track 3 Alignment + 0G Compute TeeML
 
 ### ✨ Added
-- Track 2 (Agentic Trading Arena) pivot — repositioned entire project narrative
+- Track 3 (Agentic Economy & Autonomous Applications) — confirmed track alignment across all submission materials
 - Mermaid flowchart architecture diagram in README
 - Browser-side keepalive ping every 4 minutes to prevent Render free-tier cold starts
 - Rate limiting on AI agent: 30 req/min on `/optimize`, 5 req/hr on `/fine-tune` (flask-limiter)

@@ -369,4 +369,4 @@
 
 *SmartChain Hub · QA Test Execution Report · 2026-05-18*
 *smartchainhubfrontend.vercel.app · 0G Galileo Testnet*
-*0G APAC Hackathon 2026 — Track 2: Agentic Trading Arena*
+*0G APAC Hackathon 2026 — Track 3: Agentic Economy & Autonomous Applications*

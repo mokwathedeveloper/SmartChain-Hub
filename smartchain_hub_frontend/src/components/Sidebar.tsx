@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 interface SidebarProps { onClose?: () => void; }
@@ -55,18 +56,8 @@ const Sidebar = ({ onClose }: SidebarProps) => {
         {/* Subtle glow behind logo */}
         <div className="absolute -top-4 -left-4 w-24 h-24 bg-blue-600/8 rounded-full blur-2xl pointer-events-none" />
 
-        <Link href="/dashboard" className="relative flex items-center gap-3 group" onClick={() => onClose?.()}>
-          {/* Logo icon */}
-          <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-600/30 shrink-0 group-hover:shadow-blue-600/50 transition-shadow">
-            <svg width="18" height="18" viewBox="0 0 40 40" fill="none">
-              <path d="M20 4L34 12V28L20 36L6 28V12L20 4Z" fill="white" opacity="0.95"/>
-              <path d="M20 12L28 16.5V25.5L20 30L12 25.5V16.5L20 12Z" fill="#60A5FA"/>
-            </svg>
-          </div>
-          <div>
-            <div className="font-black text-white text-sm leading-tight tracking-tight">SmartChain</div>
-            <div className="text-[10px] text-gray-500 leading-tight font-medium">Hub · 0G Network</div>
-          </div>
+        <Link href="/dashboard" className="relative flex items-center group" onClick={() => onClose?.()}>
+          <Image src="/logo-full.png" alt="SmartChain Hub" width={130} height={32} className="object-contain" priority />
         </Link>
 
         <button onClick={onClose} className="lg:hidden text-gray-600 hover:text-gray-400 p-1.5 rounded-lg hover:bg-gray-800 transition-colors">

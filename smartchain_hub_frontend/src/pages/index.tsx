@@ -277,7 +277,7 @@ export default function Home() {
               )}
               <p className="text-xs text-gray-600 mt-2">
                 {loggedInUser
-                  ? `Signed in as ${loggedInUser.email}`
+                  ? `Signed in as ${loggedInUser.email ?? loggedInUser.user_metadata?.full_name ?? 'your account'}`
                   : "No signup required for demo · Full features with account"}
               </p>
 

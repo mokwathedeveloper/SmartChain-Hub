@@ -6,7 +6,7 @@
 
 [![Latest](https://img.shields.io/badge/Latest-v2.1.0-10b981?style=for-the-badge)](https://github.com/mokwathedeveloper/SmartChain-Hub)
 [![Network](https://img.shields.io/badge/0G_Galileo_Testnet-Chain_16602-0ea5e9?style=for-the-badge&logo=ethereum&logoColor=white)](https://scan-testnet.0g.ai)
-[![Track](https://img.shields.io/badge/Track_2-Agentic_Trading_Arena-6366f1?style=for-the-badge)](https://0g.ai)
+[![Track](https://img.shields.io/badge/Track_3-Agentic_Economy-6366f1?style=for-the-badge)](https://0g.ai)
 
 All notable changes to **SmartChain Hub** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).

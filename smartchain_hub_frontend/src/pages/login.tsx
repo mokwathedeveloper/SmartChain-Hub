@@ -32,43 +32,53 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setError(error.message);
-    } else {
-      if (!rememberMe) {
-        // Save tokens to sessionStorage first, then remove from localStorage.
-        // This keeps the session alive for page refreshes in the current tab
-        // but clears it when the browser is closed (sessionStorage lifecycle).
-        const { data: { session: s } } = await supabase.auth.getSession();
-        if (s) {
-          sessionStorage.setItem("sch-session", JSON.stringify({
-            access_token: s.access_token,
-            refresh_token: s.refresh_token,
-          }));
-          Object.keys(localStorage).forEach(k => {
-            if (k.startsWith("sb-")) localStorage.removeItem(k);
-          });
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        setError(error.message);
+      } else {
+        if (!rememberMe) {
+          // Save tokens to sessionStorage first, then remove from localStorage.
+          // This keeps the session alive for page refreshes in the current tab
+          // but clears it when the browser is closed (sessionStorage lifecycle).
+          const { data: { session: s } } = await supabase.auth.getSession();
+          if (s) {
+            sessionStorage.setItem("sch-session", JSON.stringify({
+              access_token: s.access_token,
+              refresh_token: s.refresh_token,
+            }));
+            Object.keys(localStorage).forEach(k => {
+              if (k.startsWith("sb-")) localStorage.removeItem(k);
+            });
+          }
         }
+        router.push("/dashboard");
       }
-      router.push("/dashboard");
+    } catch {
+      setError("Connection failed — check your internet connection and try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleSocial = async (provider: OAuthProvider) => {
     setSocialLoading(provider);
     setError(null);
-    // Persist rememberMe across the OAuth redirect — React state is destroyed
-    // during the provider bounce, so sessionStorage is the only bridge.
-    sessionStorage.setItem("sch-remember-me", rememberMe ? "1" : "0");
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: { redirectTo: `${window.location.origin}/dashboard` },
-    });
-    if (error) {
-      sessionStorage.removeItem("sch-remember-me");
-      setError(error.message);
+    try {
+      // Persist rememberMe across the OAuth redirect — React state is destroyed
+      // during the provider bounce, so sessionStorage is the only bridge.
+      sessionStorage.setItem("sch-remember-me", rememberMe ? "1" : "0");
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: `${window.location.origin}/dashboard` },
+      });
+      if (error) {
+        sessionStorage.removeItem("sch-remember-me");
+        setError(error.message);
+        setSocialLoading(null);
+      }
+    } catch {
+      setError("Connection failed — check your internet connection and try again.");
       setSocialLoading(null);
     }
   };

@@ -37,24 +37,34 @@ export default function Signup() {
     if (!agreed) { setError("Please agree to the Terms of Service"); return; }
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: name } },
-    });
-    if (error) setError(error.message);
-    else router.push("/dashboard");
-    setLoading(false);
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: name } },
+      });
+      if (error) setError(error.message);
+      else router.push("/dashboard");
+    } catch {
+      setError("Connection failed — check your internet connection and try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSocial = async (provider: OAuthProvider) => {
     setSocialLoading(provider);
     setError(null);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: { redirectTo: `${window.location.origin}/dashboard` },
-    });
-    if (error) { setError(error.message); setSocialLoading(null); }
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: `${window.location.origin}/dashboard` },
+      });
+      if (error) { setError(error.message); setSocialLoading(null); }
+    } catch {
+      setError("Connection failed — check your internet connection and try again.");
+      setSocialLoading(null);
+    }
   };
 
   return (

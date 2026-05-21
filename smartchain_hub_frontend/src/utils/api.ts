@@ -1,11 +1,10 @@
 /**
  * AI Agent API client.
- * Calls the Flask AI agent directly for optimization.
- * Uses secureApi for SSRF protection on the health endpoint.
+ * Routes all AI agent calls through same-origin Next.js proxy routes
+ * (/api/ai-optimize, /api/ai-health) so the browser never contacts
+ * Render directly — eliminating CORS issues caused by cold-start 503s.
  */
 import { secureLogger } from './secureLogger';
-
-const AI_URL = () => process.env.NEXT_PUBLIC_AI_AGENT_URL || 'http://localhost:5000';
 
 export interface OptimizeResult {
   route: string;
@@ -41,11 +40,11 @@ export interface FineTuneResult {
   [key: string]: unknown;
 }
 
-/** Optimize a transaction — calls POST /optimize on the AI agent. */
+/** Optimize a transaction — proxied through /api/ai-optimize (same-origin, no CORS). */
 export async function optimizeTransaction(amount: number, priority: string): Promise<OptimizeResult> {
   secureLogger.info('Optimizing transaction', { amount, priority });
 
-  const res = await fetch(`${AI_URL()}/optimize`, {
+  const res = await fetch('/api/ai-optimize', {
     method:  'POST',
     headers: { 'Content-Type': 'application/json' },
     body:    JSON.stringify({ amount, priority }),
@@ -55,9 +54,9 @@ export async function optimizeTransaction(amount: number, priority: string): Pro
   return res.json() as Promise<OptimizeResult>;
 }
 
-/** Health check for the AI agent. */
+/** Health check for the AI agent — proxied through /api/ai-health (same-origin, no CORS). */
 export async function getAgentHealth(): Promise<HealthResult> {
-  const res = await fetch(`${AI_URL()}/health`);
+  const res = await fetch('/api/ai-health');
   if (!res.ok) throw new Error(`Health check failed: ${res.status}`);
   return res.json() as Promise<HealthResult>;
 }

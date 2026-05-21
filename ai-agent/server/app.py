@@ -187,7 +187,8 @@ def optimize_transaction():
             f"Optimize a blockchain transaction of ${amount} with priority: {priority}. "
             f"Return JSON with: fee (number), savings (number), route (string), confidence (number 0-100)."
         )
-    except Exception:
+    except Exception as e:
+        app.logger.warning("Unexpected error calling 0G Compute: %s", e)
         og_result = None
 
     if og_result:
@@ -207,7 +208,8 @@ def optimize_transaction():
                 "tee_signer": og_result["tee_signer"],
                 "provider_id": og_result["provider_id"],
             }
-        except Exception:
+        except Exception as e:
+            app.logger.warning("Failed to parse 0G Compute response, falling back to local optimizer: %s", e)
             result = _local_optimize(amount, priority)
             result["tee_verified"] = False
     else:

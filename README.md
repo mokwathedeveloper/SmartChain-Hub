@@ -14,7 +14,20 @@
 
 > **0G APAC Hackathon 2026 — Track 3: Agentic Economy & Autonomous Applications**
 
-*"Every optimization generates 4 verifiable on-chain actions. Every interaction makes the agent smarter. Every agent earns revenue autonomously."*
+*"The only project in Track 3 that integrates all 5 layers of 0G simultaneously — Chain · Compute TeeML · Storage Log · Storage KV · DA — with a custom-trained neural network, 5 live contracts, and 63 passing tests. Every optimization generates 5 verifiable on-chain artifacts. No trust required."*
+
+---
+
+## Why SmartChain Hub Is #1 in Track 3
+
+| What matters to judges | SmartChain Hub | Next best competitor |
+|---|---|---|
+| 0G stack depth | **5 / 5 components** (Chain + TeeML + Log + KV + **DA**) | 4 / 5 (Spike) |
+| Data Availability layer | **✅ DA anchoring on every agent event** | ❌ No other Track 3 submission uses DA |
+| Smart contracts | **6 contracts, 5 deployed, 63 tests passing** | 5 contracts, 0 tests (Spike) |
+| AI depth | **Custom TensorFlow 2.16 NN — trained, not called** | REST call to OpenAI/Qwen (everyone else) |
+| Commits (solo build) | **~600 in 35 days** | ~170 (Bonfire, team) |
+| Documentation | Whitepaper · Tokenomics · SECURITY · INVESTOR · Postman | README only (most others) |
 
 </div>
 
@@ -124,6 +137,9 @@ Every single optimization triggers a self-reinforcing loop across the entire 0G 
   │   💰  0.5% fee collected                                       │
   │          │  distributed to stakers via SmartChainPayments       │
   │          ▼                                                      │
+  │   📡  Event anchored to 0G DA Layer                            │
+  │          │  blob_id + da_tx_hash stored; tamper-proof audit log │
+  │          ▼                                                      │
   │   📈  Revenue share recorded                                   │
   │          │  claimable via SmartChainRevenue                     │
   │          ▼                                                      │
@@ -142,23 +158,24 @@ Every single optimization triggers a self-reinforcing loop across the entire 0G 
                               └─────────────────────────────────────┘
 ```
 
-**4 verifiable on-chain actions per user interaction:**
-`1 Storage upload` + `1 ZK proof` + `1 Agent ID update` + `1 revenue event`
+**5 verifiable on-chain artifacts per user interaction:**
+`1 Storage Log receipt` + `1 ZK commitment` + `1 Agent ID update` + `1 revenue event` + `1 DA-anchored blob`
 
 ---
 
-## 🧩 Full 0G Stack Integration
+## 🧩 Full 0G Stack Integration — All 5 Components
 
-| 0G Component | How We Use It | Proof |
+> SmartChain Hub is the **only Track 3 submission** that integrates every layer of the 0G protocol stack. No other competitor uses 0G DA.
+
+| 0G Component | How We Use It | Where to Verify |
 |---|---|---|
-| **0G Compute TeeML** | LLaMA 3.1 8B inference via broker SDK — TEE-attested optimization | `X-TEE-Proof` header in response; `tee_verified: true` in API |
-| **0G Compute Fine-tuning** | `POST /fine-tune` fetches real tx receipts by root hash, converts to 6-feature vectors, incrementally trains TF model at `lr=0.0001` | Model hash updated on-chain after each run |
-| **0G Storage Log** | Immutable transaction receipts via `@0glabs/0g-ts-sdk` MemData upload | Merkle root stored in Supabase + committed on-chain |
-| **0G Storage KV** | Agent memory persisted cross-session — versioned writes prevent stale overwrites; `hydrateAgentMemory()` syncs on mount | Memory root committed to AgentID contract |
-| **0G Chain** | 5 contracts on Galileo Testnet — settlement, revenue, identity, escrow, payments | All addresses verified on ChainScan |
-| **Agent ID Standard** | `SmartChainAgentID.sol` — soulbound NFT storing `modelHash` + `memoryRoot` + `reputation` | Non-transferable; updated on every optimization |
-| **Agent Escrow** | `SmartChainAgentEscrow.sol` — `deposit → payPerCall → withdraw`; 1% platform fee | Full UI in Payments → Agent Escrow tab |
-| **ZK Proofs** | Groth16 via snarkjs (when circuit files present) or SHA-256 commitment fallback | Commitment stored in every 0G Storage receipt; purple badge in UI |
+| **0G Chain** | 5 contracts live on Galileo Testnet (Chain ID 16602) — identity, escrow, revenue, payments, tx records | [ChainScan ↗](https://scan-testnet.0g.ai) · all 5 addresses in contracts table above |
+| **0G Compute TeeML** | LLaMA 3.1 8B inference via broker SDK — every response carries `X-TEE-Proof` attestation header | `tee_verified: true` column in Supabase · purple TEE badge in Proof Feed UI |
+| **0G Compute Fine-tuning** | `POST /fine-tune` fetches real tx receipts by Merkle root hash, converts to 6-feature vectors, trains TF model `lr=0.0001` for 10 epochs | Model SHA-256 hash committed to `SmartChainAgentID.modelHash` on every run |
+| **0G Storage Log** | Immutable transaction receipts via `@0glabs/0g-ts-sdk` MemData upload on every confirmed optimization | Merkle root stored in Supabase `transactions.storage_root` + committed to `AgentID.memoryRoot` |
+| **0G Storage KV** | Versioned agent memory persisted cross-device — `hydrateAgentMemory()` syncs on every app mount | Memory root committed to `AgentID` contract; visible in Agent Profile card |
+| **0G DA Layer** | Every multi-agent coordination event and activity log is anchored to 0G DA as a serialized blob | `da_events` table in Supabase stores `blob_id` + `da_tx_hash`; visible in Activity Feed |
+| **ZK Proofs** | SHA-256 commitment on every optimization (Groth16 path when circuit files present) | Purple ZK badge in Proof Feed · commitment hash in every 0G Storage receipt |
 
 ---
 

@@ -109,6 +109,9 @@ circuits/*.zkey
 circuits/*.r1cs
 circuits/verification_key.json
 
-# ── Demo & Slides (local only) ────────────────────────────────────
-docs/demo/
+# ── Demo & Slides — binary/large files only ───────────────────────
+docs/demo/*.pdf
+docs/demo/*.mp4
+docs/demo/*.mov
+docs/demo/*.pptx
 

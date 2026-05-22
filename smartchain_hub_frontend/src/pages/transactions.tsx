@@ -70,6 +70,13 @@ export default function Transactions() {
   const [modelHealth, setModelHealth] = useState<{ og_compute: boolean; og_compute_model: string } | null>(null);
   const [fineTuneResult, setFineTuneResult] = useState<FineTuneResult | null>(null);
   const [fineTuning, setFineTuning] = useState(false);
+
+  // Multi-agent collaboration state
+  interface AgentTask { agentId: string; name: string; role: string; latencyMs: number; output: Record<string, unknown>; paymentWei: number; paidBy: string | null }
+  interface DagEdge   { from: string; to: string; amountWei: number; label: string }
+  const [agentDag,  setAgentDag]  = useState<DagEdge[]>([]);
+  const [agentTasks, setAgentTasks] = useState<AgentTask[]>([]);
+  const [showDag,   setShowDag]   = useState(false);
   const [fineTuneError, setFineTuneError] = useState<string | null>(null);
 
   // Hydrate from 0G KV on mount (authoritative persistent memory)
@@ -180,17 +187,29 @@ export default function Transactions() {
     }
 
     try {
-      setResult(await apiOptimize(parsed, priority));
-    } catch {
-      const amt = parsed;
-      setResult({
-        fee:         Math.round(amt * 0.005 * 100) / 100,
-        savings:     Math.round(amt * 0.015 * 100) / 100,
-        route:       "0G Chain Flash Route",
-        explanation: `Optimized for ${priority} using 0G Newton heuristics.`,
-        confidence:  87,
-        tee_verified: false,
+      // Use multi-agent endpoint — orchestrates 3 specialized agents
+      const res = await fetch('/api/multi-agent', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ amount: parsed, priority, userId: user?.id }),
       });
+      const json = await res.json() as { result: OptimizeResult; agents: AgentTask[]; dag: DagEdge[]; latencyMs: number };
+      setResult(json.result as OptimizeResult);
+      if (json.agents?.length) { setAgentTasks(json.agents); setAgentDag(json.dag || []); setShowDag(true); }
+    } catch {
+      try {
+        setResult(await apiOptimize(parsed, priority));
+      } catch {
+        const amt = parsed;
+        setResult({
+          fee:         Math.round(amt * 0.005 * 100) / 100,
+          savings:     Math.round(amt * 0.015 * 100) / 100,
+          route:       "0G Chain Flash Route",
+          explanation: `Optimized for ${priority} using 0G Newton heuristics.`,
+          confidence:  87,
+          tee_verified: false,
+        });
+      }
     } finally { setOptimizing(false); }
   };
 
@@ -256,17 +275,45 @@ export default function Transactions() {
         console.warn("0G Storage upload failed (non-blocking):", e);
       }
 
-      // Supabase insert
+      // 0G DA event logging — records optimization event on Data Availability layer
+      try {
+        await fetch('/api/og-da', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: {
+              type: 'optimization',
+              user_id: user.id,
+              amount: parsedAmount,
+              fee: result.fee,
+              savings: result.savings,
+              route: result.route,
+              storage_root: storageRootHash,
+              zk_commitment: localZkCommitment,
+              tee_verified: result.tee_verified,
+              ts: Date.now(),
+            },
+          }),
+        });
+      } catch { /* non-blocking */ }
+
+      // Supabase insert — includes TEE attestation fields for /proof page
       await supabase.from('transactions').insert([{
-        user_id: user.id,
-        amount: parsedAmount,
-        optimized_fee: result.fee,
-        savings: result.savings,
-        route: result.route,
-        status: 'pending',
-        tx_hash: storedTxHash,
-        storage_root: storageRootHash,
+        user_id:          user.id,
+        amount:           parsedAmount,
+        optimized_fee:    result.fee,
+        savings:          result.savings,
+        route:            result.route,
+        status:           'pending',
+        tx_hash:          storedTxHash,
+        storage_root:     storageRootHash,
         storage_scan_url: storageScanUrl,
+        tee_verified:     result.tee_verified ?? false,
+        tee_proof:        result.tee_proof   || null,
+        tee_signer:       result.tee_signer  || null,
+        provider_id:      result.provider_id || null,
+        ml_engine:        result.ml_engine   || null,
+        zk_commitment:    localZkCommitment  || null,
       }]);
 
       // Agent memory — non-blocking
@@ -283,7 +330,7 @@ export default function Transactions() {
           const minted = await hasAgentID(signer);
           if (!minted) await mintAgentID(signer);
           await updateAgentMemory(signer, storageRootHash, result.savings);
-          const onChainTxHash = await recordTransactionOnChain(signer, parsedAmount, result.fee, result.route);
+          const onChainTxHash = await recordTransactionOnChain(signer, parsedAmount, result.fee, result.route, result.savings, storageRootHash ?? '');
           storedTxHash = onChainTxHash;
           await supabase.from('transactions')
             .update({ status: 'confirmed', tx_hash: onChainTxHash })
@@ -804,6 +851,43 @@ export default function Transactions() {
                           <span className="text-xs text-gray-500 shrink-0">{result.confidence}% confidence</span>
                         </div>
                       </div>
+
+                      {/* Multi-Agent Payment DAG */}
+                      {showDag && agentTasks.length > 0 && (
+                        <div className="border border-purple-500/20 bg-purple-500/5 rounded-xl p-4 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs font-bold text-purple-300">Agent Coordination — Payment DAG</p>
+                            <button onClick={() => setShowDag(false)} className="text-gray-600 hover:text-gray-400 text-xs">hide</button>
+                          </div>
+                          <div className="space-y-2">
+                            {agentTasks.map(a => (
+                              <div key={a.agentId} className="flex items-center gap-2.5 bg-gray-900/60 rounded-lg p-2.5">
+                                <div className="w-7 h-7 rounded-full bg-purple-600/20 border border-purple-500/30 flex items-center justify-center shrink-0">
+                                  <svg className="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs font-semibold text-white">{a.name}</p>
+                                  <p className="text-[10px] text-gray-600 truncate">{a.role}</p>
+                                </div>
+                                <div className="text-right shrink-0">
+                                  <p className="text-[10px] text-gray-500">{a.latencyMs}ms</p>
+                                  {a.paidBy && <p className="text-[10px] text-purple-400">{(a.paymentWei / 1e12).toFixed(1)} μA0GI</p>}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="border-t border-purple-500/15 pt-2 space-y-1">
+                            {agentDag.map((edge, i) => (
+                              <div key={i} className="flex items-center gap-2 text-[10px] text-gray-600">
+                                <span className="font-mono text-purple-500">{edge.from === 'user' ? 'User' : edge.from.replace('sch-','').replace('-v1','').replace('-v2','')}</span>
+                                <span>→</span>
+                                <span className="font-mono text-gray-500">{edge.to.replace('sch-','').replace('-v1','').replace('-v2','')}</span>
+                                <span className="ml-auto text-purple-600">{(edge.amountWei / 1e12).toFixed(1)} μA0GI</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       {/* TEE badge */}
                       <div className={`flex items-center gap-3 p-3 rounded-xl border ${

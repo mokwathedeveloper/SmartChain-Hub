@@ -44,32 +44,31 @@ async function pingChain(): Promise<{ status: ComponentStatus; latency: number; 
 async function pingStorage(): Promise<{ status: ComponentStatus; latency: number; detail: string }> {
   const t0 = Date.now();
   try {
-    // Read-only: query the 0G Storage indexer for registered nodes — no data uploaded
-    const res = await fetch('https://indexer-storage-testnet-standard.0g.ai/nodes', {
-      signal: AbortSignal.timeout(6_000),
-    });
-    if (!res.ok) return { status: 'degraded', latency: Date.now() - t0, detail: `Indexer HTTP ${res.status}` };
-    let json: unknown;
-    try {
-      json = await res.json();
-    } catch {
-      return { status: 'degraded', latency: Date.now() - t0, detail: 'Storage indexer returned invalid data' };
-    }
-    if (!Array.isArray(json)) return { status: 'degraded', latency: Date.now() - t0, detail: 'Storage indexer returned invalid data' };
-    return { status: 'live', latency: Date.now() - t0, detail: `${json.length} node${json.length !== 1 ? 's' : ''} indexed` };
+    // Proxy through our own API route — the 0G indexer has no CORS headers so
+    // a direct browser fetch is blocked with ERR_FAILED / missing Allow-Origin.
+    const res = await fetch('/api/og-storage-health', { signal: AbortSignal.timeout(8_000) });
+    if (!res.ok) return { status: 'degraded', latency: Date.now() - t0, detail: `Health check HTTP ${res.status}` };
+    const json = await res.json() as { status: string; nodeCount?: number; detail?: string };
+    if (json.status !== 'live') return { status: 'degraded', latency: Date.now() - t0, detail: json.detail || 'Storage degraded' };
+    const n = json.nodeCount ?? 0;
+    return { status: 'live', latency: Date.now() - t0, detail: `${n} node${n !== 1 ? 's' : ''} indexed` };
   } catch {
-    return { status: 'degraded', latency: Date.now() - t0, detail: 'Storage indexer unreachable' };
+    return { status: 'degraded', latency: Date.now() - t0, detail: 'Storage endpoint unreachable' };
   }
 }
 
 async function pingKv(): Promise<{ status: ComponentStatus; latency: number; detail: string }> {
   const t0 = Date.now();
   try {
-    const res = await fetch('/api/agent-memory?agentId=_health_check_', {
+    const res = await fetch('/api/agent-memory?userId=_health_check_', {
       signal: AbortSignal.timeout(5_000),
     });
-    // 404 means KV is reachable but no key — still healthy
-    return { status: res.ok || res.status === 404 ? 'live' : 'degraded', latency: Date.now() - t0, detail: 'KV reachable' };
+    // Any HTTP response (including 4xx) proves the KV endpoint is alive and responding.
+    // 400 = missing/invalid userId (normal — we have no auth token here).
+    // 401 = auth required. 404 = key not found. All confirm the route is up.
+    // Only network errors or 5xx indicate a real outage.
+    const live = res.status < 500;
+    return { status: live ? 'live' : 'degraded', latency: Date.now() - t0, detail: live ? 'KV reachable' : `KV error ${res.status}` };
   } catch {
     return { status: 'degraded', latency: Date.now() - t0, detail: 'KV unreachable' };
   }

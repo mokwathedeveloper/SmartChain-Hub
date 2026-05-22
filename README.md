@@ -531,7 +531,7 @@ npx hardhat test
 
 <div align="center">
 
-Built with ❤️ for the 0G APAC Hackathon 2026
+Built with  for the 0G APAC Hackathon 2026
 
 `#0GHackathon` · `#BuildOn0G` · `#AgenticEconomy`
 

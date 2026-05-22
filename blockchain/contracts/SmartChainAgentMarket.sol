@@ -76,8 +76,21 @@ contract SmartChainAgentMarket {
         pendingOwner = address(0);
     }
 
-    /** Permanently renounce ownership (sets owner to address(0)). Irreversible. */
-    function renounceOwnership() external onlyOwner {
+    /**
+     * Permanently renounce ownership (sets owner to address(0)). Irreversible.
+     * Any accumulated protocol fees are swept to the current owner first, because
+     * withdrawProtocolFees() uses onlyOwner and would be permanently inaccessible
+     * once owner is address(0).
+     */
+    function renounceOwnership() external onlyOwner nonReentrant {
+        // CEI: zero out fees before the external call
+        if (collectedProtocolFees > 0) {
+            uint256 amount = collectedProtocolFees;
+            collectedProtocolFees = 0;
+            (bool ok,) = payable(owner).call{value: amount}("");
+            require(ok, "Fee sweep failed");
+            emit FeesWithdrawn(owner, amount);
+        }
         emit OwnershipTransferred(owner, address(0));
         owner        = address(0);
         pendingOwner = address(0);

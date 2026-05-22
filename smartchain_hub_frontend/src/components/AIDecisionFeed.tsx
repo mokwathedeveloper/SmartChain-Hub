@@ -60,8 +60,8 @@ const AIDecisionFeed = () => {
       
       <div className="mt-6 pt-4 border-t border-white/5">
         <div className="flex justify-between items-center text-[10px] text-gray-500 font-mono">
-          <span>THROUGHPUT: 4.2k tx/s</span>
-          <span className="text-green-500">Latency: 0.2ms</span>
+          <span>NODE: 0G-COMPUTE-TEEML</span>
+          <span className="text-blue-500/60">simulation feed</span>
         </div>
       </div>
     </div>

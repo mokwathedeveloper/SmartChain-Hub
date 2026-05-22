@@ -45,9 +45,10 @@ const AIOptimizationWidget = ({ onStateChange }: WidgetProps) => {
     } catch {
       setTimeout(() => {
         const amt = parseFloat(amount);
+        const fee = Math.round(amt * 0.005 * 100) / 100;
         setOptimizedResult({
-          fee:     Math.round(amt * 0.005 * 100) / 100,
-          savings: Math.round(amt * 0.015 * 100) / 100,
+          fee,
+          savings: Math.round(amt * 0.003 * 100) / 100,  // always < fee
           route:       '0G Chain Flash Route (Fallback)',
           explanation: `The AI prioritized ${priority} using simulation heuristics for 0G Newton.`,
           confidence:  85.5,
@@ -66,7 +67,7 @@ const AIOptimizationWidget = ({ onStateChange }: WidgetProps) => {
     if (!optimizedResult || !user) return;
     setIsExecuting(true);
     try {
-      let tx_hash = `0x${Math.random().toString(16).slice(2)}${Math.random().toString(16).slice(2, 6)}`;
+      let tx_hash = '';        // set only after a confirmed on-chain transaction
       let storage_root = '';
 
       addNotification('Uploading to 0G Storage...', 'info');
@@ -84,14 +85,19 @@ const AIOptimizationWidget = ({ onStateChange }: WidgetProps) => {
         try {
           const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
           if (contractAddress && contractAddress !== 'your-deployed-contract-address-here') {
-            const abi = ['function recordTransaction(bytes32 txHash, uint256 amount, uint256 fee, string route) external'];
+            const abi = ['function recordTransaction(bytes32 _txHash, uint256 _amount, uint256 _fee, uint256 _savings, string calldata _route, bytes32 _storageRoot) external'];
             const contract = new ethers.Contract(contractAddress, abi, signer);
             const bytes32Hash = ethers.id(Date.now().toString() + user.id);
+            const storageRoot = storage_root
+              ? ethers.encodeBytes32String(storage_root.slice(0, 31))
+              : ethers.ZeroHash;
             const tx = await contract.recordTransaction(
               bytes32Hash,
               ethers.parseUnits(amount, 18),
               ethers.parseUnits(String(optimizedResult.fee), 18),
+              ethers.parseUnits(String(optimizedResult.savings), 18),
               optimizedResult.route,
+              storageRoot,
             );
             await tx.wait();
             tx_hash = tx.hash;

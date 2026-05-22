@@ -85,13 +85,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     a1Output = await r.json() as Record<string, unknown>;
   } catch {
     const amt = Number(amount);
+    const fee = Math.round(amt * 0.003 * 100) / 100;
     a1Output = {
-      route:       "0G Chain Flash Route",
-      fee:         Math.round(amt * 0.003 * 100) / 100,
-      savings:     Math.round(amt * 0.025 * 100) / 100,
-      confidence:  91,
+      route:        "0G Chain Flash Route",
+      fee,
+      savings:      Math.round(amt * 0.002 * 100) / 100,  // always < fee
+      confidence:   91,
       tee_verified: false,
-      fallback:    true,
+      fallback:     true,
     };
   }
   const a1End = Date.now();
@@ -125,7 +126,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     {
       agentId:    "sch-market-data-v1",
       name:       "Market Data Agent",
-      role:       "Real-time congestion, gas price, and liquidity data from 0G Chain",
+      role:       "Network congestion heuristics and gas price estimation (simulation-based; 0G indexer integration planned)",
       startMs:    a2Start - orchestratorStart,
       endMs:      a2End   - orchestratorStart,
       latencyMs:  a2End - a2Start,

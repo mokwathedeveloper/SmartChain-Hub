@@ -20,7 +20,7 @@ describe("SmartChain Hub Contracts", function () {
       const amount = ethers.parseEther("1.0");
       const fee = ethers.parseEther("0.02");
       
-      await transaction.connect(addr1).recordTransaction(txHash, amount, fee, "Route A");
+      await transaction.connect(addr1).recordTransaction(txHash, amount, fee, ethers.parseEther("0.01"), "Route A", ethers.ZeroHash);
       
       const tx = await transaction.getTransaction(txHash);
       expect(tx.sender).to.equal(addr1.address);
@@ -33,7 +33,7 @@ describe("SmartChain Hub Contracts", function () {
 
     it("Should fail if non-owner tries to validate", async function () {
       const txHash = ethers.id("test-tx-2");
-      await transaction.connect(addr1).recordTransaction(txHash, 1000, 5, "Route A");
+      await transaction.connect(addr1).recordTransaction(txHash, 1000, 5, 2n, "Route A", ethers.ZeroHash);
       await expect(transaction.connect(addr1).validateTransaction(txHash)).to.be.reverted;
     });
   });

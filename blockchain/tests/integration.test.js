@@ -15,7 +15,7 @@ describe("Integration & Exploratory Tests", function () {
   describe("Transaction → Revenue integration", () => {
     it("records tx then distributes revenue from fee", async () => {
       const hash = ethers.id("integration-1");
-      await tx.connect(alice).recordTransaction(hash, ethers.parseEther("100"), ethers.parseEther("1"), "0G Flash");
+      await tx.connect(alice).recordTransaction(hash, ethers.parseEther("100"), ethers.parseEther("1"), ethers.parseEther("0.5"), "0G Flash", ethers.ZeroHash);
       await tx.connect(owner).validateTransaction(hash);
       const stored = await tx.getTransaction(hash);
       expect(stored.validated).to.equal(true);
@@ -79,9 +79,9 @@ describe("Integration & Exploratory Tests", function () {
 
     it("duplicate tx hash reverts", async () => {
       const hash = ethers.id("dup");
-      await tx.connect(alice).recordTransaction(hash, 100n, 1n, "route");
-      await expect(tx.connect(alice).recordTransaction(hash, 100n, 1n, "route"))
-        .to.be.revertedWith("Transaction already exists");
+      await tx.connect(alice).recordTransaction(hash, 100n, 1n, 0n, "route", ethers.ZeroHash);
+      await expect(tx.connect(alice).recordTransaction(hash, 100n, 1n, 0n, "route", ethers.ZeroHash))
+        .to.be.revertedWith("Transaction already recorded");
     });
 
     it("validate non-existent tx reverts", async () => {
@@ -92,7 +92,7 @@ describe("Integration & Exploratory Tests", function () {
 
     it("double validate reverts", async () => {
       const hash = ethers.id("double-val");
-      await tx.connect(alice).recordTransaction(hash, 100n, 1n, "route");
+      await tx.connect(alice).recordTransaction(hash, 100n, 1n, 0n, "route", ethers.ZeroHash);
       await tx.connect(owner).validateTransaction(hash);
       await expect(tx.connect(owner).validateTransaction(hash))
         .to.be.revertedWith("Already validated");
@@ -129,7 +129,7 @@ describe("Integration & Exploratory Tests", function () {
 
     it("non-owner cannot validate transactions", async () => {
       const hash = ethers.id("sec-1");
-      await tx.connect(alice).recordTransaction(hash, 100n, 1n, "route");
+      await tx.connect(alice).recordTransaction(hash, 100n, 1n, 0n, "route", ethers.ZeroHash);
       await expect(tx.connect(alice).validateTransaction(hash))
         .to.be.revertedWithCustomError(tx, "OwnableUnauthorizedAccount");
     });

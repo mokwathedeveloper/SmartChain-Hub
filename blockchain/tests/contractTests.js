@@ -15,7 +15,14 @@ describe("SmartChain Contracts", function () {
   describe("SmartChainTransaction", () => {
     it("records a transaction", async () => {
       const hash = ethers.id("test-tx-1");
-      await transaction.connect(user).recordTransaction(hash, ethers.parseUnits("100", 18), ethers.parseUnits("0.5", 18), "0G Flash");
+      await transaction.connect(user).recordTransaction(
+        hash,
+        ethers.parseUnits("100", 18),
+        ethers.parseUnits("0.5", 18),
+        ethers.parseUnits("0.1", 18),
+        "0G Flash",
+        ethers.ZeroHash,
+      );
       const stored = await transaction.getTransaction(hash);
       expect(stored.sender).to.equal(user.address);
       expect(stored.validated).to.equal(false);
@@ -23,13 +30,15 @@ describe("SmartChain Contracts", function () {
 
     it("reverts on duplicate hash", async () => {
       const hash = ethers.id("test-tx-dup");
-      await transaction.connect(user).recordTransaction(hash, 100n, 1n, "route");
-      await expect(transaction.connect(user).recordTransaction(hash, 100n, 1n, "route")).to.be.revertedWith("Transaction already exists");
+      await transaction.connect(user).recordTransaction(hash, 100n, 1n, 0n, "route", ethers.ZeroHash);
+      await expect(
+        transaction.connect(user).recordTransaction(hash, 100n, 1n, 0n, "route", ethers.ZeroHash)
+      ).to.be.revertedWith("Transaction already recorded");
     });
 
     it("owner can validate", async () => {
       const hash = ethers.id("test-tx-val");
-      await transaction.connect(user).recordTransaction(hash, 100n, 1n, "route");
+      await transaction.connect(user).recordTransaction(hash, 100n, 1n, 0n, "route", ethers.ZeroHash);
       await transaction.connect(owner).validateTransaction(hash);
       const stored = await transaction.getTransaction(hash);
       expect(stored.validated).to.equal(true);

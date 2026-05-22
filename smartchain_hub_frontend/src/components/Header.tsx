@@ -11,16 +11,20 @@ import { useWeb3 } from '@/context/Web3Context';
 interface HeaderProps { onMenuClick?: () => void; }
 
 const pageTitles: Record<string, { title: string; sub: string }> = {
-  '/dashboard':    { title: 'Dashboard',        sub: 'Overview of your agent activity' },
-  '/transactions': { title: 'AI Optimizer',     sub: 'TEE-verified transaction optimization' },
-  '/payments':     { title: 'Payments',         sub: 'Send, stake, and withdraw A0GI' },
-  '/onramp':       { title: 'Buy A0GI',         sub: 'Fund your wallet with fiat or crypto' },
-  '/history':      { title: 'History',          sub: 'On-chain transaction history' },
-  '/revenue':      { title: 'Revenue Sharing',  sub: 'Claim your share of platform fees' },
-  '/profile':      { title: 'Profile',          sub: 'Manage your account settings' },
+  '/dashboard':    { title: 'Dashboard',         sub: 'Overview of your agent activity' },
+  '/transactions': { title: 'AI Optimizer',      sub: 'TEE-verified transaction optimization' },
+  '/console':      { title: 'AI Optimizer',      sub: 'TEE-verified transaction optimization' },
+  '/payments':     { title: 'Payments',          sub: 'Send, stake, and withdraw A0GI' },
+  '/onramp':       { title: 'Buy A0GI',          sub: 'Fund your wallet with fiat or crypto' },
+  '/history':      { title: 'History',           sub: 'On-chain transaction history' },
+  '/revenue':      { title: 'Revenue Sharing',   sub: 'Claim your share of platform fees' },
+  '/profile':      { title: 'Profile',           sub: 'Manage your account settings' },
+  '/marketplace':  { title: 'Agent Marketplace', sub: 'Hire AI agents or list your own for the economy' },
+  '/proof':        { title: 'TEE Proofs',        sub: 'Live TeeML attestation explorer' },
+  '/activity':     { title: 'Activity Feed',     sub: 'Live 0G DA event stream for the agent economy' },
 };
 
-const APP_ROUTES = ['/dashboard', '/transactions', '/payments', '/onramp', '/console', '/history', '/revenue', '/profile'];
+const APP_ROUTES = ['/dashboard', '/transactions', '/payments', '/onramp', '/console', '/history', '/revenue', '/profile', '/marketplace', '/proof', '/activity'];
 
 // ── Wallet Connect Modal ──────────────────────────────────────────────────────
 function WalletModal({ onClose, onConnect }: { onClose: () => void; onConnect: (addr: string) => void }) {

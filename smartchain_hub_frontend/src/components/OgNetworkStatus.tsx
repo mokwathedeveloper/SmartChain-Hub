@@ -49,7 +49,13 @@ async function pingStorage(): Promise<{ status: ComponentStatus; latency: number
     const res = await fetch('/api/og-storage-health', { signal: AbortSignal.timeout(8_000) });
     if (!res.ok) return { status: 'degraded', latency: Date.now() - t0, detail: `Health check HTTP ${res.status}` };
     const json = await res.json() as { status: string; nodeCount?: number; detail?: string };
-    if (json.status !== 'live') return { status: 'degraded', latency: Date.now() - t0, detail: json.detail || 'Storage degraded' };
+    if (json.status !== 'live') {
+      // Distinguish between indexer outage and our proxy being down
+      const msg = json.detail?.includes('503') || json.detail?.includes('unreachable')
+        ? '0G indexer offline'
+        : json.detail || 'Storage degraded';
+      return { status: 'degraded', latency: Date.now() - t0, detail: msg };
+    }
     const n = json.nodeCount ?? 0;
     return { status: 'live', latency: Date.now() - t0, detail: `${n} node${n !== 1 ? 's' : ''} indexed` };
   } catch {
@@ -77,9 +83,19 @@ async function pingKv(): Promise<{ status: ComponentStatus; latency: number; det
 async function pingCompute(): Promise<{ status: ComponentStatus; latency: number; detail: string }> {
   const t0 = Date.now();
   try {
-    const res = await fetch('/api/ai-health', { signal: AbortSignal.timeout(5_000) });
-    const json = await res.json() as { status?: string };
-    return { status: json.status === 'ok' ? 'live' : 'degraded', latency: Date.now() - t0, detail: `AI Compute ${json.status ?? 'ok'}` };
+    // 15 s timeout: Render free tier can take ~10-15 s to cold-start.
+    // Any HTTP response means the service is reachable (alive or warming up).
+    // Only a network error (timeout, ECONNREFUSED) means truly unreachable.
+    const res = await fetch('/api/ai-health', { signal: AbortSignal.timeout(15_000) });
+    let json: { status?: string } = {};
+    try { json = await res.json() as { status?: string }; } catch { /* non-JSON ok */ }
+    const live = res.ok || res.status < 500;
+    const detail = json.status === 'ok'
+      ? 'TeeML ready'
+      : res.status === 503
+        ? 'Compute warming up'
+        : `Compute ${json.status ?? res.status}`;
+    return { status: live ? 'live' : 'degraded', latency: Date.now() - t0, detail };
   } catch {
     return { status: 'degraded', latency: Date.now() - t0, detail: 'Compute unreachable' };
   }

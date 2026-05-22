@@ -4,14 +4,16 @@
  */
 import { ethers } from "ethers";
 
+// specialty and modelHash are bytes32 on-chain (gas-optimised).
+// Use ethers.encodeBytes32String / decodeBytes32String for conversion.
 const MARKET_ABI = [
-  "function listAgent(uint256 pricePerTask, string calldata specialty, string calldata modelHash) external",
+  "function listAgent(uint256 pricePerTask, bytes32 specialty, bytes32 modelHash) external",
   "function delistAgent() external",
   "function hireAgent(address agentOwner, string calldata taskRef) external payable",
-  "function getActiveListings() external view returns (tuple(address owner, uint256 pricePerTask, string specialty, string modelHash, uint256 totalHires, uint256 totalEarned, bool active, uint256 listedAt)[])",
-  "function getListing(address owner) external view returns (tuple(address owner, uint256 pricePerTask, string specialty, string modelHash, uint256 totalHires, uint256 totalEarned, bool active, uint256 listedAt))",
+  "function getActiveListings() external view returns (tuple(address owner, uint256 pricePerTask, bytes32 specialty, bytes32 modelHash, uint256 totalHires, uint256 totalEarned, bool active, uint256 listedAt)[])",
+  "function getListing(address owner) external view returns (tuple(address owner, uint256 pricePerTask, bytes32 specialty, bytes32 modelHash, uint256 totalHires, uint256 totalEarned, bool active, uint256 listedAt))",
   "function getMarketStats() external view returns (uint256 listed, uint256 hiresTotal, uint256 volumeWei)",
-  "event AgentListed(address indexed owner, uint256 pricePerTask, string specialty)",
+  "event AgentListed(address indexed owner, uint256 pricePerTask, bytes32 specialty)",
   "event AgentHired(uint256 indexed hireId, address indexed hirer, address indexed agentOwner, uint256 paidWei, string taskRef)",
 ];
 
@@ -45,6 +47,17 @@ function getWriteContract(signer: ethers.Signer) {
   return new ethers.Contract(MARKET_ADDRESS, MARKET_ABI, signer);
 }
 
+/** Encode a UTF-8 string to bytes32 (truncate to 31 chars to fit null terminator). */
+function toBytes32(s: string): string {
+  const safe = s.slice(0, 31); // ethers requires ≤ 31 bytes for encodeBytes32String
+  return ethers.encodeBytes32String(safe);
+}
+
+/** Decode bytes32 back to a human-readable string. */
+function fromBytes32(b: string): string {
+  try { return ethers.decodeBytes32String(b); } catch { return b; }
+}
+
 /** List your agent for hire. priceUsd is converted to wei (1 USD = 1e15 wei on testnet). */
 export async function listAgentForHire(
   signer: ethers.Signer,
@@ -56,7 +69,7 @@ export async function listAgentForHire(
   if (!specialty.trim())  throw new Error("specialty is required");
   if (!modelHash.trim())  throw new Error("modelHash is required");
   const priceWei = BigInt(Math.round(priceUsd * 1e15));
-  const tx = await getWriteContract(signer).listAgent(priceWei, specialty, modelHash);
+  const tx = await getWriteContract(signer).listAgent(priceWei, toBytes32(specialty), toBytes32(modelHash));
   const receipt = await tx.wait();
   return receipt.hash;
 }
@@ -87,8 +100,8 @@ export async function getActiveListings(): Promise<AgentListing[]> {
     return raw.map(r => ({
       owner:        r.owner,
       pricePerTask: BigInt(r.pricePerTask.toString()),
-      specialty:    r.specialty,
-      modelHash:    r.modelHash,
+      specialty:    fromBytes32(r.specialty as unknown as string),
+      modelHash:    fromBytes32(r.modelHash as unknown as string),
       totalHires:   Number(r.totalHires),
       totalEarned:  BigInt(r.totalEarned.toString()),
       active:       r.active,
@@ -117,8 +130,8 @@ export async function getMyListing(owner: string): Promise<AgentListing | null> 
     return {
       owner:        r.owner,
       pricePerTask: BigInt(r.pricePerTask.toString()),
-      specialty:    r.specialty,
-      modelHash:    r.modelHash,
+      specialty:    fromBytes32(r.specialty as unknown as string),
+      modelHash:    fromBytes32(r.modelHash as unknown as string),
       totalHires:   Number(r.totalHires),
       totalEarned:  BigInt(r.totalEarned.toString()),
       active:       r.active,

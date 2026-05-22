@@ -1,0 +1,259 @@
+{
+  "info": {
+    "name": "SmartChain Hub API",
+    "description": "All 18 Next.js API routes for SmartChain Hub — 0G APAC Hackathon 2026.\nBase URL: https://smartchainhubfrontend.vercel.app (production) or http://localhost:3000 (local).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "smartchain-hub-v1"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
+    { "key": "userId",  "value": "your-supabase-user-id", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "AI & Optimization",
+      "item": [
+        {
+          "name": "AI Optimize",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/ai-optimize",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000,\n  \"priority\": \"speed\",\n  \"congestion\": 45\n}"
+            },
+            "description": "Proxy to AI agent /optimize endpoint. Returns route, fee, savings, confidence, tee_verified, tee_proof."
+          }
+        },
+        {
+          "name": "Fine-Tune Model",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/fine-tune",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"dryRun\": false\n}"
+            },
+            "description": "Trigger incremental TF model fine-tune on user's 0G Storage tx data. Returns { ok, samplesUsed, newModelHash?, reason? }."
+          }
+        },
+        {
+          "name": "Multi-Agent",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/multi-agent",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"agents\": [\"agent-1\", \"agent-2\"],\n  \"task\": \"optimize cross-chain route for 5000 USDC\"\n}"
+            },
+            "description": "Dispatch multi-agent coordination job. Returns { results[], agentCount }."
+          }
+        },
+        {
+          "name": "AI Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/ai-health",
+            "description": "Health check for AI agent on Render. Returns { status: 'ok' | 'warming' }. 503 = cold-starting (still live)."
+          }
+        },
+        {
+          "name": "Keepalive",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/keepalive",
+            "description": "Keepalive ping to prevent Render free-tier cold starts. Called on 4-min browser interval."
+          }
+        }
+      ]
+    },
+    {
+      "name": "0G Storage",
+      "item": [
+        {
+          "name": "Storage Upload",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/storage-upload",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": {\n    \"userId\": \"{{userId}}\",\n    \"amount\": 1000,\n    \"fee\": 4.50,\n    \"savings\": 12.30,\n    \"route\": \"0G Flash\",\n    \"timestamp\": \"2026-05-22T10:00:00Z\"\n  }\n}"
+            },
+            "description": "Upload tx receipt to 0G Storage Log layer via @0glabs/0g-ts-sdk MemData. Returns { rootHash, txHash, storageScanUrl }. Rate: 20 req/min/IP."
+          }
+        },
+        {
+          "name": "Agent Memory — Read",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/agent-memory?userId={{userId}}",
+              "query": [{ "key": "userId", "value": "{{userId}}" }]
+            },
+            "description": "Read agent memory from 0G Storage KV. Returns the memory blob for the given userId."
+          }
+        },
+        {
+          "name": "Agent Memory — Write",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/agent-memory",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"memory\": {\n    \"preferredRoute\": \"0G Flash\",\n    \"riskTolerance\": \"low\",\n    \"txCount\": 14\n  }\n}"
+            },
+            "description": "Write/update agent memory in 0G Storage KV. Returns { ok }."
+          }
+        },
+        {
+          "name": "0G Storage Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/og-storage-health",
+            "description": "Proxy health check to 0G Storage indexer (bypasses browser CORS). Returns { status, nodeCount }."
+          }
+        }
+      ]
+    },
+    {
+      "name": "ZK Proof",
+      "item": [
+        {
+          "name": "Generate ZK Proof",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/zk-proof",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000,\n  \"fee\": 4.50,\n  \"savings\": 12.30,\n  \"route\": \"0G Flash\",\n  \"userId\": \"{{userId}}\"\n}"
+            },
+            "description": "Generate Groth16 ZK proof (or SHA-256 commitment fallback). Returns { commitment, proof?, verified }."
+          }
+        },
+        {
+          "name": "Proof Feed",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/proof-feed?limit=20&offset=0",
+              "query": [
+                { "key": "limit",  "value": "20"  },
+                { "key": "offset", "value": "0"   }
+              ]
+            },
+            "description": "Returns the most recent TEE-attested optimizations (global, public). Used by /proof page. Returns { proofs[], total, chain }."
+          }
+        }
+      ]
+    },
+    {
+      "name": "0G DA & Chain Stats",
+      "item": [
+        {
+          "name": "0G DA — Submit Blob",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/og-da",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payload\": {\n    \"type\": \"optimization\",\n    \"userId\": \"{{userId}}\",\n    \"amount\": 1000,\n    \"savings\": 12.30\n  }\n}"
+            },
+            "description": "Anchor a blob to 0G DA layer. Returns { da_tx_hash, blob_id }."
+          }
+        },
+        {
+          "name": "0G DA Feed",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/og-da-feed?limit=20&offset=0",
+              "query": [
+                { "key": "limit",  "value": "20" },
+                { "key": "offset", "value": "0"  }
+              ]
+            },
+            "description": "Query DA event history from Supabase. Returns { events[], source }. Used by /activity page."
+          }
+        },
+        {
+          "name": "0G Chain Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/og-stats",
+            "description": "Live 0G chain stats — block height, TPS, validator count."
+          }
+        }
+      ]
+    },
+    {
+      "name": "On-Ramp",
+      "item": [
+        {
+          "name": "Stripe — Create PaymentIntent",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/onramp/stripe",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 50,\n  \"currency\": \"usd\"\n}"
+            },
+            "description": "Create Stripe PaymentIntent for fiat on-ramp. Returns { clientSecret }. Requires STRIPE_SECRET_KEY."
+          }
+        },
+        {
+          "name": "Stripe — Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",        "value": "application/json" },
+              { "key": "stripe-signature",     "value": "<stripe-sig-header>" }
+            ],
+            "url": "{{baseUrl}}/api/onramp/stripe-webhook",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "description": "Handle Stripe webhook events (payment_intent.succeeded). Validates STRIPE_WEBHOOK_SECRET. Register URL in Stripe Dashboard."
+          }
+        },
+        {
+          "name": "M-Pesa — STK Push",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/onramp/mpesa",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500,\n  \"phone\": \"254712345678\",\n  \"email\": \"user@example.com\"\n}"
+            },
+            "description": "Initiate Flutterwave M-Pesa STK push for KES on-ramp. Returns { status, flw_ref }. Requires FLUTTERWAVE_SECRET_KEY."
+          }
+        },
+        {
+          "name": "M-Pesa — Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",          "value": "application/json" },
+              { "key": "verif-hash",             "value": "<flw-webhook-hash>" }
+            ],
+            "url": "{{baseUrl}}/api/onramp/mpesa-webhook",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "description": "Handle Flutterwave webhook events. Validates FLUTTERWAVE_WEBHOOK_HASH header."
+          }
+        }
+      ]
+    }
+  ]
+}

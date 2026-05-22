@@ -128,7 +128,9 @@ Stream 3 — Agent Escrow Fee
   → 100% to Protocol Treasury
 ```
 
-**Revenue projection (conservative):**
+**Revenue projection (base case):**
+
+> **Two scenarios:** This table represents the **base case** (10K monthly active agents at $1K avg tx). The **conservative case** matches the SOM in INVESTOR.md: 50,000 users × $100 avg annual fee = **$5M ARR**. Key difference: conservative assumes lower per-user volume and a slower ramp to paid optimisations; base case assumes agents transact frequently on higher-value transactions.
 
 | Metric | Month 3 | Month 6 | Month 12 |
 |---|---|---|---|

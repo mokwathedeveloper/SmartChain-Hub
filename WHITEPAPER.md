@@ -265,7 +265,7 @@ real user data
   0G Storage         more optimizations → more volume
 ```
 
-**Four verifiable on-chain actions per optimization:**
+**Five verifiable on-chain actions per optimization:**
 - 1 Storage receipt (0G Storage Log)
 - 1 ZK commitment (snarkjs / SHA-256)
 - 1 AgentID update (0G Chain)

@@ -26,14 +26,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    // Limit to 5,000 most-recent rows as a safety cap.
+    // Long-term: replace with a Supabase RPC aggregate function.
     const [txRes, daRes] = await Promise.all([
       admin
         .from("transactions")
-        .select("amount, savings, tee_verified, user_id"),
+        .select("amount, savings, tee_verified, user_id")
+        .order("created_at", { ascending: false })
+        .limit(5000),
       admin
         .from("da_events")
         .select("id", { count: "exact", head: true }),
     ]);
+
+    if (txRes.error) throw txRes.error;
+    if (daRes.error) throw daRes.error;
 
     const rows = txRes.data ?? [];
     let totalVolume  = 0;

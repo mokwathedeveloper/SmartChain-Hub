@@ -17,13 +17,15 @@
 
 ## The Opportunity in One Sentence
 
-**SmartChain Hub is the infrastructure layer for the $1 trillion AI agent economy — giving every AI agent a permanent identity, verifiable intelligence, and autonomous revenue on 0G Network.**
+**SmartChain Hub is the infrastructure layer for the emerging AI agent economy — giving every AI agent a permanent identity, verifiable intelligence, and autonomous revenue on 0G Network.**
+
+*The AI agent market is projected to reach $52.6B by 2030 (MarketsandMarkets 2025), with Jensen Huang projecting a $1 trillion total agentic economy at NVIDIA GTC 2026 — combining software, services, and labor displacement. SmartChain Hub captures the infrastructure fee layer across this entire stack.*
 
 ---
 
 ## The Problem
 
-**$500 billion will flow through AI agents by 2030. None of it is verifiable. None of it belongs to the agents.**
+**$52.6 billion in AI agent market value will exist by 2030 (MarketsandMarkets), with trillions in transactions flowing through these agents. None of it is verifiable. None of it belongs to the agents.**
 
 Today's AI agents are not agents — they are tools owned by platforms:
 
@@ -59,7 +61,7 @@ This is not a software problem. It is an **architectural problem** — the entir
 | Metric | Value |
 |---|---|
 | Live demo | ✅ [smartchainhubfrontend.vercel.app](https://smartchainhubfrontend.vercel.app) |
-| Smart contracts deployed | 6 contracts on 0G Galileo Testnet (verified on ChainScan) |
+| Smart contracts deployed | 5 contracts on 0G Galileo Testnet (verified on ChainScan); SmartChainAgentMarket compiled and tested, pending mainnet funding for deployment |
 | Codebase size | 90 TypeScript files · 9 Python test suites · 587 commits |
 | Test coverage | 63 contract tests passing (0 failing) · 9 AI agent test suites |
 | TypeScript errors | 0 (strict mode) |
@@ -101,13 +103,17 @@ Protocol revenue is fully on-chain, auditable, and governed by $SCH token holder
 
 ```
 Total Addressable Market (TAM)
-  AI Agent Economy                    $52.6B by 2030 (MarketsandMarkets)
-  Global DeFi transaction volume      $3T+ annually (DeFiLlama)
-  Cross-chain bridge volume           $50B+ annually
-  B2B crypto payments                 $120T annually (BIS)
+  On-chain transaction volume (DeFi + cross-chain + crypto B2B)
+  Source: DeFiLlama (~$3T DeFi) + Chainalysis (~$9T on-chain transfers)
+  TAM ≈ $12T annually in optimisable on-chain transaction volume
 
-  TAM = $170T+ in addressable transaction volume
-  At 0.5% fee capture on 0.1% of volume → $850M annual revenue at scale
+  Fee capture math (explicit):
+  0.5% protocol fee × 0.1% market penetration × $12T = $60M annual revenue
+  0.5% protocol fee × 1.0% market penetration × $12T = $600M annual revenue
+
+  Note: AI agent market ($52.6B, MarketsandMarkets) and B2B crypto payments
+  ($120T, BIS global all-currency estimate) are intentionally excluded from
+  the TAM to avoid double-counting with on-chain volume.
 
 Serviceable Addressable Market (SAM)
   0G Network ecosystem users          ~500K wallets (growing 40% QoQ)
@@ -118,7 +124,8 @@ Serviceable Addressable Market (SAM)
 
 Serviceable Obtainable Market (SOM) — Year 1
   Target: 50,000 active users
-  Revenue: ~$5M ARR at $100 avg annual fee
+  Revenue: ~$5M ARR at $100 avg annual fee (conservative case)
+  Revenue: ~$18M ARR at base case — see TOKENOMICS.md for full model
 ```
 
 ---

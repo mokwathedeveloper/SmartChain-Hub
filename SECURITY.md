@@ -73,6 +73,7 @@ We follow coordinated disclosure. Please allow 90 days before public disclosure 
 |---|---|---|---|
 | RAB-001 | High | Missing reentrancy guard on `hireAgent()` | ✅ Fixed — `nonReentrant` modifier added |
 | RAB-002 | Medium | CEI pattern violation in fee withdrawal | ✅ Fixed — state zeroed before external call |
+| RAB-003 | Informational | Gas optimisation opportunity in `updateAgentID()` — redundant storage write on unchanged fields | ✅ Acknowledged — accepted; write cost within acceptable range for testnet phase |
 | RAB-004 | Medium | `renounceOwnership()` locks protocol fees permanently | ✅ Fixed — fee sweep added before owner zeroed |
 | RAB-005 | Low | Character-based `toBytes32` can exceed 31 bytes for multibyte UTF-8 chars | ✅ Fixed — byte-aware `TextEncoder` approach |
 

@@ -13,15 +13,20 @@ import { errMsg } from "@/utils/errors";
 import { rateLimit, getClientIp } from "@/utils/rateLimit";
 import { ACTIVE_CHAIN } from "@/utils/chains";
 
+// Accept both naming conventions: the Supabase standard name and the legacy
+// name that was set on Vercel before the standard name was adopted.
+const serviceKey =
+  (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || "").trim();
+
 const supabaseAdmin = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim(),
-  (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim(),
+  serviceKey,
 );
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") return res.status(405).end();
 
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()) {
+  if (!serviceKey) {
     return res.status(500).json({ error: "Server configuration error: SUPABASE_SERVICE_ROLE_KEY required" });
   }
 

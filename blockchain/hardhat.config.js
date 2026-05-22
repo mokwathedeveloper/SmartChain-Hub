@@ -14,9 +14,14 @@ module.exports = {
       chainId: 16661,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
-    og_newton: {
+    og_galileo: {
       url: "https://evmrpc-testnet.0g.ai",
       chainId: 16602,
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    },
+    og_newton: {
+      url: "https://rpc-testnet.0g.ai",
+      chainId: 16600,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
     // ── Ethereum Networks ─────────────────────────────────────────

@@ -56,7 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const events = (txData || []).map(tx => ({
       id:         tx.id,
       type:       "optimization",
-      blob_id:    tx.storage_root || `0x${tx.id?.replace(/-/g, "")}`,
+      blob_id:    tx.storage_root || (tx.id ? `0x${tx.id.replace(/-/g, "")}` : null),
       da_tx_hash: tx.tx_hash || null,
       payload: {
         route:       tx.route,

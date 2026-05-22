@@ -96,14 +96,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   const a1End = Date.now();
 
-  // ── Agents 2 & 3 run in parallel ─────────────────────────────────────
+  // ── Agent 2: Market Data (must complete first — risk agent needs real congestion) ──
   const a2Start = Date.now();
-  const a3Start = Date.now();
-  const [marketData, riskData] = await Promise.all([
-    runMarketDataAgent(Number(amount)),
-    runRiskAgent(Number(amount), 40, String(a1Output.route || "")),
-  ]);
+  const marketData = await runMarketDataAgent(Number(amount));
   const a2End = Date.now();
+
+  // ── Agent 3: Risk Assessor with actual congestion from Agent 2 ───────────────
+  const a3Start = Date.now();
+  const riskData = await runRiskAgent(Number(amount), marketData.congestion, String(a1Output.route || ""));
   const a3End = Date.now();
 
   // ── Micropayment amounts (demonstration values in wei) ─────────────────
@@ -168,20 +168,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Log agent coordination event directly to Supabase da_events (avoids self-referential HTTP call)
   try {
-    const payload = {
+    // Hash deterministic, timestamp-free content so blob_id is stable per logical event
+    const hashable = {
       type:    "multi_agent_coordination",
-      user_id: userId,
+      user_id: userId ?? null,
       amount,
       agents:  agents.map(a => ({ id: a.agentId, latency: a.latencyMs })),
       dag,
-      ts:      Date.now(),
     };
-    const blobId = createHash("sha256").update(JSON.stringify(payload)).digest("hex");
+    const blobId = createHash("sha256").update(JSON.stringify(hashable)).digest("hex");
     await supabase.from("da_events").insert([{
       type:       "multi_agent_coordination",
       blob_id:    blobId,
       da_tx_hash: null,
-      payload,
+      payload: {
+        user_id: userId,
+        amount,
+        agents:  agents.map(a => ({ id: a.agentId, latency: a.latencyMs })),
+        dag,
+        ts:      Date.now(),
+      },
       created_at: new Date().toISOString(),
     }]);
   } catch { /* non-blocking */ }

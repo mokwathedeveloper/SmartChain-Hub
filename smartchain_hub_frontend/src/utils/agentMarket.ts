@@ -52,6 +52,9 @@ export async function listAgentForHire(
   specialty: string,
   modelHash: string,
 ): Promise<string> {
+  if (!Number.isFinite(priceUsd) || priceUsd <= 0) throw new Error("Invalid priceUsd: must be a positive finite number");
+  if (!specialty.trim())  throw new Error("specialty is required");
+  if (!modelHash.trim())  throw new Error("modelHash is required");
   const priceWei = BigInt(Math.round(priceUsd * 1e15));
   const tx = await getWriteContract(signer).listAgent(priceWei, specialty, modelHash);
   const receipt = await tx.wait();

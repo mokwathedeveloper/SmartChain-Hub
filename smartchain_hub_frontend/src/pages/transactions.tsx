@@ -193,7 +193,9 @@ export default function Transactions() {
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ amount: parsed, priority, userId: user?.id }),
       });
+      if (!res.ok) throw new Error(`Multi-agent HTTP ${res.status}`);
       const json = await res.json() as { result: OptimizeResult; agents: AgentTask[]; dag: DagEdge[]; latencyMs: number };
+      if (!json.result) throw new Error('Multi-agent returned no result');
       setResult(json.result as OptimizeResult);
       if (json.agents?.length) { setAgentTasks(json.agents); setAgentDag(json.dag || []); setShowDag(true); }
     } catch {

@@ -52,19 +52,25 @@ export default function ProofPage() {
   const [proofs, setProofs]     = useState<ProofRecord[]>([]);
   const [meta, setMeta]         = useState<FeedMeta | null>(null);
   const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [page, setPage]         = useState(0);
   const PER_PAGE = 20;
 
   const load = async (offset = 0) => {
     setLoading(true);
+    setError(null);
     try {
       const res  = await fetch(`/api/proof-feed?limit=${PER_PAGE}&offset=${offset}`);
+      if (!res.ok) throw new Error(`Server responded with ${res.status}`);
       const json = await res.json() as { proofs: ProofRecord[]; meta: FeedMeta };
       setProofs(json.proofs || []);
       setMeta(json.meta || null);
-    } catch { /* silent */ }
-    setLoading(false);
+    } catch (e: unknown) {
+      setError((e as Error).message || 'Failed to load proofs');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { load(page * PER_PAGE); }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -161,6 +167,16 @@ export default function ProofPage() {
               {Array(5).fill(0).map((_, i) => (
                 <div key={i} className="h-12 bg-gray-800/60 rounded-xl animate-pulse" />
               ))}
+            </div>
+          ) : error ? (
+            <div className="p-8 text-center">
+              <p className="text-sm text-red-400 mb-3">{error}</p>
+              <button
+                onClick={() => load(page * PER_PAGE)}
+                className="text-xs text-blue-400 hover:text-blue-300 font-semibold transition-colors"
+              >
+                Retry
+              </button>
             </div>
           ) : proofs.length === 0 ? (
             <div className="py-16 text-center">

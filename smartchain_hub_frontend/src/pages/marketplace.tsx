@@ -112,7 +112,7 @@ export default function MarketplacePage() {
     setActionBusy(true);
     setActionMsg(null);
     try {
-      const taskRef = `smartchain-hire-${Date.now()}`;
+      const taskRef = `smartchain-hire-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
       const hash    = await hireAgent(signer, agent.owner, agent.pricePerTask, taskRef);
       setActionMsg({ type: 'ok', text: `Agent hired! Tx: ${hash.slice(0, 22)}… — check your 0G wallet for the optimization result.` });
       setHiringAgent(null);

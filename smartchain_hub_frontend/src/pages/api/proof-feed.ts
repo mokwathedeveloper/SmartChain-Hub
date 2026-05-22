@@ -15,11 +15,15 @@ import { ACTIVE_CHAIN } from "@/utils/chains";
 
 const supabaseAdmin = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim(),
-  (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim(),
+  (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim(),
 );
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") return res.status(405).end();
+
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()) {
+    return res.status(500).json({ error: "Server configuration error: SUPABASE_SERVICE_ROLE_KEY required" });
+  }
 
   res.setHeader("Cache-Control", "public, s-maxage=15, stale-while-revalidate=30");
 
@@ -52,9 +56,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       storageScanUrl:  row.storage_scan_url || null,
       teeVerified:     row.tee_verified     ?? false,
       teeProof:        row.tee_proof        || null,
-      teeSigner:       row.tee_signer       || "0xTEENode-0G-Galileo",
-      providerId:      row.provider_id      || "0g-compute-broker",
-      mlEngine:        row.ml_engine        || "0G Compute / TeeML",
+      teeSigner:       row.tee_signer       || null,
+      providerId:      row.provider_id      || null,
+      mlEngine:        row.ml_engine        || null,
       zkCommitment:    row.zk_commitment    || null,
       timestamp:       row.created_at,
     }));

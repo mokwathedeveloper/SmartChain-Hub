@@ -43,6 +43,8 @@ contract SmartChainAgentMarket is Ownable, ReentrancyGuard {
 
     // agentOwner → listing
     mapping(address => AgentListing) public listings;
+    // tracks whether an address was ever pushed to listedOwners (prevents duplicate entries on relist)
+    mapping(address => bool) private everListed;
     address[] public listedOwners;
 
     // hireId → record
@@ -69,8 +71,9 @@ contract SmartChainAgentMarket is Ownable, ReentrancyGuard {
     ) external {
         require(_pricePerTask > 0, "Price must be > 0");
 
-        if (!listings[msg.sender].active) {
+        if (!everListed[msg.sender]) {
             listedOwners.push(msg.sender);
+            everListed[msg.sender] = true;
         }
 
         listings[msg.sender] = AgentListing({

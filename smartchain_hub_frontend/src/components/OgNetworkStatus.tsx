@@ -89,7 +89,9 @@ async function pingCompute(): Promise<{ status: ComponentStatus; latency: number
     const res = await fetch('/api/ai-health', { signal: AbortSignal.timeout(15_000) });
     let json: { status?: string } = {};
     try { json = await res.json() as { status?: string }; } catch { /* non-JSON ok */ }
-    const live = res.ok || res.status < 500;
+    // 503 = Render service is reachable but still cold-starting → live (warming up).
+    // 5xx other than 503 = server error → degraded. Network errors caught below.
+    const live = res.status < 500 || res.status === 503;
     const detail = json.status === 'ok'
       ? 'TeeML ready'
       : res.status === 503

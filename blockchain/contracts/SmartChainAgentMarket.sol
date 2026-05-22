@@ -16,10 +16,14 @@ pragma solidity ^0.8.20;
 contract SmartChainAgentMarket {
 
     address public owner;
+    address public pendingOwner;
     bool    private _locked;
 
     modifier onlyOwner()    { require(msg.sender == owner,  "Not owner");  _; }
     modifier nonReentrant() { require(!_locked, "Reentrant"); _locked = true; _; _locked = false; }
+
+    event OwnershipTransferInitiated(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     uint256 public constant PROTOCOL_FEE_BPS = 1000;   // 10 %
     uint256 public constant BPS_BASE         = 10_000;
@@ -56,6 +60,28 @@ contract SmartChainAgentMarket {
     event FeesWithdrawn(address indexed to, uint256 amount);
 
     constructor() { owner = msg.sender; }
+
+    /** Initiate a 2-step ownership transfer. pendingOwner must call acceptOwnership(). */
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(newOwner != address(0), "New owner is zero address");
+        pendingOwner = newOwner;
+        emit OwnershipTransferInitiated(owner, newOwner);
+    }
+
+    /** Complete ownership transfer — must be called by pendingOwner. */
+    function acceptOwnership() external {
+        require(msg.sender == pendingOwner, "Not pending owner");
+        emit OwnershipTransferred(owner, msg.sender);
+        owner        = msg.sender;
+        pendingOwner = address(0);
+    }
+
+    /** Permanently renounce ownership (sets owner to address(0)). Irreversible. */
+    function renounceOwnership() external onlyOwner {
+        emit OwnershipTransferred(owner, address(0));
+        owner        = address(0);
+        pendingOwner = address(0);
+    }
 
     function listAgent(uint256 _pricePerTask, bytes32 _specialty, bytes32 _modelHash) external {
         require(_pricePerTask > 0, "Price > 0");
@@ -127,6 +153,7 @@ contract SmartChainAgentMarket {
     }
 
     function withdrawProtocolFees(address payable _to) external onlyOwner nonReentrant {
+        require(_to != address(0), "Invalid recipient");
         uint256 amount = collectedProtocolFees;
         require(amount > 0, "Nothing to withdraw");
         collectedProtocolFees = 0;

@@ -48,9 +48,17 @@ function getWriteContract(signer: ethers.Signer) {
   return new ethers.Contract(MARKET_ADDRESS, MARKET_ABI, signer);
 }
 
-/** Encode a UTF-8 string to bytes32 (truncate to 31 chars to fit null terminator). */
+/** Encode a UTF-8 string to bytes32 (byte-aware truncation — max 31 UTF-8 bytes). */
 function toBytes32(s: string): string {
-  const safe = s.slice(0, 31); // ethers requires ≤ 31 bytes for encodeBytes32String
+  const enc = new TextEncoder();
+  let safe = '';
+  let byteLen = 0;
+  for (const ch of s) {
+    const chBytes = enc.encode(ch).length;
+    if (byteLen + chBytes > 31) break;
+    safe += ch;
+    byteLen += chBytes;
+  }
   return ethers.encodeBytes32String(safe);
 }
 

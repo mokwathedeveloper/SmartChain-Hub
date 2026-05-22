@@ -42,7 +42,7 @@ const Layout = ({ children }: LayoutProps) => {
         {/* Main content */}
         <div className="flex-1 flex flex-col min-h-screen min-h-dvh min-w-0 overflow-x-hidden">
           <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
-          <main id="main-content" className="flex-grow p-3 sm:p-4 lg:p-6 overflow-y-auto bg-gray-950">
+          <main id="main-content" className="flex-grow p-4 sm:p-6 lg:p-8 overflow-y-auto bg-gray-950">
             {children}
           </main>
         </div>

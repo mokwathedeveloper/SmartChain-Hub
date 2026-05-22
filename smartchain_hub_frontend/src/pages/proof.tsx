@@ -109,16 +109,16 @@ export default function ProofPage() {
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { label: "Total Confirmed",   value: meta?.total?.toLocaleString()       ?? '—', color: "text-white",       bg: "bg-gray-800/60" },
             { label: "TEE Verified",      value: meta?.teeVerified?.toLocaleString() ?? '—', color: "text-green-400",   bg: "bg-green-500/8 border border-green-500/20" },
             { label: "Verification Rate", value: `${verifiedRate}%`,                          color: "text-blue-400",    bg: "bg-blue-500/8 border border-blue-500/20" },
             { label: "Chain",             value: meta?.chainName ?? ACTIVE_CHAIN.name,        color: "text-purple-400",  bg: "bg-purple-500/8 border border-purple-500/20" },
           ].map(s => (
-            <div key={s.label} className={`${s.bg} rounded-2xl p-4`}>
-              <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-1">{s.label}</p>
-              <p className={`text-xl font-black ${s.color} tabular-nums`}>{s.value}</p>
+            <div key={s.label} className={`${s.bg} rounded-2xl p-5`}>
+              <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-2">{s.label}</p>
+              <p className={`text-2xl font-black ${s.color} tabular-nums`}>{s.value}</p>
             </div>
           ))}
         </div>

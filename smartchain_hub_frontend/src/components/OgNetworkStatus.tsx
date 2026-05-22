@@ -185,12 +185,17 @@ const OgNetworkStatus = () => {
 
       <div className="space-y-2.5">
         {components.map(c => (
-          <div key={c.name} className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
+          <div key={c.name} className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
               <span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT[c.status]} ${c.status === 'live' ? 'shadow-[0_0_6px_1px] shadow-green-400/60' : ''}`} />
-              <span className="text-xs text-gray-300 font-medium">{c.label}</span>
+              <div className="min-w-0">
+                <span className="text-xs text-gray-300 font-medium leading-none block">{c.label}</span>
+                {c.detail && (
+                  <span className="text-[10px] text-gray-600 leading-none mt-0.5 block truncate">{c.detail}</span>
+                )}
+              </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 shrink-0">
               {c.latency !== null && (
                 <span className="text-xs text-gray-600">{c.latency}ms</span>
               )}

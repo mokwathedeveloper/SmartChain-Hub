@@ -99,7 +99,13 @@ export default function Dashboard() {
   return (
     <>
       <Head><title>Dashboard | SmartChain Hub</title><meta name="robots" content="noindex,nofollow" /></Head>
-      <div className="space-y-5 animate-fade-in-up">
+      <div className="space-y-6 animate-fade-in-up">
+
+        {/* Page header */}
+        <div>
+          <h1 className="text-xl font-black text-white">Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1">Overview of your agent activity and 0G network performance.</p>
+        </div>
 
         {/* Agent ID Card */}
         <AgentIDCard />
@@ -155,7 +161,7 @@ export default function Dashboard() {
         <OgNetworkStatus />
 
         {/* Stats Cards — use StatCard component */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatCard
             label="Transactions (30d)"
             value={stats.totalTx.toLocaleString()}
@@ -211,11 +217,11 @@ export default function Dashboard() {
           </div>
           <div className="flex gap-3">
             {/* Y-axis */}
-            <div className="flex flex-col justify-between text-right pr-2 text-[10px] text-gray-600 h-32 shrink-0 select-none">
+            <div className="flex flex-col justify-between text-right pr-2 text-[10px] text-gray-600 h-40 shrink-0 select-none">
               <span>High</span><span>Mid</span><span>Low</span>
             </div>
             {/* Bars with gradient */}
-            <div className="flex-1 flex items-end gap-0.5 h-32">
+            <div className="flex-1 flex items-end gap-0.5 h-40">
               {barData.map((h, i) => (
                 <div
                   key={i}

@@ -126,21 +126,21 @@ export default function ActivityPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { label: "Total Events",  value: String(events.length),                               color: "text-white",      bg: "bg-gray-800/60" },
             { label: "Optimizations", value: String(eventCounts["optimization"] ?? 0),             color: "text-blue-400",   bg: "bg-blue-500/8 border border-blue-500/20" },
             { label: "Multi-Agent",   value: String(eventCounts["multi_agent_coordination"] ?? 0), color: "text-purple-400", bg: "bg-purple-500/8 border border-purple-500/20" },
           ].map(s => (
-            <div key={s.label} className={`${s.bg} rounded-2xl p-4`}>
-              <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-1">{s.label}</p>
-              <p className={`text-xl font-black ${s.color}`}>{s.value}</p>
+            <div key={s.label} className={`${s.bg} rounded-2xl p-5`}>
+              <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-2">{s.label}</p>
+              <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
             </div>
           ))}
-          <div className="bg-green-500/8 border border-green-500/20 rounded-2xl p-4">
-            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-1">Status</p>
-            <p className="text-xl font-black text-green-400 flex items-center gap-1.5">
-              <span className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
+          <div className="bg-green-500/8 border border-green-500/20 rounded-2xl p-5">
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-2">Status</p>
+            <p className="text-2xl font-black text-green-400 flex items-center gap-2">
+              <span className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse" />
               Live
             </p>
           </div>

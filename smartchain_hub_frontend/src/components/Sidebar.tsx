@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { ACTIVE_CHAIN } from '@/utils/chains';
 
 interface NavItem { name: string; path: string; icon: React.ReactNode; badge?: string }
 interface SidebarProps { onClose?: () => void; }
@@ -67,7 +68,7 @@ const Sidebar = ({ onClose }: SidebarProps) => {
 
   return (
     <aside
-      className="w-60 flex flex-col bg-gray-950 border-r border-gray-800/80"
+      className="w-64 flex flex-col bg-gray-950 border-r border-gray-800/80"
       style={{ height: '100vh', minHeight: '-webkit-fill-available' }}
     >
       {/* Logo area */}
@@ -91,7 +92,7 @@ const Sidebar = ({ onClose }: SidebarProps) => {
         <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse shrink-0"/>
         <div className="min-w-0">
           <p className="text-[10px] font-bold text-green-400 leading-none">LIVE</p>
-          <p className="text-[10px] text-blue-400/70 leading-none mt-0.5 truncate">0G Galileo · ID 16602</p>
+          <p className="text-[10px] text-blue-400/70 leading-none mt-0.5 truncate">{ACTIVE_CHAIN.name} · ID {ACTIVE_CHAIN.chainId}</p>
         </div>
         <div className="ml-auto w-1.5 h-6 bg-gradient-to-b from-green-400/40 to-blue-400/40 rounded-full shrink-0" />
       </div>
@@ -145,7 +146,6 @@ const Sidebar = ({ onClose }: SidebarProps) => {
             <div key={s.label} className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-gray-900/60 hover:bg-gray-900 border border-transparent hover:border-gray-800 transition-all duration-200 group">
               <div className="relative shrink-0">
                 <span className={`block w-2 h-2 rounded-full ${s.color} shadow-sm ${s.glow}`}/>
-                <span className={`absolute inset-0 w-2 h-2 rounded-full ${s.color} opacity-40 animate-ping`}/>
               </div>
               <span className="text-xs text-gray-400 font-medium flex-1 truncate">{s.label}</span>
               <span className="text-[10px] text-gray-600 group-hover:text-gray-500 transition-colors font-mono shrink-0">{s.status}</span>

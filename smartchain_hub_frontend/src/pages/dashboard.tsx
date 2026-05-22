@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { errMsg } from "@/utils/errors";
+import { capSavings } from "@/utils/format";
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
@@ -83,7 +84,7 @@ export default function Dashboard() {
   const rows = activity.map(tx => ({
     description: tx.tx_hash ? `${tx.tx_hash.slice(0, 10)}...${tx.tx_hash.slice(-6)}` : '—',
     amount: `$${Number(tx.amount).toLocaleString()}`,
-    savings: `$${Number(tx.savings || 0).toFixed(2)}`,
+    savings: `$${capSavings(Number(tx.savings || 0), tx.amount ?? null).toFixed(2)}`,
     status: tx.status === 'confirmed' ? 'Confirmed' : tx.status === 'pending' ? 'Pending' : (tx.status ?? 'Unknown'),
     statusCls: tx.status === 'confirmed'
       ? 'badge-confirmed'
@@ -320,7 +321,7 @@ export default function Dashboard() {
                     const r = tx.route || 'Unknown';
                     if (!routeMap[r]) routeMap[r] = { count: 0, savings: 0 };
                     routeMap[r].count++;
-                    routeMap[r].savings += Number(tx.savings || 0);
+                    routeMap[r].savings += capSavings(Number(tx.savings || 0), tx.amount ?? null);
                   });
                   const routes = Object.entries(routeMap);
                   return routes.length > 0 ? routes.map(([route, data], i) => (

@@ -2,6 +2,7 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/hooks/useAuth";
+import { capSavings } from "@/utils/format";
 
 type TxRow = { id?: string; tx_hash?: string; amount?: number; savings?: number; optimized_fee?: number; status?: string; created_at?: string; route?: string; storage_root?: string; storage_scan_url?: string };
 
@@ -134,7 +135,7 @@ export default function HistoryPage() {
                     <td className="px-5 py-4 text-sm font-semibold text-white">${Number(tx.amount).toLocaleString()}</td>
                     <td className="px-5 py-4 text-sm text-gray-400">${Number(tx.optimized_fee || 0).toFixed(2)}</td>
                     <td className="px-5 py-4">
-                      <span className="text-sm font-semibold text-green-400">+${Number(tx.savings || 0).toFixed(2)}</span>
+                      <span className="text-sm font-semibold text-green-400">+${capSavings(Number(tx.savings || 0), tx.amount ?? null).toFixed(2)}</span>
                     </td>
                     <td className="px-5 py-4 text-xs text-gray-500 max-w-[120px] truncate">{tx.route || '—'}</td>
                     <td className="px-5 py-4">

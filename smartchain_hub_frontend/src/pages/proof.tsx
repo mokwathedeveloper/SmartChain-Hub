@@ -6,6 +6,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ACTIVE_CHAIN } from "@/utils/chains";
+import { capSavings } from "@/utils/format";
 
 interface ProofRecord {
   id: string;
@@ -317,7 +318,7 @@ export default function ProofPage() {
                           <span className="text-xs text-gray-400 truncate flex-1">{p.route}</span>
                           <div className="flex items-center gap-3 shrink-0">
                             <span className="text-sm font-bold text-white tabular-nums">${p.amount.toLocaleString()}</span>
-                            <span className="text-sm font-semibold text-green-400 tabular-nums">+${p.savings.toFixed(2)}</span>
+                            <span className="text-sm font-semibold text-green-400 tabular-nums">+${capSavings(p.savings, p.amount).toFixed(2)}</span>
                           </div>
                         </div>
                       </div>
@@ -350,7 +351,7 @@ export default function ProofPage() {
                         {/* Amount */}
                         <span className="text-sm font-bold text-white tabular-nums text-right">${p.amount.toLocaleString()}</span>
                         {/* Savings */}
-                        <span className="text-sm font-semibold text-green-400 tabular-nums text-right">+${p.savings.toFixed(2)}</span>
+                        <span className="text-sm font-semibold text-green-400 tabular-nums text-right">+${capSavings(p.savings, p.amount).toFixed(2)}</span>
                         {/* Time */}
                         <span className="text-xs text-gray-600 text-right">{timeAgo(p.timestamp)}</span>
                         {/* Chevron */}

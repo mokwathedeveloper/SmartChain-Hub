@@ -5,6 +5,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState, useCallback, useRef } from "react";
+import { capSavings } from "@/utils/format";
 
 interface DaEvent {
   id:         string;
@@ -329,7 +330,7 @@ export default function ActivityPage() {
                               <span className="text-sm font-bold text-white tabular-nums">${amount.toLocaleString()}</span>
                             )}
                             {savings !== null && (
-                              <span className="text-sm font-semibold text-green-400 tabular-nums">+${savings.toFixed(2)}</span>
+                              <span className="text-sm font-semibold text-green-400 tabular-nums">+${capSavings(savings, amount).toFixed(2)}</span>
                             )}
                             {agentCount !== null && (
                               <span className="text-xs text-purple-400">{agentCount} agents</span>
@@ -359,7 +360,7 @@ export default function ActivityPage() {
                         </span>
                         {/* Savings */}
                         <span className="text-sm font-semibold text-green-400 tabular-nums text-right">
-                          {savings !== null ? `+$${savings.toFixed(2)}` : '—'}
+                          {savings !== null ? `+$${capSavings(savings, amount).toFixed(2)}` : '—'}
                         </span>
                         {/* DA status */}
                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border w-fit ${
@@ -406,7 +407,7 @@ export default function ActivityPage() {
                           {savings !== null && (
                             <div className="bg-gray-800/60 rounded-xl p-3.5">
                               <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-1.5">AI Savings</p>
-                              <p className="text-sm font-bold text-green-400 tabular-nums">+${savings.toFixed(2)}</p>
+                              <p className="text-sm font-bold text-green-400 tabular-nums">+${capSavings(savings, amount).toFixed(2)}</p>
                             </div>
                           )}
                           <div className="bg-gray-800/60 rounded-xl p-3.5">

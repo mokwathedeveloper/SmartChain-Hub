@@ -45,6 +45,7 @@ Every agent is a **first-class economic actor** on 0G Chain.
 | 💸 SmartChainPayments | `0x540aFf6B167F8B5889d852d124C545F5f876A7eB` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0x540aFf6B167F8B5889d852d124C545F5f876A7eB) |
 | 📊 SmartChainRevenue | `0x8858886AEE6342DFA4DE5Cf66dB25dCF75b31A08` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0x8858886AEE6342DFA4DE5Cf66dB25dCF75b31A08) |
 | 📝 SmartChainTransaction | `0xf95A1610be22046c334E3bD1b11D2B88519E6C52` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0xf95A1610be22046c334E3bD1b11D2B88519E6C52) |
+| 🏪 SmartChainAgentMarket | *(deploy: see Quick Start §3)* | — |
 
 **Network:** 0G Galileo Testnet · Chain ID `16602` · RPC `https://evmrpc-testnet.0g.ai`
 
@@ -371,8 +372,24 @@ docs/backend/supabase_migration_006.sql
 cd blockchain
 cp .env.example .env               # set PRIVATE_KEY to funded wallet
 npm install
+npx hardhat compile                # must pass before deploying
+
+# Deploy core suite (AgentID, Payments, Revenue, Escrow, Transaction)
 npx hardhat run scripts/deploy.js --network og_newton
-# Copy output addresses → update .env.local
+# Copy the 5 printed addresses → update NEXT_PUBLIC_*_CONTRACT in .env.local
+
+# Deploy the Agent Hire-Market (optional — enables /marketplace page)
+npx hardhat run scripts/deploy-market.js --network og_newton
+# Copy the printed address → NEXT_PUBLIC_AGENT_MARKET_CONTRACT in .env.local
+```
+
+> **Mainnet deployment** (0G Mainnet, Chain ID `16661`): replace `og_newton` with `og_mainnet`.
+> Ensure the deployer wallet at `PRIVATE_KEY` is funded with A0GI on the target network.
+> After deployment, set all `NEXT_PUBLIC_*_CONTRACT` values on Vercel → Settings → Environment Variables and redeploy.
+
+**Supabase migration 007** (adds TEE/ML proof columns) — run in your Supabase SQL editor:
+```
+docs/backend/supabase_migration_007.sql
 ```
 
 ### 4. Deploy AI Agent (Production)
@@ -405,6 +422,7 @@ NEXT_PUBLIC_PAYMENTS_CONTRACT=       # SmartChainPayments
 NEXT_PUBLIC_AGENT_ID_CONTRACT=       # SmartChainAgentID
 NEXT_PUBLIC_AGENT_ESCROW_CONTRACT=   # SmartChainAgentEscrow
 NEXT_PUBLIC_REVENUE_CONTRACT=        # SmartChainRevenue
+NEXT_PUBLIC_AGENT_MARKET_CONTRACT=   # SmartChainAgentMarket (deploy-market.js)
 NEXT_PUBLIC_STORAGE_PRIVATE_KEY=     # 0G Storage wallet key (client)
 STORAGE_PRIVATE_KEY=                 # 0G Storage wallet key (server)
 NEXT_PUBLIC_AI_AGENT_URL=http://localhost:5000
@@ -419,6 +437,111 @@ OG_COMPUTE_MODEL=llama-3.1-8b-instruct
 # ── Blockchain (.env) ──────────────────────────────────────────────
 PRIVATE_KEY=                         # Deployer wallet
 ```
+
+---
+
+## 🔌 API Routes Reference
+
+All routes live under `smartchain_hub_frontend/src/pages/api/`. Rate-limited endpoints return `429` on breach.
+
+### Core AI & Storage
+
+| Method | Route | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/ai-optimize` | — | Proxy to AI agent `/optimize`. Body: `{ amount, priority, congestion }`. Returns `{ route, fee, savings, confidence, tee_verified, tee_proof }`. |
+| `POST` | `/api/storage-upload` | — | Upload tx receipt to 0G Storage Log. Body: `{ data: object }`. Returns `{ rootHash, txHash, storageScanUrl }`. Rate: 20 req/min/IP. |
+| `GET/POST` | `/api/agent-memory` | userId | Read/write 0G Storage KV agent memory. GET `?userId=<id>` returns memory blob. POST `{ userId, memory }` persists it. |
+| `POST` | `/api/zk-proof` | — | Generate Groth16 or SHA-256 ZK commitment. Body: `{ amount, fee, savings, route, userId }`. Returns `{ commitment, proof?, verified }`. |
+| `POST` | `/api/fine-tune` | userId | Trigger incremental TF model fine-tune on user's 0G Storage tx data. Returns `{ ok, samplesUsed, newModelHash?, reason? }`. |
+| `POST` | `/api/multi-agent` | — | Dispatch multi-agent coordination job. Body: `{ agents[], task }`. Returns `{ results[], agentCount }`. |
+
+### 0G Network Health
+
+| Method | Route | Description |
+|---|---|---|
+| `GET` | `/api/og-storage-health` | Proxy health check to 0G Storage indexer (bypasses CORS). Returns `{ status, nodeCount }`. |
+| `GET` | `/api/og-stats` | Live 0G chain stats — block height, TPS, validator count. |
+| `GET` | `/api/og-da-feed` | Query params: `limit` (default 20), `offset`. Returns `{ events[], source }` — DA event history from Supabase. |
+| `POST` | `/api/og-da` | Anchor a blob to 0G DA layer. Body: `{ payload }`. Returns `{ da_tx_hash, blob_id }`. |
+| `GET` | `/api/ai-health` | Health check for AI agent (Render). Returns `{ status: 'ok' | 'warming' }`. 503 = cold start (live). |
+| `GET` | `/api/keepalive` | Keepalive ping — prevents Render free tier cold starts. Called on a 4-min interval. |
+
+### Proof Feed
+
+| Method | Route | Description |
+|---|---|---|
+| `GET` | `/api/proof-feed` | Query params: `limit` (default 20, max 50), `offset`. Returns `{ proofs[], total, chain }` — global TEE-verified optimizations. |
+
+### On-Ramp
+
+| Method | Route | Description |
+|---|---|---|
+| `POST` | `/api/onramp/stripe` | Create Stripe PaymentIntent. Body: `{ amount, currency }`. Returns `{ clientSecret }`. |
+| `POST` | `/api/onramp/stripe-webhook` | Handle Stripe webhook events (`payment_intent.succeeded`). Requires `STRIPE_WEBHOOK_SECRET`. |
+| `POST` | `/api/onramp/mpesa` | Initiate Flutterwave M-Pesa STK push. Body: `{ amount, phone, email }`. Returns `{ status, flw_ref }`. |
+| `POST` | `/api/onramp/mpesa-webhook` | Handle Flutterwave webhook events. Validates `FLUTTERWAVE_WEBHOOK_HASH`. |
+
+---
+
+## 📡 Request → Response Data Flow
+
+A single AI optimization traverses all 5 0G stack components:
+
+```
+Browser                  Next.js API              AI Agent (Render)        0G Stack
+  │                          │                          │                      │
+  │  POST /api/ai-optimize   │                          │                      │
+  │  { amount, priority }    │                          │                      │
+  │─────────────────────────▶│                          │                      │
+  │                          │  POST /optimize          │                      │
+  │                          │─────────────────────────▶│                      │
+  │                          │                          │  broker.0g.ai        │
+  │                          │                          │  LLaMA 3.1 8B ──────▶│ 0G Compute TeeML
+  │                          │                          │◀─────────────────────│ X-TEE-Proof header
+  │                          │  { route, fee, savings,  │                      │
+  │                          │    tee_verified, proof } │                      │
+  │                          │◀─────────────────────────│                      │
+  │  { ...result }           │                          │                      │
+  │◀─────────────────────────│                          │                      │
+  │                          │                          │                      │
+  │  POST /api/storage-upload│                          │                      │
+  │  { data: txReceipt }     │                          │                      │
+  │─────────────────────────▶│                          │                      │
+  │                          │  MemData.upload()────────────────────────────▶ 0G Storage Log
+  │                          │◀────────────────────────────────────────────── { rootHash, txHash }
+  │  { rootHash }            │                          │                      │
+  │◀─────────────────────────│                          │                      │
+  │                          │                          │                      │
+  │  POST /api/agent-memory  │                          │                      │
+  │  { userId, memory }      │                          │                      │
+  │─────────────────────────▶│                          │                      │
+  │                          │  KvClient.batchSet() ───────────────────────▶ 0G Storage KV
+  │                          │◀───────────────────────────────────────────── { ok }
+  │  { ok }                  │                          │                      │
+  │◀─────────────────────────│                          │                      │
+  │                          │                          │                      │
+  │  POST /api/zk-proof      │                          │                      │
+  │  { amount, fee, savings }│                          │                      │
+  │─────────────────────────▶│                          │                      │
+  │                          │  SHA-256 commitment ─────────────────────────▶ (stored in rootHash)
+  │  { commitment, verified } │                         │                      │
+  │◀─────────────────────────│                          │                      │
+  │                          │                          │                      │
+  │  ethers.js signer        │                          │                      │
+  │  recordTransaction() ────────────────────────────────────────────────────▶ 0G Chain
+  │  updateAgentID()  ───────────────────────────────────────────────────────▶   SmartChainAgentID
+  │◀──────────────────────────────────────────────────────────────────────── txHash
+  │                          │                          │                      │
+  │  POST /api/og-da         │                          │                      │
+  │  { payload }             │                          │                      │
+  │─────────────────────────▶│                          │                      │
+  │                          │  DA blob submit ─────────────────────────────▶ 0G DA Layer
+  │                          │◀───────────────────────────────────────────── { da_tx_hash, blob_id }
+  │  { da_tx_hash }          │                          │                      │
+  │◀─────────────────────────│                          │                      │
+```
+
+**Per-optimization on-chain footprint:** 1 Storage upload + 1 ZK commitment + 1 AgentID update + 1 Revenue event + 1 DA anchor = **5 verifiable artifacts per user interaction**.
 
 ---
 

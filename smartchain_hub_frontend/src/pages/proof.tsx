@@ -20,9 +20,9 @@ interface ProofRecord {
   storageScanUrl: string | null;
   teeVerified: boolean;
   teeProof: string | null;
-  teeSigner: string;
-  providerId: string;
-  mlEngine: string;
+  teeSigner: string | null;
+  providerId: string | null;
+  mlEngine: string | null;
   zkCommitment: string | null;
   timestamp: string;
 }
@@ -67,7 +67,7 @@ export default function ProofPage() {
       setProofs(json.proofs || []);
       setMeta(json.meta || null);
     } catch (e: unknown) {
-      setError((e as Error).message || 'Failed to load proofs');
+      setError(e instanceof Error ? e.message : 'Failed to load proofs');
     } finally {
       setLoading(false);
     }
@@ -240,9 +240,9 @@ export default function ProofPage() {
                     <div className="px-6 pb-5 bg-gray-900/40 border-t border-gray-800/40 space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
                         {[
-                          { label: "TEE Signer",     value: p.teeSigner,     mono: true  },
-                          { label: "Provider ID",    value: p.providerId,    mono: true  },
-                          { label: "ML Engine",      value: p.mlEngine,      mono: false },
+                          { label: "TEE Signer",     value: p.teeSigner  || '(not provided)', mono: true  },
+                          { label: "Provider ID",    value: p.providerId || '(not provided)', mono: true  },
+                          { label: "ML Engine",      value: p.mlEngine   || '(not provided)', mono: false },
                           { label: "Route",          value: p.route,         mono: false },
                           { label: "TEE Proof Hash", value: p.teeProof || '(stored on 0G Storage)', mono: true },
                           { label: "ZK Commitment",  value: p.zkCommitment || '(not generated)', mono: true },

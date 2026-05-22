@@ -70,6 +70,11 @@ export const CHAINS: Record<ChainKey, {
   },
 };
 
-// Active chain — driven by env var, defaults to Galileo testnet while mainnet tokens are pending
-export const ACTIVE_CHAIN_KEY = (process.env.NEXT_PUBLIC_CHAIN as ChainKey) || 'og_galileo';
+// Active chain — driven by env var, defaults to Galileo testnet while mainnet tokens are pending.
+// Guard: if NEXT_PUBLIC_CHAIN is set to an unrecognised value, fall back to og_galileo so
+// ACTIVE_CHAIN is never undefined (would crash SSG prerender with "Cannot read properties of undefined").
+export const ACTIVE_CHAIN_KEY: ChainKey =
+  (process.env.NEXT_PUBLIC_CHAIN && process.env.NEXT_PUBLIC_CHAIN in CHAINS)
+    ? (process.env.NEXT_PUBLIC_CHAIN as ChainKey)
+    : 'og_galileo';
 export const ACTIVE_CHAIN = CHAINS[ACTIVE_CHAIN_KEY];

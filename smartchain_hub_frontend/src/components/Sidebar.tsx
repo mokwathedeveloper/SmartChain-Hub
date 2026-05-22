@@ -1,7 +1,9 @@
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 
+interface NavItem { name: string; path: string; icon: React.ReactNode; badge?: string }
 interface SidebarProps { onClose?: () => void; }
 
 const navItems = [
@@ -12,6 +14,21 @@ const navItems = [
   {
     name: 'AI Optimizer', path: '/transactions',
     icon: <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+  },
+  {
+    name: 'Marketplace', path: '/marketplace',
+    icon: <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>,
+    badge: 'New',
+  },
+  {
+    name: 'TEE Proofs', path: '/proof',
+    icon: <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>,
+    badge: 'New',
+  },
+  {
+    name: 'Activity Feed', path: '/activity',
+    icon: <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>,
+    badge: 'New',
   },
   {
     name: 'Payments', path: '/payments',
@@ -36,9 +53,11 @@ const navItems = [
 ];
 
 const stackItems = [
+  { label: "0G Chain",   color: "bg-blue-500",   glow: "shadow-blue-500/40",   status: "5 Contracts" },
   { label: "0G Compute", color: "bg-purple-500", glow: "shadow-purple-500/40", status: "TeeML Active" },
   { label: "0G Storage", color: "bg-green-500",  glow: "shadow-green-500/40",  status: "KV + Log" },
-  { label: "0G Chain",   color: "bg-blue-500",   glow: "shadow-blue-500/40",   status: "4 Contracts" },
+  { label: "0G DA",      color: "bg-cyan-500",   glow: "shadow-cyan-500/40",   status: "Blob Stream" },
+  { label: "Multi-Agent",color: "bg-yellow-500", glow: "shadow-yellow-500/40", status: "3 Agents" },
 ];
 
 const Sidebar = ({ onClose }: SidebarProps) => {
@@ -80,7 +99,7 @@ const Sidebar = ({ onClose }: SidebarProps) => {
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto scrollbar-hide">
         <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest px-3 mb-2.5">Navigation</p>
-        {navItems.map(item => {
+        {(navItems as NavItem[]).map(item => {
           const active = isActive(item.path);
           return (
             <Link
@@ -93,7 +112,6 @@ const Sidebar = ({ onClose }: SidebarProps) => {
                   : 'text-gray-500 hover:bg-gray-800/80 hover:text-gray-200'
               }`}
             >
-              {/* Active gradient background */}
               {active && (
                 <>
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl" />
@@ -102,11 +120,15 @@ const Sidebar = ({ onClose }: SidebarProps) => {
                   <div className="absolute -right-6 -top-4 w-20 h-20 bg-white/5 rounded-full blur-xl pointer-events-none" />
                 </>
               )}
-
               <span className={`relative shrink-0 transition-all ${active ? 'text-white' : 'text-gray-600 group-hover:text-gray-300'}`}>
                 {item.icon}
               </span>
               <span className="relative flex-1">{item.name}</span>
+              {item.badge && !active && (
+                <span className="relative text-[9px] px-1.5 py-0.5 rounded-full bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold shrink-0">
+                  {item.badge}
+                </span>
+              )}
               {active && (
                 <span className="relative ml-auto w-1.5 h-1.5 bg-white/70 rounded-full shadow-sm shadow-white/30" />
               )}

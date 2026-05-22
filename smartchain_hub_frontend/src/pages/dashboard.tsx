@@ -8,6 +8,7 @@ import { hydrateAgentMemory } from "@/utils/agentMemory";
 import { triggerFineTune } from "@/utils/api";
 import type { FineTuneResult } from "@/utils/api";
 import StatCard from "@/components/StatCard";
+import OgNetworkStatus from "@/components/OgNetworkStatus";
 
 type TxActivity = { amount?: number; savings?: number; status?: string; created_at?: string; tx_hash?: string; route?: string };
 
@@ -149,6 +150,9 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+
+        {/* 0G Network Status */}
+        <OgNetworkStatus />
 
         {/* Stats Cards — use StatCard component */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

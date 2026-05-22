@@ -10,6 +10,7 @@ import { triggerFineTune } from "@/utils/api";
 import type { FineTuneResult } from "@/utils/api";
 import StatCard from "@/components/StatCard";
 import OgNetworkStatus from "@/components/OgNetworkStatus";
+import ProtocolStats from "@/components/ProtocolStats";
 
 type TxActivity = { amount?: number; savings?: number; status?: string; created_at?: string; tx_hash?: string; route?: string };
 
@@ -159,6 +160,7 @@ export default function Dashboard() {
         </div>
 
         {/* 0G Network Status */}
+        <ProtocolStats />
         <OgNetworkStatus />
 
         {/* Stats Cards — use StatCard component */}

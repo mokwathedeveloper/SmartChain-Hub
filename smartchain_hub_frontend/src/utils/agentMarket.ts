@@ -1,8 +1,9 @@
 /**
  * agentMarket.ts — SmartChainAgentMarket contract client
- * Deployed on 0G Galileo Testnet (chainId 16602)
+ * Targets the chain set by NEXT_PUBLIC_CHAIN (defaults to og_mainnet).
  */
 import { ethers } from "ethers";
+import { ACTIVE_CHAIN } from "./chains";
 
 // specialty and modelHash are bytes32 on-chain (gas-optimised).
 // Use ethers.encodeBytes32String / decodeBytes32String for conversion.
@@ -28,8 +29,8 @@ export interface AgentListing {
   listedAt:     number;
 }
 
-const OG_NETWORK = ethers.Network.from({ chainId: 16602, name: "og-galileo" });
-const OG_RPC     = "https://evmrpc-testnet.0g.ai";
+const OG_NETWORK = ethers.Network.from({ chainId: ACTIVE_CHAIN.chainId, name: ACTIVE_CHAIN.name });
+const OG_RPC     = ACTIVE_CHAIN.rpc;
 
 const MARKET_ADDRESS = process.env.NEXT_PUBLIC_AGENT_MARKET_CONTRACT || "";
 

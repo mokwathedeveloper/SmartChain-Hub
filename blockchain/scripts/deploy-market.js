@@ -1,6 +1,9 @@
 const hre = require("hardhat");
 
-// Deploy SmartChainAgentMarket to 0G Galileo Testnet:
+// Deploy SmartChainAgentMarket to 0G Mainnet (chainId 16661):
+//   npx hardhat run scripts/deploy-market.js --network og_mainnet
+//
+// Galileo Testnet fallback (chainId 16602):
 //   npx hardhat run scripts/deploy-market.js --network og_galileo
 
 const EXPLORERS = {

@@ -33,23 +33,56 @@ interface AgentTask {
   paidBy:     string | null;
 }
 
-// Agent 2: Market Data heuristics
+const OG_GALILEO_RPC = "https://evmrpc-testnet.0g.ai";
+
+async function rpcCall<T>(method: string, params: unknown[]): Promise<T | null> {
+  try {
+    const res = await fetch(OG_GALILEO_RPC, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
+      signal:  AbortSignal.timeout(5_000),
+    });
+    const json = await res.json() as { result?: T; error?: unknown };
+    if (json.error || json.result === undefined) return null;
+    return json.result;
+  } catch {
+    return null;
+  }
+}
+
+// Agent 2: Market Data — real 0G Galileo Testnet chain state
 async function runMarketDataAgent(amount: number): Promise<{ congestion: number; gasPrice: number; liquidity: string }> {
-  const t = Date.now();
-  await new Promise(r => setTimeout(r, 120 + Math.random() * 80)); // 120–200ms
-  const congestion = Math.floor(20 + Math.random() * 60);          // 20–80%
-  const gasPrice   = Math.round((0.001 + Math.random() * 0.005) * 10000) / 10000 || 0.003;
-  const liquidity  = amount > 10000 ? "Medium" : "High";
+  const [gasPriceHex, block] = await Promise.all([
+    rpcCall<string>("eth_gasPrice", []),
+    rpcCall<{ gasUsed: string; gasLimit: string }>("eth_getBlockByNumber", ["latest", false]),
+  ]);
+
+  // Gas price in Gwei (4 dp); fallback 0.001 Gwei
+  let gasPrice = 0.001;
+  if (gasPriceHex) {
+    const wei = Number(BigInt(gasPriceHex));
+    gasPrice  = Math.round((wei / 1e9) * 10_000) / 10_000 || 0.001;
+  }
+
+  // Block gas utilisation → congestion %; fallback 40%
+  let congestion = 40;
+  if (block?.gasUsed && block?.gasLimit) {
+    const used  = parseInt(block.gasUsed,  16);
+    const limit = parseInt(block.gasLimit, 16);
+    if (limit > 0) congestion = Math.min(Math.round((used / limit) * 100), 100);
+  }
+
+  const liquidity = amount > 10_000 ? "Medium" : "High";
   return { congestion, gasPrice, liquidity };
 }
 
-// Agent 3: Risk Assessor
+// Agent 3: Risk Assessor (deterministic from real congestion data)
 async function runRiskAgent(
   amount: number,
   congestion: number,
   route: string,
 ): Promise<{ riskScore: number; mevRisk: string; slippagePct: number; verdict: string }> {
-  await new Promise(r => setTimeout(r, 80 + Math.random() * 60)); // 80–140ms
   const mevRisk    = congestion > 55 ? "Medium" : "Low";
   const slippagePct = Math.round((0.01 + (congestion / 100) * 0.04) * 1000) / 1000;
   const riskScore  = Math.min(Math.round(congestion / 10 + (amount > 50000 ? 2 : 0)), 9);

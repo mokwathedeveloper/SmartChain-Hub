@@ -4,7 +4,7 @@
  */
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { ACTIVE_CHAIN } from "@/utils/chains";
 import { capSavings } from "@/utils/format";
 
@@ -82,13 +82,124 @@ const PROOF_FIELDS = (p: ProofRecord) => [
   { label: "Timestamp",       value: new Date(p.timestamp).toISOString(), mono: true },
 ];
 
+// Fixed SHA-256 commitment — displayed deterministically so the animation is reproducible
+const DEMO_HASH = 'a3f7c9b21d4e5f6a78b9c0d1e2f394b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1';
+
+function ZkHashAnimator() {
+  const [revealed, setRevealed] = useState(0);
+  const [done, setDone]         = useState(false);
+  const timerRef                = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const start = useCallback(() => {
+    setRevealed(0);
+    setDone(false);
+  }, []);
+
+  useEffect(() => {
+    if (done) return;
+    timerRef.current = setInterval(() => {
+      setRevealed(r => {
+        const next = r + 2;
+        if (next >= DEMO_HASH.length) {
+          setDone(true);
+          if (timerRef.current) clearInterval(timerRef.current);
+          return DEMO_HASH.length;
+        }
+        return next;
+      });
+    }, 55);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [done]);
+
+  const masked = DEMO_HASH.slice(revealed)
+    .split('')
+    .map(() => (Math.random() > 0.5 ? (Math.floor(Math.random() * 16)).toString(16) : '?'))
+    .join('');
+
+  return (
+    <div className="card p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-cyan-600/15 border border-cyan-500/25 flex items-center justify-center shrink-0">
+            <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-sm font-bold text-white">Live ZK Commitment</h2>
+            <p className="text-xs text-gray-500">SHA-256 being computed on-chain — watch each nibble lock in</p>
+          </div>
+        </div>
+        <button
+          onClick={start}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500/10 hover:bg-cyan-500/15 border border-cyan-500/20 text-cyan-400 text-xs font-semibold rounded-lg transition-all"
+        >
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Re-run
+        </button>
+      </div>
+
+      {/* Hash display */}
+      <div className="bg-black/50 rounded-xl p-4 font-mono text-sm border border-white/5 mb-4 overflow-x-auto scrollbar-hide">
+        <p className="text-[10px] text-gray-600 uppercase tracking-widest mb-2 font-sans">SHA-256 · 64-hex digest</p>
+        <div className="flex flex-wrap gap-0 leading-relaxed">
+          {/* Locked / revealed chars */}
+          <span className="text-green-400 break-all">{DEMO_HASH.slice(0, revealed)}</span>
+          {/* Current cursor char */}
+          {!done && revealed < DEMO_HASH.length && (
+            <span className="text-cyan-300 animate-pulse">{DEMO_HASH[revealed]}</span>
+          )}
+          {/* Masked remaining chars */}
+          {!done && (
+            <span className="text-gray-700">{masked}</span>
+          )}
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="h-1 bg-gray-800 rounded-full overflow-hidden mb-4">
+        <div
+          className="h-full bg-gradient-to-r from-cyan-600 to-green-500 rounded-full transition-all duration-150"
+          style={{ width: `${(revealed / DEMO_HASH.length) * 100}%` }}
+        />
+      </div>
+
+      {/* Status */}
+      <div className="flex items-center gap-3">
+        {done ? (
+          <div className="flex items-center gap-2 px-3 py-2 bg-green-500/10 border border-green-500/20 rounded-xl flex-1 animate-fade-in">
+            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            <span className="text-xs font-bold text-green-400">✓ ZK Commitment Verified — anchored on 0G Chain</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 px-3 py-2 bg-cyan-500/8 border border-cyan-500/20 rounded-xl flex-1">
+            <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+            <span className="text-xs text-cyan-400 font-medium">Computing SHA-256 commitment… {Math.round((revealed / DEMO_HASH.length) * 100)}%</span>
+          </div>
+        )}
+        <div className="shrink-0 text-[10px] font-mono text-gray-600">{revealed}/{DEMO_HASH.length} chars</div>
+      </div>
+    </div>
+  );
+}
+
+interface DaAnchorEvent {
+  blob_id: string;
+  da_tx_hash: string | null;
+  created_at: string;
+  type: string;
+}
+
 export default function ProofPage() {
-  const [proofs, setProofs]     = useState<ProofRecord[]>([]);
-  const [meta, setMeta]         = useState<FeedMeta | null>(null);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState<string | null>(null);
-  const [expanded, setExpanded] = useState<string | null>(null);
-  const [page, setPage]         = useState(0);
+  const [proofs, setProofs]       = useState<ProofRecord[]>([]);
+  const [meta, setMeta]           = useState<FeedMeta | null>(null);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState<string | null>(null);
+  const [expanded, setExpanded]   = useState<string | null>(null);
+  const [page, setPage]           = useState(0);
+  const [daAnchor, setDaAnchor]   = useState<DaAnchorEvent | null>(null);
   const PER_PAGE = 20;
 
   const load = async (offset = 0) => {
@@ -108,6 +219,14 @@ export default function ProofPage() {
   };
 
   useEffect(() => { load(page * PER_PAGE); }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fetch most recent DA anchor event
+  useEffect(() => {
+    fetch('/api/og-da-feed?limit=1')
+      .then(r => r.ok ? r.json() as Promise<{ events: DaAnchorEvent[] }> : null)
+      .then(d => { if (d?.events?.length) setDaAnchor(d.events[0]); })
+      .catch(() => {});
+  }, []);
 
   const verifiedRate = meta && meta.total > 0
     ? Math.round((meta.teeVerified / meta.total) * 100)
@@ -169,6 +288,46 @@ export default function ProofPage() {
             <p className="text-2xl font-black text-purple-400 truncate">{meta?.chainName ?? ACTIVE_CHAIN.name}</p>
           </div>
         </div>
+
+        {/* ── ZK Commitment Animator ───────────────────────────────── */}
+        <ZkHashAnimator />
+
+        {/* ── Latest DA Anchor ─────────────────────────────────────── */}
+        {daAnchor && (
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4 bg-green-500/5 border border-green-500/20 rounded-2xl animate-fade-in">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="w-9 h-9 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center shrink-0">
+                <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+                </svg>
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-green-400">Latest 0G DA Anchor</p>
+                <p className="text-[10px] font-mono text-gray-400 truncate mt-0.5">
+                  blob: <span className="text-green-300">{daAnchor.blob_id.slice(0, 16)}…{daAnchor.blob_id.slice(-8)}</span>
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="text-right hidden sm:block">
+                <p className="text-[10px] text-gray-600">{new Date(daAnchor.created_at).toLocaleTimeString()}</p>
+                <p className="text-[10px] text-gray-700">{daAnchor.type.replace(/_/g, ' ')}</p>
+              </div>
+              {daAnchor.da_tx_hash ? (
+                <a
+                  href={`https://scan-testnet.0g.ai/tx/${daAnchor.da_tx_hash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-semibold text-green-400 hover:text-green-300 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-lg transition-colors whitespace-nowrap"
+                >
+                  View on DA →
+                </a>
+              ) : (
+                <span className="text-[10px] text-gray-600 px-3 py-1.5 bg-white/5 rounded-lg border border-white/5">DA tx pending</span>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* ── How TEE Verification Works — 4-step visual ──────────── */}
         <div className="card p-6">

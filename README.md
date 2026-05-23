@@ -58,7 +58,7 @@ Every agent is a **first-class economic actor** on 0G Chain.
 | 💸 SmartChainPayments | `0x540aFf6B167F8B5889d852d124C545F5f876A7eB` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0x540aFf6B167F8B5889d852d124C545F5f876A7eB) |
 | 📊 SmartChainRevenue | `0x8858886AEE6342DFA4DE5Cf66dB25dCF75b31A08` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0x8858886AEE6342DFA4DE5Cf66dB25dCF75b31A08) |
 | 📝 SmartChainTransaction | `0xf95A1610be22046c334E3bD1b11D2B88519E6C52` | [ChainScan ↗](https://scan-testnet.0g.ai/address/0xf95A1610be22046c334E3bD1b11D2B88519E6C52) |
-| 🏪 SmartChainAgentMarket | *(deploy: see Quick Start §3)* | — |
+| 🏪 SmartChainAgentMarket | *(pending deploy — fund deployer `0x604c…451F` with 0.01 A0GI, then see Quick Start §3)* | — |
 
 **Network:** 0G Galileo Testnet · Chain ID `16602` · RPC `https://evmrpc-testnet.0g.ai`
 
@@ -392,15 +392,18 @@ npm install
 npx hardhat compile                # must pass before deploying
 
 # Deploy core suite (AgentID, Payments, Revenue, Escrow, Transaction)
-npx hardhat run scripts/deploy.js --network og_newton
+npx hardhat run scripts/deploy.js --network og_galileo
 # Copy the 5 printed addresses → update NEXT_PUBLIC_*_CONTRACT in .env.local
 
 # Deploy the Agent Hire-Market (optional — enables /marketplace page)
-npx hardhat run scripts/deploy-market.js --network og_newton
-# Copy the printed address → NEXT_PUBLIC_AGENT_MARKET_CONTRACT in .env.local
+# Deployer: 0x604cDbDBE7850bAd105C28bFE01Ad680520D451F
+# Needs: ~0.01 A0GI → get from https://hub.0g.ai/faucet
+npx hardhat run scripts/deploy-market.js --network og_galileo
+# Copy the printed address → set in Vercel env vars:
+#   NEXT_PUBLIC_AGENT_MARKET_CONTRACT=<printed address>
 ```
 
-> **Mainnet deployment** (0G Mainnet, Chain ID `16661`): replace `og_newton` with `og_mainnet`.
+> **Mainnet deployment** (0G Mainnet, Chain ID `16661`): replace `og_galileo` with `og_mainnet`.
 > Ensure the deployer wallet at `PRIVATE_KEY` is funded with A0GI on the target network.
 > After deployment, set all `NEXT_PUBLIC_*_CONTRACT` values on Vercel → Settings → Environment Variables and redeploy.
 

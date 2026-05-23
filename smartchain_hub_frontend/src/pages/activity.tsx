@@ -77,6 +77,14 @@ export default function ActivityPage() {
   const [newCount,   setNewCount]   = useState(0);
   const [source,     setSource]     = useState<string>("");
   const [expanded,   setExpanded]   = useState<string | null>(null);
+  const [copied,     setCopied]     = useState<string | null>(null);
+
+  const copyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(id);
+      setTimeout(() => setCopied(null), 1500);
+    }).catch(() => {});
+  };
 
   // Stable ref so interval callback always sees latest events
   const eventsRef = useRef<DaEvent[]>([]);
@@ -363,13 +371,20 @@ export default function ActivityPage() {
                           {savings !== null ? `+$${capSavings(savings, amount).toFixed(2)}` : '—'}
                         </span>
                         {/* DA status */}
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border w-fit ${
-                          evt.da_tx_hash
-                            ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20'
-                            : 'bg-gray-800/60 text-gray-600 border-gray-700'
-                        }`}>
-                          {evt.da_tx_hash ? 'DA ✓' : 'Pending'}
-                        </span>
+                        <div className="flex flex-col gap-1">
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border w-fit ${
+                            evt.da_tx_hash
+                              ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20'
+                              : 'bg-gray-800/60 text-gray-600 border-gray-700'
+                          }`}>
+                            {evt.da_tx_hash ? 'DA ✓' : 'Blob ✓'}
+                          </span>
+                          {evt.blob_id && (
+                            <span className="text-[9px] font-mono text-gray-700 truncate max-w-[76px]" title={evt.blob_id}>
+                              {evt.blob_id.slice(2, 10)}…
+                            </span>
+                          )}
+                        </div>
                         {/* Time */}
                         <span className="text-xs text-gray-600 text-right">{timeAgo(evt.created_at)}</span>
                         {/* Chevron */}
@@ -385,12 +400,51 @@ export default function ActivityPage() {
                         <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mb-4">Blob Details</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                           <div className="bg-gray-800/60 rounded-xl p-3.5">
-                            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-1.5">Blob ID (SHA-256)</p>
-                            <p className="text-xs font-mono text-gray-300 break-all leading-relaxed">{evt.blob_id || '—'}</p>
+                            <div className="flex items-center justify-between mb-1.5">
+                              <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Blob ID (SHA-256)</p>
+                              {evt.blob_id && (
+                                <button
+                                  onClick={e => { e.stopPropagation(); copyToClipboard(evt.blob_id, `bid-${evt.id}`); }}
+                                  className="text-[10px] px-2 py-0.5 rounded-lg bg-gray-700 text-gray-400 hover:text-white hover:bg-gray-600 transition-colors font-mono"
+                                >
+                                  {copied === `bid-${evt.id}` ? '✓ Copied' : 'Copy'}
+                                </button>
+                              )}
+                            </div>
+                            <p className="text-xs font-mono text-cyan-300 break-all leading-relaxed">{evt.blob_id || '—'}</p>
+                            <p className="text-[10px] text-gray-600 mt-1.5">
+                              Deterministic SHA-256 of event payload — independently recomputable.
+                            </p>
                           </div>
                           <div className="bg-gray-800/60 rounded-xl p-3.5">
-                            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-1.5">DA Submit Tx Hash</p>
-                            <p className="text-xs font-mono text-cyan-300 break-all leading-relaxed">{evt.da_tx_hash || '(not yet anchored)'}</p>
+                            <div className="flex items-center justify-between mb-1.5">
+                              <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">DA Submit Tx Hash</p>
+                              {evt.da_tx_hash && (
+                                <button
+                                  onClick={e => { e.stopPropagation(); copyToClipboard(evt.da_tx_hash!, `dah-${evt.id}`); }}
+                                  className="text-[10px] px-2 py-0.5 rounded-lg bg-gray-700 text-gray-400 hover:text-white hover:bg-gray-600 transition-colors font-mono"
+                                >
+                                  {copied === `dah-${evt.id}` ? '✓ Copied' : 'Copy'}
+                                </button>
+                              )}
+                            </div>
+                            <p className="text-xs font-mono text-cyan-300 break-all leading-relaxed">
+                              {evt.da_tx_hash || '(pending — DA node confirming)'}
+                            </p>
+                            {evt.da_tx_hash && (
+                              <a
+                                href={`https://scan-testnet.0g.ai/tx/${evt.da_tx_hash}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={e => e.stopPropagation()}
+                                className="inline-flex items-center gap-1 text-[10px] text-cyan-400 hover:text-cyan-300 hover:underline mt-1.5 transition-colors"
+                              >
+                                View on 0G Explorer
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                </svg>
+                              </a>
+                            )}
                           </div>
                           {route && (
                             <div className="bg-gray-800/60 rounded-xl p-3.5">

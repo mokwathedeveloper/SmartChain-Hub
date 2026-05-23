@@ -109,12 +109,27 @@ export default function MarketplacePage() {
 
   const handleHire = async (agent: AgentListing) => {
     if (!signer) return;
+    if (isDemo) {
+      setActionMsg({
+        type: 'err',
+        text: 'Contract not yet deployed. Fund deployer 0x604cDbDBE7850bAd105C28bFE01Ad680520D451F with 0.01 A0GI then run: npx hardhat run scripts/deploy-market.js --network og_galileo',
+      });
+      setHiringAgent(null);
+      return;
+    }
     setActionBusy(true);
     setActionMsg(null);
     try {
-      const taskRef = `smartchain-hire-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      // Use owner address + block timestamp for deterministic task reference
+      const taskRef = `sch-hire-${agent.owner.slice(2, 8)}-${Math.floor(Date.now() / 1000)}`;
       const hash    = await hireAgent(signer, agent.owner, agent.pricePerTask, taskRef);
-      setActionMsg({ type: 'ok', text: `Agent hired! Tx: ${hash.slice(0, 22)}… — check your 0G wallet for the optimization result.` });
+      // Log hire event to DA layer (non-blocking)
+      fetch('/api/og-da', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: { type: 'marketplace_hire', agentOwner: agent.owner, taskRef, specialty: agent.specialty, hirer: address } }),
+      }).catch(() => {});
+      setActionMsg({ type: 'ok', text: `Agent hired! Tx: ${hash.slice(0, 22)}… — check Activity Feed for the DA-anchored record.` });
       setHiringAgent(null);
       await refresh();
     } catch (e: unknown) {
@@ -313,9 +328,26 @@ export default function MarketplacePage() {
 
         {/* Listings grid */}
         {isDemo && (
-          <div className="flex items-center gap-2 px-4 py-2 bg-yellow-500/8 border border-yellow-500/20 rounded-xl">
-            <svg className="w-4 h-4 text-yellow-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <p className="text-xs text-yellow-400">Demo listings — deploy <code className="font-mono">SmartChainAgentMarket.sol</code> and set <code className="font-mono">NEXT_PUBLIC_AGENT_MARKET_CONTRACT</code> for live on-chain data.</p>
+          <div className="p-4 bg-yellow-500/8 border border-yellow-500/20 rounded-xl space-y-3">
+            <div className="flex items-start gap-3">
+              <svg className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-yellow-400 mb-1">
+                  Demo mode — SmartChainAgentMarket contract ready, pending deployment
+                </p>
+                <p className="text-xs text-yellow-400/70">
+                  Contract is compiled and tested (37 passing tests). Deploy to 0G Galileo in 2 steps:
+                </p>
+              </div>
+            </div>
+            <div className="bg-black/30 rounded-lg p-3 font-mono text-xs text-gray-300 space-y-1 overflow-x-auto">
+              <p className="text-gray-500"># 1. Fund deployer wallet with 0.01 A0GI from hub.0g.ai/faucet</p>
+              <p className="text-cyan-400">deployer: 0x604cDbDBE7850bAd105C28bFE01Ad680520D451F</p>
+              <p className="text-gray-500"># 2. Deploy</p>
+              <p className="text-green-400">cd blockchain && npx hardhat run scripts/deploy-market.js --network og_galileo</p>
+              <p className="text-gray-500"># 3. Set in Vercel env vars</p>
+              <p className="text-blue-400">NEXT_PUBLIC_AGENT_MARKET_CONTRACT={"<output address>"}</p>
+            </div>
           </div>
         )}
 

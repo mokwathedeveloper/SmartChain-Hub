@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/utils/supabase";
 import type { User } from "@supabase/supabase-js";
 
@@ -104,6 +104,313 @@ const features = [
   },
 ];
 
+// ── Guided Demo Modal ──────────────────────────────────────────────────────
+const DEMO_STEPS = [
+  {
+    id: 'agent-id',
+    label: 'Mint Agent ID',
+    badge: '0G Chain',
+    badgeColor: 'bg-blue-500/20 text-blue-300 border border-blue-500/30',
+    icon: (
+      <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+      </svg>
+    ),
+    title: 'Soulbound Agent ID Minted',
+    description: 'A non-transferable NFT is created on 0G Chain. Your agent\'s reputation, model hash, and memory root are permanently recorded.',
+    detail: (
+      <div className="space-y-2 mt-4">
+        <div className="bg-black/40 rounded-xl p-4 border border-white/5 font-mono text-xs space-y-2">
+          <div className="flex justify-between"><span className="text-gray-500">Agent ID</span><span className="text-blue-300">#0042</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Status</span><span className="text-green-400">✓ Soulbound</span></div>
+          <div className="flex justify-between gap-4"><span className="text-gray-500 shrink-0">Model Hash</span><span className="text-gray-300 truncate">0x9d8c7b6a5f4e3d2c…</span></div>
+          <div className="flex justify-between gap-4"><span className="text-gray-500 shrink-0">Memory Root</span><span className="text-gray-300 truncate">0x7f3a9b2c1d4e5f6a…</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">TX</span><span className="text-cyan-400">0x4a7f…3e01 ✓</span></div>
+        </div>
+      </div>
+    ),
+    href: '/dashboard',
+    hrefLabel: 'Go to Dashboard →',
+  },
+  {
+    id: 'optimize',
+    label: 'AI Optimization',
+    badge: '0G Compute TEE',
+    badgeColor: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
+    icon: (
+      <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+      </svg>
+    ),
+    title: 'Transaction Optimized Inside TEE',
+    description: 'LLaMA 3.1 8B runs inside an SGX Trusted Execution Environment on 0G Compute. The result is cryptographically signed — not just a heuristic.',
+    detail: (
+      <div className="space-y-2 mt-4">
+        <div className="bg-black/40 rounded-xl p-4 border border-white/5 font-mono text-xs space-y-2">
+          <div className="flex justify-between"><span className="text-gray-500">Input Amount</span><span className="text-white">$10,000.00</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Priority</span><span className="text-purple-300">Efficiency</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Estimated Fee</span><span className="text-white">$50.00</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Savings</span><span className="text-green-400">$30.00</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Route</span><span className="text-cyan-300">0G Flash Route v2</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Confidence</span><span className="text-yellow-300">91.2%</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Engine</span><span className="text-purple-300">TeeML / LLaMA 3.1 8B</span></div>
+        </div>
+        <div className="flex items-center gap-2 px-3 py-2 bg-purple-500/10 border border-purple-500/20 rounded-xl">
+          <svg className="w-3.5 h-3.5 text-purple-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <p className="text-xs text-purple-300"><span className="font-semibold">✓ TEE Verified</span> — inference ran inside SGX on 0G Compute</p>
+        </div>
+      </div>
+    ),
+    href: '/transactions?demo=true',
+    hrefLabel: 'Try Optimizer →',
+  },
+  {
+    id: 'zk-proof',
+    label: 'ZK Proof',
+    badge: '0G Chain',
+    badgeColor: 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30',
+    icon: (
+      <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+      </svg>
+    ),
+    title: 'ZK Commitment Anchored On-Chain',
+    description: 'A SHA-256 commitment of the TEE result is recorded on 0G Chain — anyone can verify the proof without re-running the model.',
+    detail: (
+      <div className="space-y-2 mt-4">
+        <div className="bg-black/40 rounded-xl p-4 border border-white/5 font-mono text-xs space-y-2">
+          <div className="flex justify-between gap-4"><span className="text-gray-500 shrink-0">ZK Hash</span><span className="text-cyan-300 truncate">SHA-256:a3f7c9…1d2e</span></div>
+          <div className="flex justify-between gap-4"><span className="text-gray-500 shrink-0">Proof Root</span><span className="text-gray-300 truncate">0xb2c4d6e8f0a1…bc3d</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">TEE Provider</span><span className="text-blue-300">0g-compute-sg-01</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Block</span><span className="text-white">#8,204,193</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Verified</span><span className="text-green-400">✓ On-Chain</span></div>
+        </div>
+      </div>
+    ),
+    href: '/proof',
+    hrefLabel: 'View Proof Page →',
+  },
+  {
+    id: 'da-anchor',
+    label: 'DA Activity Feed',
+    badge: '0G DA Layer',
+    badgeColor: 'bg-green-500/20 text-green-300 border border-green-500/30',
+    icon: (
+      <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+      </svg>
+    ),
+    title: 'Blob Anchored on 0G DA Layer',
+    description: 'Transaction metadata is uploaded to 0G Storage Log and the blob root is submitted to the 0G DA Disperser — permanent, sharded, and retrievable.',
+    detail: (
+      <div className="space-y-2 mt-4">
+        <div className="bg-black/40 rounded-xl p-4 border border-white/5 font-mono text-xs space-y-2">
+          <div className="flex justify-between gap-4"><span className="text-gray-500 shrink-0">Blob ID</span><span className="text-green-300 truncate">a3f7c9b2…1d2e4f5a</span></div>
+          <div className="flex justify-between gap-4"><span className="text-gray-500 shrink-0">Storage Root</span><span className="text-gray-300 truncate">0xc1d2e3f4…7a8b</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">DA Node</span><span className="text-blue-300">da-rpc-testnet.0g.ai</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Shards</span><span className="text-white">16 / 16 ✓</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Status</span><span className="text-green-400">✓ Dispersed</span></div>
+        </div>
+      </div>
+    ),
+    href: '/activity',
+    hrefLabel: 'View Activity Feed →',
+  },
+  {
+    id: 'revenue',
+    label: 'Revenue Share',
+    badge: '0G Chain',
+    badgeColor: 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30',
+    icon: (
+      <svg className="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    ),
+    title: 'Revenue Distributed to Stakers',
+    description: '10% of every fee is distributed proportionally to stakers via SmartChainRevenue.sol. Stake A0GI, earn 5% APY plus a share of all platform activity.',
+    detail: (
+      <div className="space-y-2 mt-4">
+        <div className="bg-black/40 rounded-xl p-4 border border-white/5 font-mono text-xs space-y-2">
+          <div className="flex justify-between"><span className="text-gray-500">Platform Fee</span><span className="text-white">$50.00</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Revenue Pool (10%)</span><span className="text-yellow-300">$5.00</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Your Stake Share</span><span className="text-white">33.3%</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Your Earnings</span><span className="text-green-400">+$1.67 A0GI</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">APY</span><span className="text-yellow-300">5.0%</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">Contract</span><span className="text-cyan-400">Revenue.sol ✓</span></div>
+        </div>
+      </div>
+    ),
+    href: '/revenue',
+    hrefLabel: 'View Revenue →',
+  },
+];
+
+function GuidedDemoModal({ onClose }: { onClose: () => void }) {
+  const [step, setStep] = useState(0);
+  const [animating, setAnimating] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const goTo = (next: number) => {
+    if (animating) return;
+    setAnimating(true);
+    setTimeout(() => {
+      setStep(next);
+      setAnimating(false);
+    }, 200);
+  };
+
+  const advance = () => {
+    if (step < DEMO_STEPS.length - 1) goTo(step + 1);
+  };
+  const back = () => {
+    if (step > 0) goTo(step - 1);
+  };
+
+  // Auto-advance every 6 seconds
+  useEffect(() => {
+    timerRef.current = setTimeout(() => {
+      if (step < DEMO_STEPS.length - 1) advance();
+    }, 6000);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
+  // Close on Escape
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  const current = DEMO_STEPS[step];
+  const isLast = step === DEMO_STEPS.length - 1;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+
+      {/* Panel */}
+      <div className="relative w-full max-w-lg bg-gray-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
+        {/* Top accent */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 pt-5 pb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black text-gray-500 uppercase tracking-widest">Guided Tour</span>
+            <span className="text-xs text-gray-700">·</span>
+            <span className="text-xs text-gray-500">{step + 1} / {DEMO_STEPS.length}</span>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors text-sm"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Progress bar */}
+        <div className="px-6 mb-5">
+          <div className="flex gap-1.5">
+            {DEMO_STEPS.map((s, i) => (
+              <button
+                key={s.id}
+                onClick={() => goTo(i)}
+                className={`h-1 rounded-full transition-all duration-300 flex-1 ${
+                  i < step ? 'bg-blue-500' : i === step ? 'bg-blue-400' : 'bg-white/10'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Step indicator pills */}
+        <div className="px-6 mb-5 flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+          {DEMO_STEPS.map((s, i) => (
+            <button
+              key={s.id}
+              onClick={() => goTo(i)}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold whitespace-nowrap shrink-0 transition-all border ${
+                i === step
+                  ? 'bg-blue-600 text-white border-blue-500'
+                  : i < step
+                  ? 'bg-blue-500/15 text-blue-400 border-blue-500/20'
+                  : 'bg-white/5 text-gray-500 border-white/10'
+              }`}
+            >
+              {i < step ? '✓ ' : ''}{s.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Content */}
+        <div
+          className="px-6 pb-2 transition-opacity duration-200"
+          style={{ opacity: animating ? 0 : 1 }}
+        >
+          <div className="flex items-start gap-3 mb-3">
+            <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+              {current.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${current.badgeColor}`}>{current.badge}</span>
+              </div>
+              <h3 className="text-white font-bold text-base leading-snug">{current.title}</h3>
+            </div>
+          </div>
+
+          <p className="text-sm text-gray-400 leading-relaxed mb-1">{current.description}</p>
+
+          {current.detail}
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-5 flex items-center justify-between gap-3 border-t border-white/5 mt-4">
+          <button
+            onClick={back}
+            disabled={step === 0}
+            className="px-4 py-2 text-xs font-semibold text-gray-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            ← Back
+          </button>
+
+          <div className="flex items-center gap-2">
+            <Link
+              href={current.href}
+              onClick={onClose}
+              className="px-4 py-2 text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              {current.hrefLabel}
+            </Link>
+
+            {!isLast ? (
+              <button
+                onClick={advance}
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all shadow-lg shadow-blue-600/20"
+              >
+                Next →
+              </button>
+            ) : (
+              <Link
+                href="/transactions?demo=true"
+                onClick={onClose}
+                className="px-5 py-2 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white font-bold text-xs rounded-xl transition-all shadow-lg shadow-violet-600/20"
+              >
+                Try It Live →
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const steps = [
   {
     n: "01",
@@ -159,6 +466,7 @@ export default function Home() {
   const router = useRouter();
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   const [liveStats, setLiveStats] = useState<LiveStats | null>(null);
+  const [showDemo, setShowDemo] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -183,6 +491,8 @@ export default function Home() {
         <title>SmartChain Hub | Sovereign AI Agents on 0G</title>
         <meta name="description" content="Decentralized AI commerce platform with soulbound Agent ID, TEE-verified inference, and persistent memory on 0G." />
       </Head>
+
+      {showDemo && <GuidedDemoModal onClose={() => setShowDemo(false)} />}
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
       <section className="relative bg-gray-950 overflow-hidden">
@@ -224,13 +534,15 @@ export default function Home() {
                     </svg>
                     Go to Dashboard
                   </Link>
-                  <Link href="/transactions"
+                  <button
+                    onClick={() => setShowDemo(true)}
                     className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold rounded-xl transition-all text-sm hover:-translate-y-0.5">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    AI Optimizer
-                  </Link>
+                    Guided Tour
+                  </button>
                 </div>
               ) : (
                 /* ── Guest CTA ── */
@@ -242,13 +554,15 @@ export default function Home() {
                     </svg>
                     Try Demo — No Wallet Needed
                   </Link>
-                  <Link href="/signup"
+                  <button
+                    onClick={() => setShowDemo(true)}
                     className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold rounded-xl transition-all text-sm hover:-translate-y-0.5">
-                    Create Account
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                    <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                  </Link>
+                    Guided Tour
+                  </button>
                 </div>
               )}
               <p className="text-xs text-gray-600 mt-2">
